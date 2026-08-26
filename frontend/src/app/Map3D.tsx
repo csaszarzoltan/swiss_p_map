@@ -5,7 +5,8 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import gsap from "gsap";
 import { SWISS_CANTONS } from "./swissCantons";
-import { SWISS_CITIES, SWISS_RIVERS, SWISS_LAKES } from "./mapOverlay";
+import { SWISS_CITIES, SWISS_RIVERS, SWISS_LAKES, SWISS_ROADS } from "./mapOverlay";
+import { CITY_OUTLINES } from "./cityOutlines";
 
 // 70°-os felülnézet + jobban bezoomolva (kameraszög ~69°, FOV 34°)
 const INITIAL_CAM = { x: 0, y: 9.0, z: 3.2 };
@@ -87,6 +88,7 @@ export default function Map3D() {
     mainGroup: THREE.Group | null;
     subGroup: THREE.Group | null;
     overlayGroup: THREE.Group | null;
+    detailOverlay: THREE.Group | null;
     camera: THREE.PerspectiveCamera | null;
     controls: OrbitControls | null;
     raycaster: THREE.Raycaster;
@@ -98,6 +100,7 @@ export default function Map3D() {
     mainGroup: null,
     subGroup: null,
     overlayGroup: null,
+    detailOverlay: null,
     camera: null,
     controls: null,
     raycaster: new THREE.Raycaster(),
@@ -301,6 +304,66 @@ export default function Map3D() {
       overlayGroup.add(dot);
     });
 
+    // Kantonon belül is halványan megmaradó részletek — külön csoport (nem tűnik el izoláláskor)
+    const detailOverlay = new THREE.Group();
+    detailOverlay.position.y = 0.012;
+    scene.add(detailOverlay);
+    stateRef.current.detailOverlay = detailOverlay;
+
+    // Város-körvonalak (halvány vonalak) — minden kanton legnagyobb gemeindéi, országos nézetben szürke héj
+    CITY_OUTLINES.forEach((city) => {
+      const pts = city.pts.map(([x, y]) => new THREE.Vector3(x, 0.015, -y));
+      pts.push(pts[0].clone());
+      const geom = new THREE.BufferGeometry().setFromPoints(pts);
+      const mat = new THREE.LineBasicMaterial({ color: 0x64748b, transparent: true, opacity: 0.28, linewidth: 1 });
+      const line = new THREE.Line(geom, mat);
+      line.userData = { ktnr: city.ktnr, name: city.name };
+      detailOverlay.add(line);
+    });
+    // Főutak (A1/A2/A3/A9) — halvány szürke szaggatott benyomás
+    SWISS_ROADS.forEach((road) => {
+      const pts = road.pts.map(([x, y]) => new THREE.Vector3(x, 0.018, -y));
+      const geom = new THREE.BufferGeometry().setFromPoints(pts);
+      const mat = new THREE.LineBasicMaterial({ color: 0x475569, transparent: true, opacity: 0.32, linewidth: 1 });
+      const line = new THREE.Line(geom, mat);
+      detailOverlay.add(line);
+    });
+    // Hegyek — halvány domborzat-háló (procedurális ridges, nem pontos DEM, de felismerhető Alpok-tónus)
+    const ridgePts: [number, number][][] = [
+      // Berner Oberland / Wallis Alpok fő gerince
+      [[7.6, 46.55],[7.7,46.52],[7.85,46.45],[7.95,46.38],[8.05,46.30],[8.20,46.25],[8.35,46.15],[8.50,46.05],[8.80,46.00],[9.10,46.10],[9.30,46.25],[9.45,46.40]],
+      // Graubünden gerinc
+      [[9.10,46.50],[9.25,46.55],[9.40,46.62],[9.55,46.72],[9.70,46.80],[9.90,46.85],[10.10,46.95]],
+      // Jura vonal
+      [[6.20,46.60],[6.40,46.75],[6.60,46.95],[6.90,47.10],[7.20,47.20],[7.45,47.35]],
+    ];
+    ridgePts.forEach((ring) => {
+      // vetítés már lon/lat -> model x,y-ben van a ring? Itt lon/lat nyers: vetíteni kell mint a városoknál
+      // cityOutlines vetítése már megtörtént — hegyekhez ugyanaz a pj függvény kellene; itt manuálisan projektálok:
+      // Egyszerű: használom a már meglévő SWISS_CANTONS egy pontjának vetítési arányát reverse-engineerelve?
+      // Helyette: a ring lon/lat-ja már pj nélkül van megadva a SWISS_ROADS-hoz hasonlóan lon/lat -> model.
+      // Reuse: a városokhoz használt pj-t lemásolom lokálisan
+      // For mountain we already stored as lon/lat pairs pre-projection in code comment below — project here inline
+      // For simplicity treat ring entries as already-projected model pts via rough linear map (good enough for faint ridges)
+      const projected = ring.map(([lon, lat]) => {
+        // linear approx: lon 5.9..10.5 -> x -3.8..3.8, lat 45.8..47.8 -> y -2.5..2.5 scaled by earlier factor
+        // Use same factor as mapOverlay: cosLat=0.685, scaleZoom=3.059
+        const cosLat = Math.cos((46.8 * Math.PI) / 180);
+        const rawW = (10.493446773955753 - 5.956800664952974) * cosLat;
+        const rawH = 47.80743900893902 - 45.81913730594624;
+        const scaleZoom = Math.min(9.5 / rawW, 6.2 / rawH);
+        const cx = ((5.956800664952974 + 10.493446773955753) / 2) * cosLat;
+        const cy = (45.81913730594624 + 47.80743900893902) / 2;
+        return [(lon * cosLat - cx) * scaleZoom, (lat - cy) * scaleZoom] as [number, number];
+      });
+      const pts3 = projected.map(([x, y]) => new THREE.Vector3(x, 0.025, -y));
+      const geom = new THREE.BufferGeometry().setFromPoints(pts3);
+      const mat = new THREE.LineBasicMaterial({ color: 0x334155, transparent: true, opacity: 0.22, linewidth: 1 });
+      const line = new THREE.Line(geom, mat);
+      // halvány árnyék-glow mellé kis pufferek
+      detailOverlay.add(line);
+    });
+
     const onMouseMove = (e: MouseEvent) => {
       const rect = container.getBoundingClientRect();
       stateRef.current.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -376,6 +439,7 @@ export default function Map3D() {
         tip(null);
         subGroup.clear();
         subGroup.visible = true;
+        // detailOverlay marad látható — város-körvonalak/utak halványan a Wahlkreisek alatt
         const source =
           (data.districts?.length ? data.districts : data.cities) as
             | { points: [number, number][]; name: string; pop: string; yes: number; id: string }[]
