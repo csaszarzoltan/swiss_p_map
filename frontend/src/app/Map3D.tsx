@@ -8,8 +8,9 @@ import { SWISS_CANTONS } from "./swissCantons";
 
 // A svájc_3d_terkep.html logikájának vanilla→React portja — ADR-003
 
-const INITIAL_CAM = { x: 0, y: 9.5, z: 16.5 };
-const INITIAL_TARGET = { x: 0, y: 0, z: -0.2 };
+// Jobban bezoomolva induláskor: közelebb & alacsonyabb FOV, szebb fény és kontraszt
+const INITIAL_CAM = { x: 0, y: 6.2, z: 10.2 };
+const INITIAL_TARGET = { x: 0, y: 0, z: -0.15 };
 
 const BASE_GLASS = { color: 0x1e293b, opacity: 0.42 };
 const BASE_EDGE = 0x64748b;
@@ -193,7 +194,7 @@ export default function Map3D() {
 
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x030712, 0.025);
-    const camera = new THREE.PerspectiveCamera(42, container.clientWidth / container.clientHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(36, container.clientWidth / container.clientHeight, 0.1, 1000);
     camera.position.set(INITIAL_CAM.x, INITIAL_CAM.y, INITIAL_CAM.z);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
@@ -207,17 +208,26 @@ export default function Map3D() {
     controls.dampingFactor = 0.05;
     controls.target.set(INITIAL_TARGET.x, INITIAL_TARGET.y, INITIAL_TARGET.z);
     controls.maxPolarAngle = Math.PI / 2.05;
+    controls.minDistance = 2.5;
+    controls.maxDistance = 28;
+    controls.enablePan = true;
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.65));
-    const dl1 = new THREE.DirectionalLight(0xffffff, 0.9);
-    dl1.position.set(10, 20, 15);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    const dl1 = new THREE.DirectionalLight(0xffffff, 1.05);
+    dl1.position.set(10, 22, 14);
     dl1.castShadow = true;
+    dl1.shadow.mapSize.set(2048, 2048);
     scene.add(dl1);
-    const dl2 = new THREE.DirectionalLight(0x38bdf8, 0.4);
-    dl2.position.set(-15, 10, -10);
+    const dl2 = new THREE.DirectionalLight(0x38bdf8, 0.5);
+    dl2.position.set(-14, 12, -10);
     scene.add(dl2);
+    const fill = new THREE.DirectionalLight(0x94a3b8, 0.35);
+    fill.position.set(0, 8, -12);
+    scene.add(fill);
     const grid = new THREE.GridHelper(36, 36, 0x1e293b, 0x0f172a);
-    grid.position.y = -0.05;
+    grid.position.y = -0.07;
+    grid.material.opacity = 0.55;
+    (grid.material as THREE.LineBasicMaterial).transparent = true;
     scene.add(grid);
 
     const mainGroup = new THREE.Group();
