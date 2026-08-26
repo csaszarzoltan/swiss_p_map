@@ -10,6 +10,7 @@ Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Ch
 - Competitor scan: `docs/competitor/2026-W35-scan.md` (Houzy Pro, smartconext)
 - Scaffold: `pyproject.toml`, `requirements.txt`, `tests/unit/test_geo_converter.py`, `tests/conftest.py`
 - CI: `.github/workflows/ci.yml`
+- Phase 1 backend: `src/models/{geo,place,politics}.py`, `src/services/{geo_converter,swisstopo,politics,place}_service.py`, `src/main.py` (FastAPI: /health, /api/v1/geo/convert, /api/v1/politics/representatives, /api/v1/place/{postcode}), `tests/e2e/test_core_e2e.py` — 19 passed
 
 ### Changed
 - Lean módszertan: `.agent-pipeline/` kivezetve, kanban+ADR+research marad (commit `0bb2cec`)

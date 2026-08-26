@@ -5,19 +5,19 @@
 ## Áttekintés
 
 A **Swiss P Map** egyesíti a svájci nyílt kormányzati adatokat (**Open Government Data - OGD**):
-- **Politics (MVP Fázis 1):** Választókerületi képviselők (*Gemeinderat / Kantonsrat / Nationalrat*), parlamenti indítványok (*Vorstösse*), lobbi-összeférhetetlenségek (*Lobbywatch*), helyi szavazások (*Abstimmungen*).
-- **Place & Property (MVP Fázis 1):** Községi adókulcs (*Gemeindesteuerfuss*), zajterhelési térkép (*sonBASE*), tömegközlekedési minőség (*ÖV-Güteklassen*), épületregiszter (*GWR*).
-- **Planning (Fázis 2):** Áramló 20 napos építési engedélykérelmek (*Amtsblattportal / eAuflageZH*), fellebbezési visszaszámláló (*Einsprachefrist*) és zónabesorolás (*ÖREB*).
+- **Politics (MVP Fázis 1 — kész):** Választókerületi képviselők (*Wahlkreis*), `GET /api/v1/politics/representatives?postcode=8004`
+- **Place & Property (MVP Fázis 1 — kész):** Adókulcs, zaj, ÖV-Güteklassen, `GET /api/v1/place/{postcode}`
+- **Geo (kész):** LV95 ↔ WGS84 konverzió, Swisstopo search, `GET /api/v1/geo/convert?easting=&northing=`
+- **Planning (Fázis 2):** Áramló 20 napos építési kérelmek (*Amtsblattportal / eAuflageZH*), *ÖREB* zónák
 
 ---
 
 ## Architektúra & Stack (ADR-001)
 
-- **Frontend:** Next.js (React / TypeScript / Tailwind CSS) + **MapLibre GL JS** (hardveresen gyorsított WebGL vektoros térképkliens, 60fps)
-- **Térképréteg:** Hivatalos **Swisstopo Vector Tiles** (`vectortiles.geo.admin.ch`)
-- **Backend & Geodata ETL:** Python 3.11+ (FastAPI, PyProj, Shapely a svájci LV95 $\leftrightarrow$ WGS84 konverzióhoz)
-- **Adattár:** PostgreSQL + PostGIS (térbeli indexeléshez és sugaras lekérdezésekhez)
-- **AI Réteg:** Claude / Gemini API a képviselői indítványok és helyi ügyek közérthető lakossági összefoglalására (DE, FR, IT, EN)
+- **Backend:** Python 3.11+ (FastAPI, Pydantic, PyProj, Shapely)
+- **Adattár (tervezett):** PostgreSQL + PostGIS
+- **Frontend (tervezett):** Next.js + MapLibre GL JS (Swisstopo Vector Tiles)
+- **AI Réteg (tervezett):** Claude / Gemini — képviselői indítványok közérthető összefoglalója
 
 ---
 
@@ -25,17 +25,21 @@ A **Swiss P Map** egyesíti a svájci nyílt kormányzati adatokat (**Open Gover
 
 ```
 swiss_p_map/
-├── docs/
-│   ├── decisions/            # ADR-döntések (ADR-000-template.md)
-│   ├── research/             # Kutatások (kickoff + scout)
-│   └── competitor/           # Heti versenytárs-scout jegyzetek
-├── tests/                    # Tesztek (keretrendszer: amit az ADR-001 választ)
+├── src/
+│   ├── main.py                 # FastAPI app
+│   ├── models/geo.py|place.py|politics.py
+│   └── services/geo_converter.py|swisstopo_service.py|politics_service.py|place_service.py
+├── tests/
 │   ├── conftest.py
-│   └── unit/
-├── .github/workflows/ci.yml  # GitHub Actions (az ADR-001 után)
-├── AGENTS.md                 # Agent belépési szabályok
-├── METHODOLOGY.md            # Kódolási és minőségi irányelvek
-└── pyproject.toml            # Projekt & teszt konfiguráció (ADR-001 után)
+│   ├── unit/test_geo_converter.py|test_domain_models.py|test_swisstopo_service.py
+│   └── e2e/test_core_e2e.py
+├── docs/
+│   ├── decisions/ADR-001-stack-and-architecture.md
+│   ├── research/2026-08-26-kickoff.md
+│   └── competitor/2026-W35-scan.md
+├── .github/workflows/ci.yml
+├── AGENTS.md / METHODOLOGY.md / workflows/principles.md
+└── pyproject.toml
 ```
 
 > Nincs `.agent-pipeline/` — a lean módszertan kanban boardon + ADR-en + research-ön alapul. A pipeline (`01_requirements`→`02_specs`→`06_e2e_discovery`) csak 20+ feature-nél / audit-igénynél kell; akkor hozd vissza külön.
@@ -45,9 +49,17 @@ swiss_p_map/
 ## Fejlesztés és Tesztelés
 
 ```bash
-# Függőségek telepítése
 pip install -r requirements.txt
+pytest -v          # 19 passed (unit + e2e)
+mypy src tests --ignore-missing-imports
+ruff check src tests
 
-# Tesztek futtatása (pytest)
-pytest -v
+# API lokálisan
+uvicorn src.main:app --reload --port 8000
+# → http://127.0.0.1:8000/docs  (Swagger)
+# → http://127.0.0.1:8000/health
 ```
+
+## Kanban
+
+Board: `swiss-p-map` (`hermes kanban --board swiss-p-map ls`) — 4 task done (geo models, swisstopo, politics+place+API).
