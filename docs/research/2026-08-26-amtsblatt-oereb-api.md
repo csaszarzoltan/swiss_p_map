@@ -66,3 +66,10 @@ Base URL: `https://amtsblattportal.ch/api/v1/publications/xml`
 - https://geolion.zh.ch/geodatenservice/2029 (ZH ÖREB WFS)
 
 → Javaslat az ADR-002-be: **ADR-002-data-ingestion-pipeline.md**
+
+## Független újravalidáció (2026-08-26, 2. futás — friss curl-bizonyítékok)
+
+- Heti lista (`BP-ZH`+`BP-ZH01`, `2026-08-20→08-26`) újrahívva: `<total>120</total>` ✅ (~17/nap megerősítve).
+- `/json` **lista** → HTTP 404 `PUBLICATION.EXCEPTION.NOT.FOUND`; `/json` **single** → HTTP 404. Az XML-only kontraktum újra igazolva.
+- Élő single publikáció (Uster, `c1f797ae-…`): minden állított mező jelen (`registrationOffice.swissZipCode/town/municipalityId`, `publicationDate=2026-08-26`, `expirationDate=2027-08-26` = +1 év, `legalRemedy` Auflage-szöveggel); **nincs koordináta**, cím a `title.de`-ben („Seefeldstrasse 6, Assek. Nr. 7325, Uster").
+- ⚠️ Új megfigyelés — **schema-verzió drift**: a dok oldal „latest PROD 1.24"-et mond, az élő XML `xsi:schemaLocation` viszont `…/schemas/kabzh/1.26/BP-ZH01-export.xsd`-re mutat. A névtér verziózott → a parser legyen **verzió-toleráns** (ne a verziószámra, hanem a helyi nevekre szűrjön).
