@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+node_modules/
+dist/
+build/
+.venv/
+*.db
+.agent-pipeline/06_e2e_discovery/evidence/
