@@ -47,9 +47,10 @@ async function getJson<T>(path: string): Promise<T> {
 }
 
 export const api = {
-  place: (postcode: string) => getJson<PlaceInfo>(`/api/v1/place/${postcode}`),
-  politics: (postcode: string) =>
-    getJson<DistrictRepresentatives>(`/api/v1/politics/representatives?postcode=${postcode}`),
+  place: (postcode: string, live = true) =>
+    getJson<PlaceInfo>(`/api/v1/place/${postcode}${live ? "?live=true" : ""}`),
+  politics: (postcode: string, live = true) =>
+    getJson<DistrictRepresentatives>(`/api/v1/politics/representatives?postcode=${postcode}${live ? "&live=true" : ""}`),
   planning: (postcode?: string, activeOnly = true) =>
     getJson<{ items: Baugesuch[] }>(
       `/api/v1/planning/baugesuche?${new URLSearchParams({
