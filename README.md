@@ -1,23 +1,56 @@
 # Swiss P Map
 
-Új projekt — svájci P-térkép. Induló állapot: stratégiai dokumentumok + módszertan, kód még nincs.
+> **„A svájci környék egyetlen térképén”** — Integrált interaktív döntéstámogató térkép a helyi politika, életminőség és épített környezet metszetében.
 
-## Mi van most
-- `AGENTS.md` — agent context (bármelyik LLM olvassa)
-- `METHODOLOGY.md` — általános fejlesztési szabályok
-- `workflows/principles.md` — munkaelvek, szerepek
-- `docs/decisions/ADR-000-template.md` — döntés-sablon
-- `docs/research/`, `docs/competitor/` — kutatási keret
+## Áttekintés
 
-## Következő lépések (javasolt sorrend)
-1. **Kickoff research** → `docs/research/YYYY-MM-DD-kickoff.md`: mit is építünk pontosan? 3 opció comparison table-lel (pl. web app / mobil / API-first)
-2. **ADR-001** → stack + architektúra döntés (1 oldal)
-3. Scaffold a döntés alapján (tests + src keret)
-4. CI (GitHub Actions) az ADR-ben választott tesztfuttatóval
-5. Heti scout cron + nightly teszt cron bekötése (Hermes cron, mint az AI_prod_engine-nél)
+A **Swiss P Map** egyesíti a svájci nyílt kormányzati adatokat (**Open Government Data - OGD**):
+- **Politics (MVP Fázis 1):** Választókerületi képviselők (*Gemeinderat / Kantonsrat / Nationalrat*), parlamenti indítványok (*Vorstösse*), lobbi-összeférhetetlenségek (*Lobbywatch*), helyi szavazások (*Abstimmungen*).
+- **Place & Property (MVP Fázis 1):** Községi adókulcs (*Gemeindesteuerfuss*), zajterhelési térkép (*sonBASE*), tömegközlekedési minőség (*ÖV-Güteklassen*), épületregiszter (*GWR*).
+- **Planning (Fázis 2):** Áramló 20 napos építési engedélykérelmek (*Amtsblattportal / eAuflageZH*), fellebbezési visszaszámláló (*Einsprachefrist*) és zónabesorolás (*ÖREB*).
 
-## Módszertan
-A módszertan LLM-független: bármelyik agent (Claude, GPT, Gemini, Hermes...) dolgozhat itt. Kötelező minimum: **dokumentálj** (`docs/research` + `docs/decisions`) és **tesztelj** mielőtt késznek mondod. Részletek: `workflows/principles.md`.
+---
 
-## Requirements
-Még nincs futtatási környezet — az ADR-001 dönt róla.
+## Architektúra & Stack (ADR-001)
+
+- **Frontend:** Next.js (React / TypeScript / Tailwind CSS) + **MapLibre GL JS** (hardveresen gyorsított WebGL vektoros térképkliens, 60fps)
+- **Térképréteg:** Hivatalos **Swisstopo Vector Tiles** (`vectortiles.geo.admin.ch`)
+- **Backend & Geodata ETL:** Python 3.11+ (FastAPI, PyProj, Shapely a svájci LV95 $\leftrightarrow$ WGS84 konverzióhoz)
+- **Adattár:** PostgreSQL + PostGIS (térbeli indexeléshez és sugaras lekérdezésekhez)
+- **AI Réteg:** Claude / Gemini API a képviselői indítványok és helyi ügyek közérthető lakossági összefoglalására (DE, FR, IT, EN)
+
+---
+
+## Mappastruktúra
+
+```
+swiss_p_map/
+├── .agent-pipeline/          # Agent vezérelt specifikációs és E2E pipeline
+│   ├── 00_index/manifest.json
+│   ├── 02_specs/pending/     # SPEC-001 részletes specifikáció
+│   └── 03_e2e_suites/        # Feketedobozos API/GUI E2E tesztek
+├── docs/
+│   ├── competitor/           # W35 heti versenytárs scout (Houzy, smartconext)
+│   ├── decisions/            # ADR-001 stack döntés
+│   └── research/             # Kickoff domain elemzés
+├── tests/                    # Unit és integrációs tesztcsomag
+│   ├── conftest.py
+│   ├── test_pipeline_manifest.py
+│   └── unit/
+├── .github/workflows/ci.yml  # GitHub Actions CI workflow
+├── AGENTS.md                 # Agent belépési szabályok
+├── METHODOLOGY.md            # Kódolási és minőségi irányelvek
+└── pyproject.toml            # Python projekt & teszt konfiguráció
+```
+
+---
+
+## Fejlesztés és Tesztelés
+
+```bash
+# Függőségek telepítése
+pip install -r requirements.txt
+
+# Tesztek futtatása (pytest)
+pytest -v
+```
