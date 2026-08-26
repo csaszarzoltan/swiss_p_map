@@ -7,4 +7,3 @@ dist/
 build/
 .venv/
 *.db
-.agent-pipeline/06_e2e_discovery/evidence/

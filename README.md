@@ -25,23 +25,20 @@ A **Swiss P Map** egyesíti a svájci nyílt kormányzati adatokat (**Open Gover
 
 ```
 swiss_p_map/
-├── .agent-pipeline/          # Agent vezérelt specifikációs és E2E pipeline
-│   ├── 00_index/manifest.json
-│   ├── 02_specs/pending/     # SPEC-001 részletes specifikáció
-│   └── 03_e2e_suites/        # Feketedobozos API/GUI E2E tesztek
 ├── docs/
-│   ├── competitor/           # W35 heti versenytárs scout (Houzy, smartconext)
-│   ├── decisions/            # ADR-001 stack döntés
-│   └── research/             # Kickoff domain elemzés
-├── tests/                    # Unit és integrációs tesztcsomag
+│   ├── decisions/            # ADR-döntések (ADR-000-template.md)
+│   ├── research/             # Kutatások (kickoff + scout)
+│   └── competitor/           # Heti versenytárs-scout jegyzetek
+├── tests/                    # Tesztek (keretrendszer: amit az ADR-001 választ)
 │   ├── conftest.py
-│   ├── test_pipeline_manifest.py
 │   └── unit/
-├── .github/workflows/ci.yml  # GitHub Actions CI workflow
+├── .github/workflows/ci.yml  # GitHub Actions (az ADR-001 után)
 ├── AGENTS.md                 # Agent belépési szabályok
 ├── METHODOLOGY.md            # Kódolási és minőségi irányelvek
-└── pyproject.toml            # Python projekt & teszt konfiguráció
+└── pyproject.toml            # Projekt & teszt konfiguráció (ADR-001 után)
 ```
+
+> Nincs `.agent-pipeline/` — a lean módszertan kanban boardon + ADR-en + research-ön alapul. A pipeline (`01_requirements`→`02_specs`→`06_e2e_discovery`) csak 20+ feature-nél / audit-igénynél kell; akkor hozd vissza külön.
 
 ---
 

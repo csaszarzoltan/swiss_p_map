@@ -6,7 +6,6 @@
 - Új unit teszt: `tests/unit/test_<modul_név>.py`
 - API/E2E teszt: `tests/e2e/test_<feature>_e2e.py` vagy `tests/test_<feature>.py`
 - Frontend: `control_plane/static/app.js` (view-k szerint szekcionálva), `index.html`, `styles.css`
-- Pipeline spec: `.agent-pipeline/02_specs/{pending,in_progress,done}/SPEC-XXX.md`
 
 ### Kódolási stílus
 - Python 3.11+ (type hints kötelező, `from __future__ import annotations`)
@@ -116,7 +115,7 @@ Példák:
 - `researcher` nem zárhat kártyát ADR nélkül: minden feature / nagyobb döntés → 1 `docs/decisions/ADR-NNN-{slug}.md` (max 1 oldal, template: `ADR-000-template.md`). `proposed → accepted` státusz, `docs/research/YYYY-MM-DD-*.md` linkkel.
 - `researcher` nyers anyag: `docs/research/YYYY-MM-DD-{tema}.md` (max 5 oldal, **comparison table kötelező** ha több opció). Kanban comment csak linket tesz: "Research kész: docs/research/... → jóváhagyásra vár" + `kanban_block(kind=needs_human)`.
 - Heti scout (cron): `docs/competitor/YYYY-Www-scan.md` (triage, BLOCKED emberi jóváhagyásig — ember nélkül nem indul dev).
-- Evidence TTL: `.agent-pipeline/06_e2e_discovery/evidence/RUN-*` 30 nap után törlődik (cron), `archive/` 90 nap után tömörítve. Monolit doc nem nőhet: `docs/API.md` új endpointja már `docs/api/<feature>.md`-be kerül.
+- Evidence TTL: képernyőképek / időszakos riportok (pl. screenshots, futtatási bizonyítékok) 30 nap után törlődnek; docs/archive 90 nap után tömörítve. Monolit doc nem nőhet: `docs/API.md` új endpointja már `docs/api/<feature>.md`-be kerül.
 
 ### README.md
 - Projekt leírás

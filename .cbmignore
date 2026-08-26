@@ -1,7 +1,3 @@
 
-# Konszolidáció 2026-08-25: evidence + archív kizárása indexből (20% kisebb gráf)
-.agent-pipeline/archive/
-.agent-pipeline/06_e2e_discovery/evidence/
-.agent-pipeline/06_e2e_discovery/generated-tests/
 docs/archive/
 docs/screenshots/
