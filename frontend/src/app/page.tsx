@@ -3,6 +3,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import SearchPanel from "./SearchPanel";
+import { coordFor } from "./postcode_coords";
 import type { DistrictRepresentatives, PlaceInfo } from "@/lib/api";
 
 const Map = dynamic(() => import("./Map"), { ssr: false });
@@ -15,6 +16,9 @@ interface Result {
 
 export default function Home() {
   const [result, setResult] = useState<Result | null>(null);
+  const lngLat: [number, number] | null = result?.place?.postcode
+    ? (coordFor(result.place.postcode) ?? null)
+    : null;
 
   return (
     <main className="mx-auto max-w-5xl p-6">
@@ -23,7 +27,7 @@ export default function Home() {
         „A svájci környék egyetlen térképén” — Zürich pilot (ADR-001)
       </p>
 
-      <Map />
+      <Map lngLat={lngLat} />
 
       <SearchPanel onResult={setResult} />
 
