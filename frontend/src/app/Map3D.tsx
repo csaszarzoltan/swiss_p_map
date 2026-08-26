@@ -124,7 +124,8 @@ export default function Map3D() {
 
   const applyHover = (mesh: THREE.Mesh) => {
     document.body.style.cursor = "pointer";
-    gsap.to(mesh.position, { y: (mesh.userData.baseY as number) + 0.65, duration: 0.28, ease: "power2.out" });
+    const baseY = mesh.userData.baseY as number;
+    gsap.to(mesh.position, { y: baseY + (mesh.userData.isCity ? 0.28 : 0.45), duration: 0.28, ease: "power2.out" });
     gsap.to((mesh.material as THREE.MeshStandardMaterial).color, { r: 0.22, g: 0.74, b: 0.97, duration: 0.2 });
     gsap.to(mesh.material as THREE.MeshStandardMaterial, { opacity: 0.82, duration: 0.2 });
     (mesh.material as THREE.MeshStandardMaterial).emissive.setHex(HOVER_EMISSIVE);
@@ -166,11 +167,11 @@ export default function Map3D() {
       gsap.to(s.camera!.position, { x: center.x, y: center.y + CANTON_CAM_OFFSET.y, z: center.z + CANTON_CAM_OFFSET.z, duration: 1.0, ease: "power2.inOut" });
       gsap.to(s.controls!.target, { x: center.x, y: center.y, z: center.z, duration: 1.0, ease: "power2.inOut" });
       s.subGroup!.children.forEach((cm) => {
-        gsap.to((cm as THREE.Mesh).material as THREE.MeshStandardMaterial, { opacity: 0.58, duration: 0.4 });
+        gsap.to((cm as THREE.Mesh).material as THREE.MeshStandardMaterial, { opacity: 0.34, duration: 0.4 });
       });
       setBreadcrumb(`SVÁJC / ${(s.selectedCanton!.userData as { name: string }).name.toUpperCase()}`);
       setTitle(`${(s.selectedCanton!.userData as { name: string }).name} kanton`);
-      setSubtitle("Körzeti adatok megnyitva. Vidd az egeret a városok fölé a kiemeléshez!");
+      setSubtitle("Körzeti adatok megnyitva. Vidd az egeret a körzetek fölé a kiemeléshez!");
       const d = s.selectedCanton!.userData as { name: string; pop: string; yes: number };
       setStatTarget(d.name);
       setStatPop(d.pop);
@@ -182,6 +183,26 @@ export default function Map3D() {
       s.subGroup!.visible = false;
       s.mainGroup!.visible = true;
       s.overlayGroup!.visible = true;
+      // topológia visszaállítás országos opacitásra
+      if (s.detailOverlay) {
+        s.detailOverlay.children.forEach((obj) => {
+          const mat = (obj as THREE.Line).material as THREE.LineBasicMaterial;
+          if (mat.color.getHex() === 0x64748b) gsap.to(mat, { opacity: 0.28, duration: 0.4 });
+          else if (mat.color.getHex() === 0x475569) gsap.to(mat, { opacity: 0.32, duration: 0.4 });
+          else if (mat.color.getHex() === 0x334155) gsap.to(mat, { opacity: 0.22, duration: 0.4 });
+        });
+      }
+      if (s.overlayGroup) {
+        s.overlayGroup.children.forEach((obj) => {
+          if ((obj as THREE.Mesh).isMesh) {
+            const mm = (obj as THREE.Mesh).material as THREE.MeshStandardMaterial;
+            if (mm.color?.getHex() === 0x1e40af) gsap.to(mm, { opacity: 0.35, duration: 0.4 });
+          } else if ((obj as THREE.Line).isLine) {
+            const lm = (obj as THREE.Line).material as THREE.LineBasicMaterial;
+            if (lm.color.getHex() === 0x3b82f6) gsap.to(lm, { opacity: 0.7, duration: 0.4 });
+          }
+        });
+      }
       // restore other cantons
       s.mainGroup!.children.forEach((c) => {
         c.visible = true;
@@ -399,6 +420,21 @@ export default function Map3D() {
         districts?: { points: [number, number][]; name: string; pop: string; yes: number; id: string }[];
         name: string;
       };
+      if (s.selectedCanton && data.isCity && !s.selectedCity) {
+        s.selectedCity = s.currentHovered;
+        const box = new THREE.Box3().setFromObject(s.selectedCity as unknown as THREE.Object3D);
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+        gsap.to(camera.position, { x: center.x, y: center.y + CITY_CAM_OFFSET.y, z: center.z + CITY_CAM_OFFSET.z, duration: 1.1, ease: "power3.inOut" });
+        gsap.to(controls.target, { x: center.x, y: center.y, z: center.z, duration: 1.1, ease: "power3.inOut" });
+        subGroup.children.forEach((cm) => {
+          if (cm !== s.selectedCity) gsap.to((cm as THREE.Mesh).material as THREE.MeshStandardMaterial, { opacity: 0.12, duration: 0.4 });
+        });
+        setBreadcrumb(`SVÁJC / ${(s.selectedCanton.userData as { name: string }).name.toUpperCase()} / ${data.name.toUpperCase()}`);
+        setTitle(data.name);
+        setSubtitle("Települési szintű szavazóköri végeredmény.");
+        return;
+      }
       // Kanton szintre lépés — izolálás + Wahlkreis-darabolás
       if (!s.selectedCanton && !data.isCity) {
         const clicked = s.currentHovered;
@@ -446,26 +482,45 @@ export default function Map3D() {
             | undefined;
         if (source?.length) {
           source.forEach((item, idx) => {
-            const m = buildMesh(item.points, 0.42, item as unknown as Record<string, unknown>, true);
-            // hézag: sugárirányban kifelé toljuk a kerületi darabokat
+            const m = buildMesh(item.points, 0.22, item as unknown as Record<string, unknown>, true);
+            // kisebb kiemelés + hézag: topológia alatta jobban látszik
             const tmpBox = new THREE.Box3().setFromObject(m);
             const tmpCenter = new THREE.Vector3();
             tmpBox.getCenter(tmpCenter);
             const dir = tmpCenter.clone().sub(center);
             dir.y = 0;
             if (dir.lengthSq() > 1e-6) {
-              dir.normalize().multiplyScalar(0.09);
+              dir.normalize().multiplyScalar(0.05);
               m.position.x += dir.x;
               m.position.z += dir.z;
             }
-            m.userData.baseY = 0.35;
-            m.position.y = 0.35;
-            // pop-in stagger
-            m.scale.set(0.88, 0.88, 0.88);
+            m.userData.baseY = 0.14;
+            m.position.y = 0.14;
             (m.material as THREE.MeshStandardMaterial).opacity = 0;
+            (m.material as THREE.MeshStandardMaterial).transparent = true;
             subGroup.add(m);
             gsap.to(m.scale, { x: 1, y: 1, z: 1, duration: 0.52, delay: idx * 0.045, ease: "back.out(1.5)" });
-            gsap.to(m.material as THREE.MeshStandardMaterial, { opacity: 0.58, duration: 0.42, delay: idx * 0.045 });
+            gsap.to(m.material as THREE.MeshStandardMaterial, { opacity: 0.34, duration: 0.42, delay: idx * 0.045 });
+          });
+          // kantonon belül: város-körvonalak + utak + hegyek megerősítése (topológia előtérbe)
+          const dl = stateRef.current.detailOverlay!;
+          dl.children.forEach((obj) => {
+            const line = obj as THREE.Line;
+            const mat = line.material as THREE.LineBasicMaterial;
+            if (mat.color.getHex() === 0x64748b) gsap.to(mat, { opacity: 0.62, duration: 0.4 }); // város-körvonal
+            else if (mat.color.getHex() === 0x475569) gsap.to(mat, { opacity: 0.55, duration: 0.4 }); // út
+            else if (mat.color.getHex() === 0x334155) gsap.to(mat, { opacity: 0.40, duration: 0.4 }); // hegy
+          });
+          // rivers/lakes/city markers: ne tüntesd el, csak halványítsd — topológia referencia maradjon
+          const ol = stateRef.current.overlayGroup!;
+          ol.children.forEach((obj) => {
+            if ((obj as THREE.Mesh).isMesh) {
+              const mm = (obj as THREE.Mesh).material as THREE.MeshStandardMaterial;
+              if (mm.color?.getHex() === 0x1e40af) gsap.to(mm, { opacity: 0.22, duration: 0.4 }); // tó
+            } else if ((obj as THREE.Line).isLine) {
+              const lm = (obj as THREE.Line).material as THREE.LineBasicMaterial;
+              if (lm.color.getHex() === 0x3b82f6) gsap.to(lm, { opacity: 0.45, duration: 0.4 }); // folyó marad
+            }
           });
         }
         setBreadcrumb(`SVÁJC / ${data.name.toUpperCase()}`);
@@ -473,21 +528,6 @@ export default function Map3D() {
         setSubtitle("Választási körzetek (Wahlkreis) szerint szétbontva — vidd az egeret egy körzet fölé!");
         setShowBack(true);
         return;
-      }
-      // Város / Wahlkreis szintre lépés
-      if (s.selectedCanton && data.isCity && !s.selectedCity) {
-        s.selectedCity = s.currentHovered;
-        const box = new THREE.Box3().setFromObject(s.selectedCity);
-        const center = new THREE.Vector3();
-        box.getCenter(center);
-        gsap.to(camera.position, { x: center.x, y: center.y + CITY_CAM_OFFSET.y, z: center.z + CITY_CAM_OFFSET.z, duration: 1.1, ease: "power3.inOut" });
-        gsap.to(controls.target, { x: center.x, y: center.y, z: center.z, duration: 1.1, ease: "power3.inOut" });
-        subGroup.children.forEach((cm) => {
-          if (cm !== s.selectedCity) gsap.to((cm as THREE.Mesh).material as THREE.MeshStandardMaterial, { opacity: 0.12, duration: 0.4 });
-        });
-        setBreadcrumb(`SVÁJC / ${(s.selectedCanton.userData as { name: string }).name.toUpperCase()} / ${data.name.toUpperCase()}`);
-        setTitle(data.name);
-        setSubtitle("Települési szintű szavazóköri végeredmény.");
       }
     };
 
