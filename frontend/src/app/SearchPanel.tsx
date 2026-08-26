@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import {useTranslations} from 'next-intl';
 import { api, type Baugesuch, type DistrictRepresentatives, type PlaceInfo } from "@/lib/api";
 import { resolveQuery } from "./postcode_coords";
 
@@ -13,6 +14,7 @@ interface Result {
 }
 
 export default function SearchPanel({ onResult }: { onResult: (r: Result) => void }) {
+  const t = useTranslations();
   const [query, setQuery] = useState("8004");
   const [loading, setLoading] = useState(false);
 
@@ -38,11 +40,11 @@ export default function SearchPanel({ onResult }: { onResult: (r: Result) => voi
         if (lngLat) {
           onResult({ lngLat, error: undefined });
         } else {
-          onResult({ error: `Nincs találat: „${q}"` });
+          onResult({ error: t('search.errorNotFound', {query: q}) });
         }
       }
     } catch {
-      onResult({ error: `Nincs adat: ${query.trim()}` });
+      onResult({ error: t('search.errorNoData', {query: query.trim()}) });
     } finally {
       setLoading(false);
     }
@@ -54,7 +56,7 @@ export default function SearchPanel({ onResult }: { onResult: (r: Result) => voi
         className="border rounded px-3 py-2 text-sm w-64"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="PLZ, cím vagy község (pl. 8004 vagy Bahnhofstrasse 10)"
+        placeholder={t('search.placeholder')}
         onKeyDown={(e) => e.key === "Enter" && search()}
         data-testid="search-input"
       />
@@ -64,7 +66,7 @@ export default function SearchPanel({ onResult }: { onResult: (r: Result) => voi
         disabled={loading || query.trim().length < 2}
         data-testid="search-button"
       >
-        {loading ? "…" : "Keresés"}
+        {loading ? "…" : t('search.button')}
       </button>
     </div>
   );

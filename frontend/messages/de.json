@@ -1,0 +1,71 @@
+{
+  "search": {
+    "placeholder": "PLZ, Adresse oder Gemeinde (z.B. 8004 oder Bahnhofstrasse 10)",
+    "button": "Suchen",
+    "loading": "…",
+    "errorNotFound": "Kein Treffer: „{query}“",
+    "errorNoData": "Keine Daten: {query}"
+  },
+  "tabs": {
+    "overview": "Übersicht",
+    "politik": "Politik",
+    "ort": "Ort",
+    "planung": "Planung"
+  },
+  "summary": {
+    "label": "KI-ZUSAMMENFASSUNG",
+    "steuerFallback": "Steuerfuss k.A.",
+    "laermFallback": "Lärm k.A.",
+    "oev": "ÖV-Güte {klass}",
+    "bgMany": "{count} Baugesuche sind noch einsprachefähig",
+    "bgOne": "1 Baugesuch ist noch einsprachefähig",
+    "bgNone": "keine aktiven Baugesuche im 20-Tage-Fenster",
+    "polWith": "{name} ({party}) vertritt {district}",
+    "polNone": "keine Vertretung geladen",
+    "template": "In {postcode} {municipality} zahlst du {steuer} bei {laerm} ({oev}). {bg} — {pol}."
+  },
+  "overview": {
+    "steuerfuss": "STEUERFUSS",
+    "laermOev": "LÄRM · ÖV",
+    "wahlkreis": "WAHLKREIS",
+    "baugesuche": "BAUGESUCHE",
+    "baugesucheActive": "{count} aktiv — Einsprache möglich",
+    "baugesucheNone": "keine aktiven im 20-Tage Fenster"
+  },
+  "politik": {
+    "wahlkreis": "WAHLKREIS · {name}",
+    "empty": "Keine Vertretung für diese PLZ geladen.",
+    "source": "Quelle: PARIS-API · Lobbywatch (künftig)"
+  },
+  "ort": {
+    "steuerfuss": "STEUERFUSS",
+    "gemeinde": "Gemeinde: {municipality} ({canton})",
+    "laermTag": "LÄRM (TAG)",
+    "sonBase": "sonBASE · künftig Heatmap",
+    "oevGuete": "ÖV-GÜTEKLASSE",
+    "oevDesc": "A = dicht, E = selten",
+    "gebaeude": "GEBÄUDE (GWR)",
+    "gebaeudeUnit": "{count} Gebäude"
+  },
+  "planung": {
+    "loading": "Lade Baugesuche…",
+    "empty": "Keine aktiven Baugesuche im 20-Tage Fenster für {postcode}.",
+    "activeHeader": "{count} AKTIV — EINSPRACHE MÖGLICH",
+    "auflageBis": "Aufl. bis {date}",
+    "daysLeft": "{count} Tag{plural} übrig",
+    "urgent": "· bald abgelaufen"
+  },
+  "footer": "Daten: /api/v1/place · /api/v1/politics · /api/v1/planning · Three.js + Swisstopo boundaries",
+  "map": {
+    "title": "Schweizerische Eidgenossenschaft",
+    "subtitle": "Bewege die Maus über einen Kanton für die 3D-Hervorhebung, dann klicke, um die Städte im Kanton zu entdecken!",
+    "breadcrumb": "SCHWEIZ",
+    "cantons": "26 Kantone",
+    "population": "8.9 Millionen",
+    "hint": "Linke Taste: Drehen · Rechts: Schwenken · Rad: Zoom"
+  },
+  "header": {
+    "title": "Swiss P Map",
+    "subtitle": "Die Schweizer Nachbarschaft auf einer Karte"
+  }
+}

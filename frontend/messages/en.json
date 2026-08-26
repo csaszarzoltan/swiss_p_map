@@ -1,0 +1,71 @@
+{
+  "search": {
+    "placeholder": "Postcode, address or municipality (e.g. 8004 or Bahnhofstrasse 10)",
+    "button": "Search",
+    "loading": "…",
+    "errorNotFound": "No match: “{query}”",
+    "errorNoData": "No data: {query}"
+  },
+  "tabs": {
+    "overview": "Overview",
+    "politik": "Politics",
+    "ort": "Place",
+    "planung": "Planning"
+  },
+  "summary": {
+    "label": "AI SUMMARY",
+    "steuerFallback": "tax rate n/a",
+    "laermFallback": "noise n/a",
+    "oev": "public transport {klass}",
+    "bgMany": "{count} building applications still open for objection",
+    "bgOne": "1 building application still open for objection",
+    "bgNone": "no active building applications in the 20-day window",
+    "polWith": "{name} ({party}) represents {district}",
+    "polNone": "no representation loaded",
+    "template": "In {postcode} {municipality} you pay {steuer} with {laerm} ({oev}). {bg} — {pol}."
+  },
+  "overview": {
+    "steuerfuss": "TAX RATE",
+    "laermOev": "NOISE · TRANSPORT",
+    "wahlkreis": "DISTRICT",
+    "baugesuche": "APPLICATIONS",
+    "baugesucheActive": "{count} active — objection possible",
+    "baugesucheNone": "no active in 20-day window"
+  },
+  "politik": {
+    "wahlkreis": "DISTRICT · {name}",
+    "empty": "No representation loaded for this postcode.",
+    "source": "Source: PARIS-API · Lobbywatch (coming)"
+  },
+  "ort": {
+    "steuerfuss": "TAX RATE",
+    "gemeinde": "Municipality: {municipality} ({canton})",
+    "laermTag": "NOISE (DAY)",
+    "sonBase": "sonBASE · heatmap coming",
+    "oevGuete": "PT QUALITY",
+    "oevDesc": "A = dense, E = sparse",
+    "gebaeude": "BUILDINGS (GWR)",
+    "gebaeudeUnit": "{count} buildings"
+  },
+  "planung": {
+    "loading": "Loading applications…",
+    "empty": "No active applications in the 20-day window for {postcode}.",
+    "activeHeader": "{count} ACTIVE — OBJECTION POSSIBLE",
+    "auflageBis": "Until {date}",
+    "daysLeft": "{count} day{plural} left",
+    "urgent": "· expiring soon"
+  },
+  "footer": "Data: /api/v1/place · /api/v1/politics · /api/v1/planning · Three.js + Swisstopo boundaries",
+  "map": {
+    "title": "Swiss Confederation",
+    "subtitle": "Hover a canton for 3D highlight, then click to explore cities inside!",
+    "breadcrumb": "SWITZERLAND",
+    "cantons": "26 Cantons",
+    "population": "8.9 Million",
+    "hint": "Left: Rotate · Right: Pan · Wheel: Zoom"
+  },
+  "header": {
+    "title": "Swiss P Map",
+    "subtitle": "The Swiss neighbourhood on one map"
+  }
+}

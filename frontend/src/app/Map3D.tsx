@@ -71,24 +71,34 @@ function buildMesh(
   return mesh;
 }
 
+interface MapLocale {
+  title: string;
+  breadcrumb: string;
+  subtitle: string;
+  cantons: string;
+  population: string;
+  hint: string;
+}
+
 export default function Map3D(
   {
     selectedPostcode = null,
     baugesuche = [],
+    mapLocale,
   }: {
     selectedPostcode?: string | null;
     baugesuche?: Baugesuch[];
+    mapLocale?: MapLocale;
   } = {},
 ) {
+  const ml = mapLocale ?? {title:"Schweizerische Eidgenossenschaft",breadcrumb:"SCHWEIZ",subtitle:"Bewege die Maus über einen Kanton für die 3D-Hervorhebung, dann klicke, um die Städte im Kanton zu entdecken!",cantons:"26 Kantone",population:"8,9 Millionen",hint:"Linke Taste: Drehen · Rechts: Schwenken · Rad: Zoom"};
   const containerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const [breadcrumb, setBreadcrumb] = useState("SVÁJC");
-  const [title, setTitle] = useState("Svájci Államszövetség");
-  const [subtitle, setSubtitle] = useState(
-    "Vidd az egeret egy kanton fölé a 3D kiemeléshez, majd kattints a kantonon belüli városok felfedezéséhez!",
-  );
-  const [statTarget, setStatTarget] = useState("26 Kanton");
-  const [statPop, setStatPop] = useState("8.9 Millió");
+  const [breadcrumb, setBreadcrumb] = useState(() => ml.breadcrumb);
+  const [title, setTitle] = useState(() => ml.title);
+  const [subtitle, setSubtitle] = useState(() => ml.subtitle);
+  const [statTarget, setStatTarget] = useState(() => ml.cantons);
+  const [statPop, setStatPop] = useState(() => ml.population);
   const [voteYes, setVoteYes] = useState(61.4);
   const [showBack, setShowBack] = useState(false);
   const stateRef = useRef<{
@@ -680,7 +690,7 @@ export default function Map3D(
       />
 
       <div className="pointer-events-none absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full border border-white/5 bg-[rgba(15,23,42,0.6)] px-4 py-1.5 text-xs tracking-[0.5px] text-slate-500 backdrop-blur-[8px]">
-        Bal gomb: Forgatás · Jobb gomb: Eltolás · Görgő: Zoom
+        {ml.hint}
       </div>
     </div>
   );

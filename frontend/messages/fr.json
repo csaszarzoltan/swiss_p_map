@@ -1,0 +1,71 @@
+{
+  "search": {
+    "placeholder": "NPA, adresse ou commune (p. ex. 8004 ou Bahnhofstrasse 10)",
+    "button": "Rechercher",
+    "loading": "…",
+    "errorNotFound": "Aucun résultat : « {query} »",
+    "errorNoData": "Pas de données : {query}"
+  },
+  "tabs": {
+    "overview": "Aperçu",
+    "politik": "Politique",
+    "ort": "Lieu",
+    "planung": "Planification"
+  },
+  "summary": {
+    "label": "RÉSUMÉ IA",
+    "steuerFallback": "taux fiscal n.d.",
+    "laermFallback": "bruit n.d.",
+    "oev": "TP {klass}",
+    "bgMany": "{count} demandes de permis encore opposables",
+    "bgOne": "1 demande encore opposable",
+    "bgNone": "aucune demande active dans 20 jours",
+    "polWith": "{name} ({party}) représente {district}",
+    "polNone": "aucune représentation chargée",
+    "template": "À {postcode} {municipality} tu paies {steuer} avec {laerm} ({oev}). {bg} — {pol}."
+  },
+  "overview": {
+    "steuerfuss": "TAUX FISCAL",
+    "laermOev": "BRUIT · TP",
+    "wahlkreis": "CIRCONSCRIPTION",
+    "baugesuche": "DEMANDES",
+    "baugesucheActive": "{count} actives — opposition possible",
+    "baugesucheNone": "aucune active (20 jours)"
+  },
+  "politik": {
+    "wahlkreis": "CIRCONSCRIPTION · {name}",
+    "empty": "Aucune représentation pour ce NPA.",
+    "source": "Source : PARIS-API · Lobbywatch (à venir)"
+  },
+  "ort": {
+    "steuerfuss": "TAUX FISCAL",
+    "gemeinde": "Commune : {municipality} ({canton})",
+    "laermTag": "BRUIT (JOUR)",
+    "sonBase": "sonBASE · carte à venir",
+    "oevGuete": "QUALITÉ TP",
+    "oevDesc": "A = dense, E = rare",
+    "gebaeude": "BÂTIMENTS (RegBL)",
+    "gebaeudeUnit": "{count} bâtiments"
+  },
+  "planung": {
+    "loading": "Chargement…",
+    "empty": "Aucune demande active (20 jours) pour {postcode}.",
+    "activeHeader": "{count} ACTIVES — OPPOSITION POSSIBLE",
+    "auflageBis": "Jusqu’au {date}",
+    "daysLeft": "{count} jour{plural} restant",
+    "urgent": "· bientôt expiré"
+  },
+  "footer": "Données : /api/v1/place · /api/v1/politics · /api/v1/planning · Three.js + Swisstopo",
+  "map": {
+    "title": "Confédération suisse",
+    "subtitle": "Survole un canton pour le relief 3D, clique pour explorer les villes !",
+    "breadcrumb": "SUISSE",
+    "cantons": "26 Cantons",
+    "population": "8,9 millions",
+    "hint": "Gauche : rotation · Droite : panoramique · Molette : zoom"
+  },
+  "header": {
+    "title": "Swiss P Map",
+    "subtitle": "Le voisinage suisse sur une seule carte"
+  }
+}
