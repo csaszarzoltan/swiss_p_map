@@ -3,7 +3,6 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import SearchPanel from "./SearchPanel";
-import { coordFor } from "./postcode_coords";
 import type { DistrictRepresentatives, PlaceInfo } from "@/lib/api";
 
 const Map = dynamic(() => import("./Map"), { ssr: false });
@@ -12,13 +11,12 @@ interface Result {
   place?: PlaceInfo;
   politics?: DistrictRepresentatives;
   error?: string;
+  lngLat?: [number, number] | null;
 }
 
 export default function Home() {
   const [result, setResult] = useState<Result | null>(null);
-  const lngLat: [number, number] | null = result?.place?.postcode
-    ? (coordFor(result.place.postcode) ?? null)
-    : null;
+  const lngLat: [number, number] | null = result?.lngLat ?? null;
 
   return (
     <main className="mx-auto max-w-5xl p-6">

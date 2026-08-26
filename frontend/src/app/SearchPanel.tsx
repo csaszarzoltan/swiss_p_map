@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { api, type DistrictRepresentatives, type PlaceInfo } from "@/lib/api";
+import { resolveQuery } from "./postcode_coords";
 
 interface Result {
   place?: PlaceInfo;
   politics?: DistrictRepresentatives;
   error?: string;
+  lngLat?: [number, number] | null;
 }
 
 export default function SearchPanel({ onResult }: { onResult: (r: Result) => void }) {
@@ -24,9 +26,15 @@ export default function SearchPanel({ onResult }: { onResult: (r: Result) => voi
     try {
       if (isPostcode(q)) {
         const [place, politics] = await Promise.all([api.place(q), api.politics(q)]);
-        onResult({ place, politics, error: undefined });
+        const lngLat = await import("./postcode_coords").then((m) => m.resolvePostcode(q));
+        onResult({ place, politics, lngLat, error: undefined });
       } else {
-        onResult({ error: `Keresés: „${q}" — térkép pozicionálva (részletes adatok PLZ-re érhetők el)` });
+        const lngLat = await resolveQuery(q);
+        if (lngLat) {
+          onResult({ lngLat, error: undefined });
+        } else {
+          onResult({ error: `Nincs találat: „${q}"` });
+        }
       }
     } catch {
       onResult({ error: `Nincs adat: ${query.trim()}` });
