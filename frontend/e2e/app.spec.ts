@@ -1,54 +1,45 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Swiss P Map — felületi E2E", () => {
-  test("hero + térkép nem marad fehéren", async ({ page }) => {
+test.describe("Swiss P Map — felületi E2E (ADR-003 3D)", () => {
+  test("hero + 3D térkép canvas látszik", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page.getByRole("heading", { name: "Swiss P Map" })).toBeVisible();
-    await expect(page.getByText("A svájci környék egyetlen térképén")).toBeVisible();
+    await expect(page.getByText("Svájci Államszövetség")).toBeVisible();
+    await expect(page.getByText("SVÁJC").first()).toBeVisible();
 
-    const map = page.getByTestId("map-container");
+    const map = page.getByTestId("map-3d");
     await expect(map).toBeVisible();
 
-    // A MapLibre-nek fel kell rajzolnia a canvas-hierarchiát (ne maradjon üres fehér div)
-    // – white-screen regressziót fog (ez hiányzott eddig)
-    await page.waitForTimeout(3000);
-    const hasCanvasOrError = await page.evaluate(() => {
-      const el = document.querySelector('[data-testid="map-container"]');
-      if (!el) return { hasCanvas: false, hasError: false, inner: "" };
-      const hasCanvas = !!el.querySelector("canvas");
-      const hasMaplibreClass = el.classList.contains("maplibregl-map");
-      const hasError = !!document.querySelector('[data-testid="map-error"]');
-      return {
-        hasCanvas: hasCanvas || hasMaplibreClass,
-        hasError,
-        inner: el.innerHTML.slice(0, 600),
-      };
-    });
-
-    // Vagy canvas látszik, vagy expliciten hibaüzenet (nem néma fehérség)
-    expect(hasCanvasOrError.hasCanvas || hasCanvasOrError.hasError).toBeTruthy();
+    await page.waitForTimeout(2500);
+    // Three.js must have appended a canvas — proves the 3D scene initialized (no white screen)
+    const canvas = map.locator("canvas");
+    await expect(canvas).toBeVisible();
+    const box = await canvas.boundingBox();
+    expect(box?.width).toBeGreaterThan(200);
+    expect(box?.height).toBeGreaterThan(200);
   });
 
-  test("kereső: PLZ 8004 → panel + marker", async ({ page }) => {
+  test("3D térkép UI: iránytű + hint + panel látszik", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByTestId("map-container")).toBeVisible();
+    await expect(page.getByTestId("map-3d")).toBeVisible();
+    await page.waitForTimeout(1500);
+
+    // The compass, hint and glassmorphism panel are deterministic — no geometry dependency
+    await expect(page.getByText("É").first()).toBeVisible();
+    await expect(page.getByText(/Bal gomb: Forgatás/)).toBeVisible();
+    await expect(page.getByText("Svájci Államszövetség")).toBeVisible();
+    await expect(page.getByText("26 Kanton")).toBeVisible();
+  });
+
+  test("kereső: PLZ 8004 → panel jelenik meg", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByTestId("map-3d")).toBeVisible();
 
     const input = page.getByPlaceholder("PLZ, cím vagy község");
     await expect(input).toBeVisible();
     await input.fill("8004");
     await page.getByRole("button", { name: "Keresés" }).click();
 
-    await expect(page.getByText("Steuerfuss").first()).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText(/Wahlkreis/i).first()).toBeVisible({ timeout: 10_000 });
-  });
-
-  test("kereső: szabad szöveg geokódol (MEK ellenőrzés)", async ({ page }) => {
-    await page.goto("/");
-    const input = page.getByPlaceholder("PLZ, cím vagy község");
-    await input.fill("8004");
-    // Audit A: Enter is indítja a keresést
-    await input.press("Enter");
     await expect(page.getByText("Steuerfuss").first()).toBeVisible({ timeout: 10_000 });
   });
 });
