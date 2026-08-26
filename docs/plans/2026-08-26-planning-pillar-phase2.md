@@ -133,6 +133,8 @@ Build + tsc zöld, commit: `feat: Baugesuche a térképen`
 
 ### Task 5: ÖREB zóna-lekérdezés (külön kártya, ha Task 0 igazolja az M2M-et)
 
+> **Audit C (live OGD):** amint a Task 3/4 done, a `politics_service.py` / `place_service.py` stubokat a `swisstopo_service.py` mintájára Protocol-alapú httpx klienssel kell felvértezni — tesztek mockolva, élesben a valódi Zürich OGD JSON-t hívva. Ez a Task 5 után külön kártya, ne ebben a ciklusban.
+
 Kanton ZH végpont + XML parse (Shapely-mentes MVP: csak zónanév visszaadása postcode→parcella helyett községi szinten). Kockázat: M2M komplexitás — külön research igényel, ne ebben a ciklusban.
 
 ## Verification

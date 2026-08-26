@@ -2,7 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import * as maplibregl from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
+
+// Audit B: a globális CSS-t a layout.tsx importálja (Next.js 14 warn fix)
+// A Map komponens így komponens-szinten már nem importál CSS-t.
 
 const ZH_HB: [number, number] = [8.54, 47.378];
 const SWISSTOPO_STYLE =

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import "maplibre-gl/dist/maplibre-gl.css"; // Audit B: globális CSS itt (nem Map.tsx-ben)
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

@@ -128,6 +128,8 @@ git commit -m "feat: típusos API client (place, politics)"
 
 ### Task 3: Postcode search UI komponens
 
+> **Audit 2026-08-26 (A):** A Task 3 eredetileg 4 számjegyű PLZ-re volt szűkítve (`maxLength={4}`). Az auditor javaslatára a Task 3 már szabad szöveges keresést enged (cím, község, irányítószám), a teljes Swisstopo `type=locations` képesség kihasználásával. A Task 5 élő geokódolása így már nem csak PLZ-t, hanem pl. „Bahnhofstrasse 10, Zürich" vagy „Langstrasse" lekérdezést is kiszolgál.
+
 **Objective:** Input mező + „Keresés" gomb; eredmény Place+Politics panel.
 
 **Files:**
@@ -149,19 +151,32 @@ interface Result {
 }
 
 export default function SearchPanel({ onResult }: { onResult: (r: Result) => void }) {
-  const [postcode, setPostcode] = useState("8004");
+  const [query, setQuery] = useState("8004");
   const [loading, setLoading] = useState(false);
 
+  // Audit A: szabad szöveg (PLZ, cím, község) — nem csak 4 számjegy.
+  // A backend place/politics hívás továbbra is PLZ-alapú; ha a query nem 4 számjegy,
+  // a geokódolás (Task 5) oldja fel koordinátára, a panel pedig csak geokódolt találatnál tölt.
+  function isPostcode(q: string): boolean {
+    return /^\d{4}$/.test(q.trim());
+  }
+
   async function search() {
+    const q = query.trim();
+    if (q.length < 2) return;
     setLoading(true);
     try {
-      const [place, politics] = await Promise.all([
-        api.place(postcode),
-        api.politics(postcode),
-      ]);
-      onResult({ place, politics });
+      if (isPostcode(q)) {
+        const [place, politics] = await Promise.all([api.place(q), api.politics(q)]);
+        onResult({ place, politics });
+      } else {
+        // Szabad szöveg: a geokódolás (Task 5) felel a koordinátáért;
+        // a panel üzenetet mutat, amíg a map fly-to megtörténik.
+        onResult({ error: `Keresés: „${q}" — térkép pozicionálva (részletes adatok PLZ-re érhetők el)` });
+        // A tényleges fly-to a page.tsx-ben a query alapján hívott resolve-nal történik (Task 4/5).
+      }
     } catch {
-      onResult({ error: `Nincs adat: ${postcode}` });
+      onResult({ error: `Nincs adat: ${q}` });
     } finally {
       setLoading(false);
     }
@@ -170,18 +185,18 @@ export default function SearchPanel({ onResult }: { onResult: (r: Result) => voi
   return (
     <div className="flex gap-2 mt-4">
       <input
-        className="border rounded px-3 py-2 text-sm"
-        value={postcode}
-        onChange={(e) => setPostcode(e.target.value)}
-        placeholder="PLZ (pl. 8004)"
-        maxLength={4}
+        className="border rounded px-3 py-2 text-sm w-64"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="PLZ, cím vagy község (pl. 8004 vagy Bahnhofstrasse 10)"
+        onKeyDown={(e) => e.key === "Enter" && search()}
       />
       <button
         className="bg-sky-600 text-white rounded px-4 py-2 text-sm disabled:opacity-50"
         onClick={search}
-        disabled={loading || postcode.length !== 4}
+        disabled={loading || query.trim().length < 2}
       >
-        {loading ? "..." : "Keresés"}
+        {loading ? "…" : "Keresés"}
       </button>
     </div>
   );
@@ -260,6 +275,8 @@ git commit -m "feat: marker fly-to postcode szerint"
 ---
 
 ### Task 5: Élő Swisstopo geokódolás a stub helyett
+
+> **Audit A következménye:** a Task 3 már szabad szöveges queryt enged, ezért a geokódolás nem csak `PLZ 8004` formát, hanem bármilyen `type=locations` találatot kezel (cím, község, utca). A Task 5 implementációja így valós Zürich-szerte használható keresővé válik.
 
 **Objective:** A postcode → koordináta átalakítás valódi Swisstopo hívás legyen.
 
