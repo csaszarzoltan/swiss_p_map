@@ -3,9 +3,9 @@
 > Template alapján — 1 oldal. Research: `docs/research/2026-08-26-amtsblatt-oereb-api.md`
 
 - **Dátum:** 2026-08-26
-- **Státusz:** proposed (emberi jóváhagyás before code)
+- **Státusz:** accepted (2026-08-26 — „Mehet az A” emberi jóváhagyás)
 - **Szerző:** analyst (research: élő API-próbák, 2026-08-26)
-- **Kanban:** t_add5150f
+- **Kanban:** t_add5150f (done 2026-08-26 — unblocked, Task 1+ indul)
 
 ## Kontextus
 
