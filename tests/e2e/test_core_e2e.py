@@ -37,3 +37,12 @@ def test_place_known_postcode() -> None:
 def test_place_unknown() -> None:
     r = client.get("/api/v1/place/9999")
     assert r.status_code == 404
+
+
+def test_cors_preflight() -> None:
+    r = client.options(
+        "/api/v1/place/8004",
+        headers={"Origin": "http://localhost:3000", "Access-Control-Request-Method": "GET"},
+    )
+    assert r.status_code in (200, 204)
+    assert r.headers.get("access-control-allow-origin") == "http://localhost:3000"

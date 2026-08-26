@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 
 from src.models.geo import CoordinateWGS84
 from src.services.geo_converter import lv95_to_wgs84
@@ -10,6 +11,13 @@ from src.services.place_service import PlaceService
 from src.services.politics_service import PoliticsService
 
 app = FastAPI(title="Swiss P Map", version="0.1.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 _politics = PoliticsService()
 _place = PlaceService()
