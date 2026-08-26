@@ -19,7 +19,9 @@ Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Ch
 - Frontend CSS: `maplibre-gl.css` → `layout.tsx` (Next 14 globális import, build/lint zöld)
 
 ### Verified
-- Füstteszt (élő uvicorn 18081): /health, /api/v1/place/8004, /api/v1/politics/representatives?postcode=8004, /api/v1/geo/convert, CORS preflight → mind 200 OK
+- Füstteszt (élő uvicorn): /health, /api/v1/place/8004, /api/v1/politics/representatives?postcode=8004, /api/v1/geo/convert, CORS preflight → mind 200 OK
+- Élő lánc 8310/3310-en (CORS env: `SWISSPM_CORS_ORIGINS`): API + frontend HTML bizonyítva; 3000/8000-es portokon más projektek futnak
+- Planning Task 0: Amtsblatt API élően igazolva (6669 BP-ZH rekord, ~17/nap, XML-only) → research + **ADR-002 proposed** (kanban t_add5150f blocked needs_input)
 
 ## [0.1.0] - 2026-08-26
 - Bootstrap: `AGENTS.md`, `METHODOLOGY.md`, `workflows/principles.md`, ADR/research/competitor keret (commit `31ba465`)
