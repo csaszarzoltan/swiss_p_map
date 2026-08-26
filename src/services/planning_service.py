@@ -1,42 +1,41 @@
-"""Planning service — in-memory Baugesuch store + fetch via AmtsblattService."""
+"""Planning service — SQLite-backed Baugesuch store + Amtsblatt fetch."""
 
 from __future__ import annotations
 
 from datetime import date
 
+from src.db.planning_repo import PlanningRepo
 from src.models.planning import Baugesuch
 from src.services.amtsblatt_service import AmtsblattService
 
 
 class PlanningService:
-    """Store + query Baugesuche (MVP: in-memory, TTL via is_active).
+    """Store + query Baugesuche (SQLite persistent, TTL via auflage_end).
 
-    SQLite perzisztencia külön kártya; a felület stabil marad.
+    In-memory fallback kept via repo indirection — tests use :memory:.
     """
 
-    def __init__(self, fetcher: AmtsblattService | None = None) -> None:
+    def __init__(
+        self,
+        fetcher: AmtsblattService | None = None,
+        repo: PlanningRepo | None = None,
+    ) -> None:
         self._fetcher = fetcher or AmtsblattService()
-        self._items: list[Baugesuch] = []
+        self._repo = repo or PlanningRepo()
 
     def seed(self, items: list[Baugesuch]) -> None:
-        """Seed for tests / demo (idempotent — replaces)."""
-        self._items = list(items)
+        """Seed for tests / demo (upserts)."""
+        self._repo.upsert_many(items)
 
     def list_items(self, postcode: str | None = None, active_only: bool = True, on: date | None = None) -> list[Baugesuch]:
-        ref = on or date.today()  # noqa: DTZ011 — MVP in-memory store, wall-clock is intentional; SQLite task will use injected 'on'
-        out = self._items
-        if postcode:
-            code = postcode.strip()
-            out = [b for b in out if b.postcode == code]
-        if active_only:
-            out = [b for b in out if b.is_active(ref)]
-        return out
+        return self._repo.list_items(postcode=postcode, active_only=active_only, on=on)
 
     def get_by_postcode(self, postcode: str, active_only: bool = True, on: date | None = None) -> list[Baugesuch]:
         return self.list_items(postcode=postcode, active_only=active_only, on=on)
 
     async def refresh(self, canton: str = "ZH", since: date | None = None) -> int:
-        """Poll Amtsblatt and replace store — returns count."""
+        """Poll Amtsblatt and upsert — returns count."""
         items = await self._fetcher.fetch_publications(canton=canton, since=since)
-        self._items = items
+        if items:
+            self._repo.upsert_many(items)
         return len(items)
