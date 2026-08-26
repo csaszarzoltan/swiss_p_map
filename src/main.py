@@ -119,7 +119,14 @@ def geo_convert(
 
 
 @app.get("/api/v1/politics/representatives")
-def politics_representatives(postcode: str = Query(..., min_length=4, max_length=4)) -> dict[str, object]:
+async def politics_representatives(
+    postcode: str = Query(..., min_length=4, max_length=4),
+    live: bool = Query(default=False, description="Ha true, PARIS CQL élő lekérés (ADR-005); fallback stub"),
+) -> dict[str, object]:
+    if live:
+        data = await _politics.get_by_postcode_live(postcode)
+        if data is not None:
+            return data.model_dump()
     data = _politics.get_by_postcode(postcode)
     if data is None:
         raise HTTPException(status_code=404, detail=f"no data for postcode {postcode}")
@@ -127,7 +134,14 @@ def politics_representatives(postcode: str = Query(..., min_length=4, max_length
 
 
 @app.get("/api/v1/place/{postcode}")
-def place_info(postcode: str) -> dict[str, object]:
+async def place_info(
+    postcode: str,
+    live: bool = Query(default=False, description="Ha true, api3 Identify élő (ARE/BAFU) + fallback stub (ADR-005)"),
+) -> dict[str, object]:
+    if live:
+        data = await _place.get_by_postcode_live(postcode)
+        if data is not None:
+            return data.model_dump()
     data = _place.get_by_postcode(postcode)
     if data is None:
         raise HTTPException(status_code=404, detail=f"no data for postcode {postcode}")
