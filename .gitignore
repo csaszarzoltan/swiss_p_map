@@ -9,3 +9,5 @@ build/
 .venv/
 *.db
 .worktrees/
+frontend/test-results/
+frontend/.env.local
