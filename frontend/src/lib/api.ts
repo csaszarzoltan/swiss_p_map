@@ -34,6 +34,8 @@ export interface Baugesuch {
   auflage_end: string;
   source_url: string;
   geocode_precision: string;
+  lat: number | null;
+  lon: number | null;
 }
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";

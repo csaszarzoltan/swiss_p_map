@@ -8,6 +8,7 @@ import { SWISS_CANTONS } from "./swissCantons";
 import { SWISS_CITIES, SWISS_RIVERS, SWISS_LAKES, SWISS_ROADS } from "./mapOverlay";
 import { CITY_OUTLINES } from "./cityOutlines";
 import type { Baugesuch } from "@/lib/api";
+import { lonLatToModel } from "./projection";
 
 // 70°-os felülnézet + jobban bezoomolva (kameraszög ~69°, FOV 34°)
 const INITIAL_CAM = { x: 0, y: 9.0, z: 3.2 };
@@ -71,12 +72,14 @@ function buildMesh(
 }
 
 export default function Map3D(
-  props: {
+  {
+    selectedPostcode = null,
+    baugesuche = [],
+  }: {
     selectedPostcode?: string | null;
     baugesuche?: Baugesuch[];
   } = {},
 ) {
-  void props; // Task 4: 3D pin layer — selectedPostcode/baugesuche a keresőből
   const containerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [breadcrumb, setBreadcrumb] = useState("SVÁJC");
@@ -96,6 +99,7 @@ export default function Map3D(
     subGroup: THREE.Group | null;
     overlayGroup: THREE.Group | null;
     detailOverlay: THREE.Group | null;
+    pinGroup: THREE.Group | null;
     camera: THREE.PerspectiveCamera | null;
     controls: OrbitControls | null;
     raycaster: THREE.Raycaster;
@@ -108,6 +112,7 @@ export default function Map3D(
     subGroup: null,
     overlayGroup: null,
     detailOverlay: null,
+    pinGroup: null,
     camera: null,
     controls: null,
     raycaster: new THREE.Raycaster(),
@@ -280,10 +285,14 @@ export default function Map3D(
     const overlayGroup = new THREE.Group();
     overlayGroup.position.y = 0.01;
     scene.add(overlayGroup);
+    const pinGroup = new THREE.Group();
+    pinGroup.position.y = 0.2;
+    scene.add(pinGroup);
 
     stateRef.current.mainGroup = mainGroup;
     stateRef.current.subGroup = subGroup;
     stateRef.current.overlayGroup = overlayGroup;
+    stateRef.current.pinGroup = pinGroup;
     stateRef.current.camera = camera;
     stateRef.current.controls = controls;
 
@@ -567,6 +576,48 @@ export default function Map3D(
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // 3D Baugesuch pins — selectedPostcode + baugesuche → pinGroup (amber pins)
+  useEffect(() => {
+    const pg = stateRef.current.pinGroup;
+    if (!pg) return;
+    pg.clear();
+    if (baugesuche.length === 0) return;
+    for (const b of baugesuche) {
+      if (b.lat == null || b.lon == null) continue;
+      const [x, y] = lonLatToModel(b.lon, b.lat);
+      const pin = new THREE.Group();
+      pin.position.set(x, 0.28, -y);
+      const stem = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.012, 0.012, 0.14, 8),
+        new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0xb45309, emissiveIntensity: 0.45 }),
+      );
+      stem.position.y = 0.07;
+      pin.add(stem);
+      const head = new THREE.Mesh(
+        new THREE.SphereGeometry(0.035, 12, 12),
+        new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xf59e0b, emissiveIntensity: 0.7 }),
+      );
+      head.position.y = 0.16;
+      pin.add(head);
+      // subtle glow ring at base
+      const ring = new THREE.Mesh(
+        new THREE.RingGeometry(0.04, 0.06, 16),
+        new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.35, side: THREE.DoubleSide }),
+      );
+      ring.rotation.x = -Math.PI / 2;
+      ring.position.y = -0.06;
+      pin.add(ring);
+      pin.userData = { baugesuch: b };
+      pg.add(pin);
+      // pulse animation
+      gsap.to(head.scale, { x: 1.18, y: 1.18, z: 1.18, duration: 0.9, yoyo: true, repeat: -1, ease: "sine.inOut" });
+    }
+    // highlight postcode badge when pins exist
+    if (selectedPostcode) {
+      setSubtitle(`Baugesuche: ${baugesuche.length} aktiv im 20-Tage Fenster — Einsprache möglich`);
+    }
+  }, [baugesuche, selectedPostcode]);
 
   const noPct = (100 - voteYes).toFixed(1);
 

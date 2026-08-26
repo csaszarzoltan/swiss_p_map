@@ -36,6 +36,68 @@ app.add_middleware(
 _politics = PoliticsService()
 _place = PlaceService()
 _planning = PlanningService()
+# Demo seed — amíg nincs napi Amtsblatt poll, 8004-en legyen aktív Baugesuch a bemutatóhoz
+try:
+    from datetime import date as _d
+    from datetime import timedelta as _td
+
+    from src.models.planning import Baugesuch as _BG
+
+    _today = _d.today()  # noqa: DTZ011 — demo seed wall-clock, SQLite task majd injectált "on"
+    _planning.seed(
+        [
+            _BG(
+                id="demo-8004-1",
+                title="Umbau Mehrfamilienhaus — Badenerstrasse 100, 8004 Zürich",
+                municipality="Zürich",
+                municipality_id=261,
+                postcode="8004",
+                canton="ZH",
+                publication_date=_today - _td(days=5),
+                expiration_date=_today + _td(days=360),
+                auflage_start=_today - _td(days=5),
+                auflage_end=_today + _td(days=15),
+                source_url="https://amtsblattportal.ch/api/v1/publications/demo-8004-1/xml",
+                geocode_precision="locality",
+                lat=47.392,
+                lon=8.517,
+            ),
+            _BG(
+                id="demo-8004-2",
+                title="Neubau Wohnüberbauung — Hardstrasse 12, 8004 Zürich",
+                municipality="Zürich",
+                municipality_id=261,
+                postcode="8004",
+                canton="ZH",
+                publication_date=_today - _td(days=12),
+                expiration_date=_today + _td(days=353),
+                auflage_start=_today - _td(days=12),
+                auflage_end=_today + _td(days=8),
+                source_url="https://amtsblattportal.ch/api/v1/publications/demo-8004-2/xml",
+                geocode_precision="address",
+                lat=47.388,
+                lon=8.523,
+            ),
+            _BG(
+                id="demo-8610-1",
+                title="Seefeldstrasse 6, Assek. Nr. 7325, 8610 Uster — Neubau (Demo)",
+                municipality="Uster",
+                municipality_id=198,
+                postcode="8610",
+                canton="ZH",
+                publication_date=_today - _td(days=2),
+                expiration_date=_today + _td(days=363),
+                auflage_start=_today - _td(days=2),
+                auflage_end=_today + _td(days=18),
+                source_url="https://amtsblattportal.ch/api/v1/publications/demo-8610-1/xml",
+                geocode_precision="address",
+                lat=47.35,
+                lon=8.72,
+            ),
+        ]
+    )
+except Exception:  # noqa: BLE001,S110 — demo seed nem törheti az app indulását
+    pass
 
 
 @app.get("/health")
