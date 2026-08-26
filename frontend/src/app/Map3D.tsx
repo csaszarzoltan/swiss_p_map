@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import gsap from "gsap";
 import { SWISS_CANTONS } from "./swissCantons";
+import { SWISS_CITIES, SWISS_RIVERS, SWISS_LAKES } from "./mapOverlay";
 
 // 70°-os felülnézet + jobban bezoomolva (kameraszög ~69°, FOV 34°)
 const INITIAL_CAM = { x: 0, y: 9.0, z: 3.2 };
@@ -85,6 +86,7 @@ export default function Map3D() {
     currentHovered: THREE.Mesh | null;
     mainGroup: THREE.Group | null;
     subGroup: THREE.Group | null;
+    overlayGroup: THREE.Group | null;
     camera: THREE.PerspectiveCamera | null;
     controls: OrbitControls | null;
     raycaster: THREE.Raycaster;
@@ -95,6 +97,7 @@ export default function Map3D() {
     currentHovered: null,
     mainGroup: null,
     subGroup: null,
+    overlayGroup: null,
     camera: null,
     controls: null,
     raycaster: new THREE.Raycaster(),
@@ -175,6 +178,7 @@ export default function Map3D() {
       s.subGroup!.clear();
       s.subGroup!.visible = false;
       s.mainGroup!.visible = true;
+      s.overlayGroup!.visible = true;
       // restore other cantons
       s.mainGroup!.children.forEach((c) => {
         c.visible = true;
@@ -242,14 +246,59 @@ export default function Map3D() {
     subGroup.visible = false;
     scene.add(mainGroup);
     scene.add(subGroup);
+    const overlayGroup = new THREE.Group();
+    overlayGroup.position.y = 0.01;
+    scene.add(overlayGroup);
+
     stateRef.current.mainGroup = mainGroup;
     stateRef.current.subGroup = subGroup;
+    stateRef.current.overlayGroup = overlayGroup;
     stateRef.current.camera = camera;
     stateRef.current.controls = controls;
 
     SWISS_CANTONS.forEach((canton) => {
       const mesh = buildMesh(canton.points as [number, number][], 0.35, canton as unknown as Record<string, unknown>, false);
       mainGroup.add(mesh);
+    });
+
+    // Tavak — lapos félig áttetsző kék
+    SWISS_LAKES.forEach((lake) => {
+      const shape = new THREE.Shape();
+      shape.moveTo(lake.pts[0][0], lake.pts[0][1]);
+      for (let i = 1; i < lake.pts.length; i++) shape.lineTo(lake.pts[i][0], lake.pts[i][1]);
+      shape.closePath();
+      const geom = new THREE.ExtrudeGeometry(shape, { depth: 0.008, bevelEnabled: false });
+      const mat = new THREE.MeshStandardMaterial({ color: 0x1e40af, transparent: true, opacity: 0.35, roughness: 0.3, metalness: 0.1 });
+      const mesh = new THREE.Mesh(geom, mat);
+      mesh.rotation.x = -Math.PI / 2;
+      mesh.position.y = -0.02;
+      overlayGroup.add(mesh);
+    });
+    // Folyók — kék vonalak
+    SWISS_RIVERS.forEach((river) => {
+      const pts3d = river.pts.map(([x, y]) => new THREE.Vector3(x, 0.02, -y));
+      const geom = new THREE.BufferGeometry().setFromPoints(pts3d);
+      const mat = new THREE.LineBasicMaterial({ color: 0x3b82f6, transparent: true, opacity: 0.7, linewidth: 2 });
+      const line = new THREE.Line(geom, mat);
+      overlayGroup.add(line);
+    });
+    // Városjelölők — kis oszlopok + pont felett
+    SWISS_CITIES.forEach((city) => {
+      const [cx, cy] = city.pts;
+      // oszlop (gyűrű nélkül, vékony)
+      const cyl = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.035, 0.035, 0.15, 12),
+        new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0xb45309, emissiveIntensity: 0.35 }),
+      );
+      cyl.position.set(cx, 0.08, -cy);
+      overlayGroup.add(cyl);
+      // pont korona
+      const dot = new THREE.Mesh(
+        new THREE.SphereGeometry(0.04, 10, 10),
+        new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xf59e0b, emissiveIntensity: 0.6 }),
+      );
+      dot.position.set(cx, 0.17, -cy);
+      overlayGroup.add(dot);
     });
 
     const onMouseMove = (e: MouseEvent) => {
@@ -319,6 +368,7 @@ export default function Map3D() {
               onComplete: () => {
                 c.visible = false;
                 mainGroup.visible = false;
+                s.overlayGroup!.visible = false;
               },
             });
           }
