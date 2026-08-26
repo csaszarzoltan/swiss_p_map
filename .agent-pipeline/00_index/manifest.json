@@ -1,0 +1,12 @@
+{
+  "tasks": {
+    "SPEC-001": {
+      "title": "Swiss Geodata Coordinate Converter & Politics Service (Zürich Pilot)",
+      "status": "PENDING_DEV",
+      "retry_count": 0,
+      "spec_path": ".agent-pipeline/02_specs/pending/SPEC-001-geo-and-politics-engine.md",
+      "e2e_test_path": ".agent-pipeline/03_e2e_suites/test_e2e_001_core.py",
+      "last_updated": "2026-08-26T10:25:00Z"
+    }
+  }
+}
