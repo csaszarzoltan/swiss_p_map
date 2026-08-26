@@ -21,6 +21,21 @@ export interface DistrictRepresentatives {
   representatives: Representative[];
 }
 
+export interface Baugesuch {
+  id: string;
+  title: string;
+  municipality: string;
+  municipality_id: number | null;
+  postcode: string;
+  canton: string;
+  publication_date: string;
+  expiration_date: string;
+  auflage_start: string;
+  auflage_end: string;
+  source_url: string;
+  geocode_precision: string;
+}
+
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 async function getJson<T>(path: string): Promise<T> {
@@ -33,4 +48,11 @@ export const api = {
   place: (postcode: string) => getJson<PlaceInfo>(`/api/v1/place/${postcode}`),
   politics: (postcode: string) =>
     getJson<DistrictRepresentatives>(`/api/v1/politics/representatives?postcode=${postcode}`),
+  planning: (postcode?: string, activeOnly = true) =>
+    getJson<{ items: Baugesuch[] }>(
+      `/api/v1/planning/baugesuche?${new URLSearchParams({
+        ...(postcode ? { postcode } : {}),
+        active_only: String(activeOnly),
+      }).toString()}`,
+    ),
 };

@@ -7,6 +7,7 @@ import gsap from "gsap";
 import { SWISS_CANTONS } from "./swissCantons";
 import { SWISS_CITIES, SWISS_RIVERS, SWISS_LAKES, SWISS_ROADS } from "./mapOverlay";
 import { CITY_OUTLINES } from "./cityOutlines";
+import type { Baugesuch } from "@/lib/api";
 
 // 70°-os felülnézet + jobban bezoomolva (kameraszög ~69°, FOV 34°)
 const INITIAL_CAM = { x: 0, y: 9.0, z: 3.2 };
@@ -69,7 +70,13 @@ function buildMesh(
   return mesh;
 }
 
-export default function Map3D() {
+export default function Map3D(
+  props: {
+    selectedPostcode?: string | null;
+    baugesuche?: Baugesuch[];
+  } = {},
+) {
+  void props; // Task 4: 3D pin layer — selectedPostcode/baugesuche a keresőből
   const containerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [breadcrumb, setBreadcrumb] = useState("SVÁJC");
