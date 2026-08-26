@@ -153,3 +153,8 @@ Példák:
 - OGD források: Swisstopo, Zürich OGD, PARIS-API, Amtsblattportal — mind mockolva tesztekben
 - LLM gateway (ha lesz): lokális proxy `http://127.0.0.1:8000/v1`, 120s timeout
 - MVP fókusz: Kanton + Stadt Zürich (ADR-001)
+
+## 8. Evolúciós rendszer (kötelező)
+- **Master:** `docs/methodology/EVOLUTIONARY-SYSTEM.md` — behavior-first, 7 fázis, US+gui_flow → RED → prototípus stop-gate → GREEN → continuous E2E (4 réteg)
+- **Függelék:** `docs/methodology/BROWSER-HELPER-MCP.md` — Browser Helper valós API (`/agent/observe`, `/agent/act`, `/page/analyze`, `/headless/screenshot`), tenant izoláció, record→replay
+- **Gate-ek:** US min 4 story (happy/edge/error/gui), BDD-gate fájlnév-alapú, ledger `verify --evidence`, canary hermes cron `no_agent`
