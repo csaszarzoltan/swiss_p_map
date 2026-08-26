@@ -14,9 +14,9 @@ A **Swiss P Map** egyesíti a svájci nyílt kormányzati adatokat (**Open Gover
 
 ## Architektúra & Stack (ADR-001)
 
-- **Backend:** Python 3.11+ (FastAPI, Pydantic, PyProj, Shapely)
+- **Backend:** Python 3.11+ (FastAPI, Pydantic, PyProj, Shapely) — kész
+- **Frontend:** Next.js 14 + MapLibre GL JS (Swisstopo Light `vectortiles.geo.admin.ch`) — kész
 - **Adattár (tervezett):** PostgreSQL + PostGIS
-- **Frontend (tervezett):** Next.js + MapLibre GL JS (Swisstopo Vector Tiles)
 - **AI Réteg (tervezett):** Claude / Gemini — képviselői indítványok közérthető összefoglalója
 
 ---
@@ -26,9 +26,14 @@ A **Swiss P Map** egyesíti a svájci nyílt kormányzati adatokat (**Open Gover
 ```
 swiss_p_map/
 ├── src/
-│   ├── main.py                 # FastAPI app
+│   ├── main.py                 # FastAPI app (CORS: localhost:3000)
 │   ├── models/geo.py|place.py|politics.py
 │   └── services/geo_converter.py|swisstopo_service.py|politics_service.py|place_service.py
+├── frontend/
+│   ├── src/app/Map.tsx         # MapLibre + Swisstopo Light, flyTo lngLat
+│   ├── src/app/SearchPanel.tsx # PLZ vagy szabad szöveg (audit A)
+│   ├── src/app/postcode_coords.ts # Swisstopo SearchServer élő geokódolás
+│   └── src/lib/api.ts          # típusos fetch wrapper
 ├── tests/
 │   ├── conftest.py
 │   ├── unit/test_geo_converter.py|test_domain_models.py|test_swisstopo_service.py
@@ -50,16 +55,24 @@ swiss_p_map/
 
 ```bash
 pip install -r requirements.txt
-pytest -v          # 19 passed (unit + e2e)
+pytest -v          # 20 passed (unit + e2e, CORS preflight)
 mypy src tests --ignore-missing-imports
 ruff check src tests
 
-# API lokálisan
+# Backend lokálisan
 uvicorn src.main:app --reload --port 8000
 # → http://127.0.0.1:8000/docs  (Swagger)
 # → http://127.0.0.1:8000/health
+
+# Frontend lokálisan (külön terminál)
+cd frontend && npm run dev
+# → http://localhost:3000  (kereső: 8004 vagy Bahnhofstrasse 10 — audit A)
 ```
 
 ## Kanban
 
-Board: `swiss-p-map` (`hermes kanban --board swiss-p-map ls`) — 4 task done (geo models, swisstopo, politics+place+API).
+Board: `swiss-p-map` (`hermes kanban --board swiss-p-map ls`) — 6 done (geo models, swisstopo, politics+place+API, frontend scaffold, map component).
+
+## API ↔ Map Integration (2026-08-26)
+
+6 task (CORS → API client → SearchPanel szabad szöveg → fly-to → élő geokódolás → füstteszt) — `docs/plans/2026-08-26-api-map-integration.md` — végrehajtva, audit A/B/C beépítve.

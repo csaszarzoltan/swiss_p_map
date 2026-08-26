@@ -326,8 +326,11 @@ git commit -m "feat: élő Swisstopo geokódolás postcode-hoz"
 
 ## Verification (a terv kész-jelentése)
 
-- [ ] `pytest -q` → 20 passed (19 + CORS)
-- [ ] `mypy src tests --ignore-missing-imports` → clean
-- [ ] `ruff check src tests` → clean
-- [ ] `cd frontend && npm run build` → success
-- [ ] Manuális füst: 8004 → marker + panel adatok látszanak
+- [x] `pytest -q` → 20 passed (19 + CORS)
+- [x] `mypy src tests --ignore-missing-imports` → clean
+- [x] `ruff check src tests` → clean
+- [x] `cd frontend && npm run build` → success
+- [x] Élő füst (uvicorn 18081): /health, /place/8004, /politics?postcode=8004, /geo/convert, CORS preflight → 200 OK
+- [x] Audit A: szabad szöveg (PLZ/cím/község) a Task 3-ban, Task 5 live geokódolás teljes locations-lel
+- [x] Audit B: maplibre-gl.css → layout.tsx (globális import), build/lint zöld
+- [x] Audit C: live OGD jegyzet a Planning Task 5-ben (külön kártya)
