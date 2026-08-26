@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Svájc 3D Interaktív Térkép – Választási Adatvizualizáció</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: radial-gradient(circle at 50% 30%, #111827 0%, #030712 100%);
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #f3f4f6;
+      user-select: none;
+      width: 100vw;
+      height: 100vh;
+    }
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    
+    /* Észak-dél iránytű és kamera szög indikátor */
+    #compass {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      z-index: 10;
+      background: rgba(17, 24, 39, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #38bdf8;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    #compass .arrow {
+      width: 0; 
+      height: 0; 
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 9px solid #38bdf8;
+      margin-bottom: 2px;
+    }
+
+    /* Lebegő Glassmorphism Adatpanel */
+    #ui-panel {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      z-index: 10;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 22px;
+      width: 320px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      pointer-events: auto;
+    }
+    
+    .breadcrumb {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #38bdf8;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .breadcrumb span {
+      color: #64748b;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 6px;
+      letter-spacing: -0.3px;
+    }
+    
+    .subtitle {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    .stats-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .stat-row:last-child {
+      margin-bottom: 0;
+    }
+    .stat-label {
+      color: #94a3b8;
+    }
+    .stat-val {
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    /* Szavazási sáv */
+    .vote-bar-container {
+      margin-top: 10px;
+    }
+    .vote-bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .vote-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(239, 68, 68, 0.5);
+      border-radius: 3px;
+      overflow: hidden;
+      display: flex;
+    }
+    .vote-bar-fill {
+      height: 100%;
+      background: #38bdf8;
+      width: 61.4%;
+      transition: width 0.4s ease;
+    }
+
+    /* Vissza gomb */
+    #back-btn {
+      display: none;
+      width: 100%;
+      margin-top: 14px;
+      padding: 11px;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #38bdf8;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s ease;
+    }
+    #back-btn:hover {
+      background: rgba(56, 189, 248, 0.3);
+      color: #ffffff;
+      border-color: #38bdf8;
+    }
+
+    /* Lebegő Tooltip */
+    #tooltip {
+      position: absolute;
+      z-index: 20;
+      pointer-events: none;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(8px);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      display: none;
+      transform: translate(-50%, -120%);
+      transition: opacity 0.15s ease;
+    }
+    #tooltip strong {
+      color: #38bdf8;
+      display: block;
+      margin-bottom: 2px;
+      font-size: 13px;
+    }
+
+    /* Alsó navigációs segítség */
+    #hint {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: #64748b;
+      letter-spacing: 0.5px;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(8px);
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      z-index: 10;
+    }
+  </style>
+
+  <!-- Three.js + OrbitControls + GSAP könyvtárak -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+
+  <div id="canvas-container"></div>
+
+  <!-- Iránytű (Észak felfelé) -->
+  <div id="compass">
+    <div class="arrow"></div>
+    <span>É</span>
+  </div>
+
+  <!-- Interaktív UI panel -->
+  <div id="ui-panel">
+    <div class="breadcrumb" id="bc-trail">
+      SVÁJC
+    </div>
+    <h1 id="panel-title">Svájci Államszövetség</h1>
+    <p class="subtitle" id="panel-desc">Vidd az egeret egy kanton fölé a 3D kiemeléshez, majd kattints a kantonon belüli városok felfedezéséhez!</p>
+    
+    <div class="stats-card">
+      <div class="stat-row">
+        <span class="stat-label">Terület / Egység:</span>
+        <span class="stat-val" id="stat-target">26 Kanton</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Népesség:</span>
+        <span class="stat-val" id="stat-pop">8.9 Millió</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Részvételi arány:</span>
+        <span class="stat-val" id="stat-turnout">58.4%</span>
+      </div>
+
+      <div class="vote-bar-container">
+        <div class="vote-bar-labels">
+          <span style="color: #38bdf8;" id="vote-yes-label">IGEN: 61.4%</span>
+          <span style="color: #f87171;" id="vote-no-label">NEM: 38.6%</span>
+        </div>
+        <div class="vote-bar">
+          <div class="vote-bar-fill" id="vote-bar-fill" style="width: 61.4%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <button id="back-btn" onclick="handleBack()">← Vissza az előző nézethez</button>
+  </div>
+
+  <div id="tooltip"></div>
+  <div id="hint">Nézet: 30° déli rálátás (Észak előre) | Bal gomb: Forgatás | Jobb gomb: Eltolás | Görgő: Zoom</div>
+
+  <script>
+    // --- 1. SVÁJC KANTONJAINAK ÉS VÁROSAINAK PONTOS POLIGON ADATBÁZISA ---
+    const SWISS_CANTONS = [{"id": "ZH", "name": "Zürich", "capital": "Zürich", "pop": "1 580 000", "yes": 68.9, "points": [[0.4653, 2.92], [1.1496, 3.32], [1.7792, 2.52], [1.5054, 1.52], [1.0675, 1.6], [0.5201, 1.72], [0.4653, 2.92]], "cities": [{"id": "ZH_1", "name": "Zürich Város", "pop": "435k", "yes": 76.8, "points": [[0.6843, 2.08], [0.958, 2.08], [0.9033, 2.4], [0.6295, 2.32]]}, {"id": "ZH_2", "name": "Winterthur", "pop": "115k", "yes": 67.2, "points": [[1.2317, 2.6], [1.5054, 2.6], [1.4507, 2.88], [1.177, 2.84]]}, {"id": "ZH_3", "name": "Uster & Pfäffikon", "pop": "140k", "yes": 63.4, "points": [[1.177, 2.0], [1.6149, 2.04], [1.6697, 2.48], [1.2317, 2.44]]}, {"id": "ZH_4", "name": "Horgen & Meilen", "pop": "170k", "yes": 65.1, "points": [[0.8759, 1.6], [1.396, 1.64], [1.4781, 2.0], [0.9306, 2.0]]}, {"id": "ZH_5", "name": "Bülach (Unterland)", "pop": "190k", "yes": 59.5, "points": [[0.6843, 2.64], [1.0949, 2.72], [1.0949, 3.2], [0.6295, 3.04]]}, {"id": "ZH_6", "name": "Dietikon (Limmattal)", "pop": "150k", "yes": 61.2, "points": [[0.4106, 2.16], [0.6569, 2.16], [0.6022, 2.56], [0.3558, 2.48]]}]}, {"id": "BE", "name": "Bern (Berne)", "capital": "Bern", "pop": "1 040 000", "yes": 56.7, "points": [[-3.093, -1.36], [-1.9981, -1.76], [-0.6295, -1.28], [0.3285, -0.48], [-0.3558, 0.12], [-1.0401, 1.12], [-1.4507, 1.84], [-2.4087, 1.72], [-3.2299, 1.04], [-2.6003, 0.4], [-2.4087, -0.88], [-3.093, -1.36]], "cities": [{"id": "BE_1", "name": "Bern Város", "pop": "144k", "yes": 72.1, "points": [[-2.3266, 0.36], [-1.9981, 0.36], [-2.0255, 0.64], [-2.354, 0.6]]}, {"id": "BE_2", "name": "Biel/Bienne", "pop": "56k", "yes": 65.4, "points": [[-2.8193, 1.12], [-2.5456, 1.16], [-2.6003, 1.4], [-2.874, 1.36]]}, {"id": "BE_3", "name": "Thun", "pop": "44k", "yes": 54.8, "points": [[-1.7792, -0.4], [-1.5054, -0.36], [-1.5602, -0.08], [-1.8339, -0.12]]}, {"id": "BE_4", "name": "Interlaken (Oberland)", "pop": "48k", "yes": 48.2, "points": [[-1.177, -0.72], [-0.6295, -0.68], [-0.6843, -0.32], [-1.2317, -0.36]]}]}, {"id": "LU", "name": "Luzern", "capital": "Luzern", "pop": "425 000", "yes": 57.2, "points": [[-1.0401, 1.12], [-0.219, 1.44], [0.5201, 1.72], [0.6022, 0.92], [0.1916, 0.32], [-0.6295, 0.32], [-1.0401, 1.12]], "cities": [{"id": "LU_1", "name": "Luzern Város", "pop": "83k", "yes": 66.8, "points": [[0.0547, 0.8], [0.3285, 0.8], [0.2737, 1.04], [0.0, 1.0]]}, {"id": "LU_2", "name": "Sursee & Sempachersee", "pop": "65k", "yes": 52.4, "points": [[-0.4106, 1.28], [-0.0821, 1.32], [-0.1369, 1.6], [-0.4653, 1.56]]}]}, {"id": "UR", "name": "Uri", "capital": "Altdorf", "pop": "37 000", "yes": 46.5, "points": [[0.6022, 0.32], [1.4233, 0.32], [1.5602, -0.56], [0.8759, -0.96], [0.5201, -0.96], [0.6022, 0.32]], "cities": [{"id": "UR_1", "name": "Altdorf & Erstfeld", "pop": "20k", "yes": 47.1, "points": [[0.958, 0.0], [1.2317, 0.0], [1.2044, 0.32], [0.9306, 0.28]]}, {"id": "UR_2", "name": "Andermatt (Gotthard)", "pop": "8k", "yes": 45.2, "points": [[0.8485, -0.88], [1.1496, -0.88], [1.1222, -0.48], [0.8212, -0.52]]}]}, {"id": "SZ", "name": "Schwyz", "capital": "Schwyz", "pop": "165 000", "yes": 45.8, "points": [[0.6022, 0.92], [1.1496, 1.2], [1.5054, 1.52], [1.9708, 1.32], [1.8339, 0.52], [1.1496, 0.32], [0.6022, 0.92]], "cities": [{"id": "SZ_1", "name": "Schwyz & Brunnen", "pop": "55k", "yes": 46.2, "points": [[1.0128, 0.64], [1.3412, 0.68], [1.2865, 0.96], [0.958, 0.92]]}, {"id": "SZ_2", "name": "Freienbach & Einsiedeln", "pop": "60k", "yes": 45.1, "points": [[1.3412, 1.12], [1.7792, 1.2], [1.7244, 1.52], [1.2865, 1.48]]}]}, {"id": "OW_NW", "name": "Unterwalden (OW & NW)", "capital": "Sarnen / Stans", "pop": "83 000", "yes": 51.0, "points": [[-0.3558, 0.12], [0.1916, 0.32], [0.6022, 0.32], [0.5201, -0.28], [0.0547, -0.28], [-0.3558, 0.12]], "cities": [{"id": "UN_1", "name": "Sarnen & Engelberg (OW)", "pop": "38k", "yes": 49.5, "points": [[-0.1369, -0.08], [0.1916, -0.08], [0.1642, 0.24], [-0.1642, 0.2]]}, {"id": "UN_2", "name": "Stans & Hergiswil (NW)", "pop": "44k", "yes": 52.8, "points": [[0.2463, 0.0], [0.5474, 0.04], [0.4927, 0.32], [0.1916, 0.28]]}]}, {"id": "GL", "name": "Glarus", "capital": "Glarus", "pop": "41 000", "yes": 50.3, "points": [[1.9708, 1.32], [2.5182, 0.92], [2.2445, 0.12], [1.697, 0.24], [1.8339, 0.52], [1.9708, 1.32]], "cities": [{"id": "GL_1", "name": "Glarus Város", "pop": "13k", "yes": 51.4, "points": [[2.0529, 0.72], [2.3266, 0.72], [2.2992, 1.04], [2.0255, 1.0]]}]}, {"id": "ZG", "name": "Zug", "capital": "Zug", "pop": "130 000", "yes": 58.1, "points": [[0.5201, 1.72], [1.0675, 1.6], [1.1496, 1.2], [0.6022, 1.04], [0.5201, 1.72]], "cities": [{"id": "ZG_1", "name": "Zug Város", "pop": "31k", "yes": 64.2, "points": [[0.6843, 1.28], [0.8759, 1.28], [0.8485, 1.48], [0.6569, 1.44]]}, {"id": "ZG_2", "name": "Baar & Cham", "pop": "42k", "yes": 57.0, "points": [[0.6022, 1.44], [0.958, 1.48], [0.9306, 1.64], [0.5748, 1.6]]}]}, {"id": "FR", "name": "Fribourg (Freiburg)", "capital": "Fribourg", "pop": "335 000", "yes": 59.8, "points": [[-3.7773, -1.2], [-3.093, -1.36], [-2.4087, -0.88], [-2.6003, 0.4], [-3.5036, 0.32], [-3.7773, -1.2]], "cities": [{"id": "FR_1", "name": "Fribourg Város", "pop": "38k", "yes": 69.4, "points": [[-3.093, -0.2], [-2.8467, -0.2], [-2.874, 0.04], [-3.1204, 0.0]]}, {"id": "FR_2", "name": "Bulle & Gruyère", "pop": "30k", "yes": 57.8, "points": [[-3.3667, -0.96], [-3.0383, -0.92], [-3.0656, -0.6], [-3.3941, -0.64]]}]}, {"id": "SO", "name": "Solothurn", "capital": "Solothurn", "pop": "280 000", "yes": 55.4, "points": [[-2.4087, 1.72], [-1.4507, 1.84], [-0.7664, 2.24], [-1.177, 2.52], [-1.9981, 2.24], [-2.4087, 1.72]], "cities": [{"id": "SO_1", "name": "Solothurn Város", "pop": "17k", "yes": 62.8, "points": [[-2.0529, 1.44], [-1.7792, 1.48], [-1.8065, 1.68], [-2.0802, 1.64]]}, {"id": "SO_2", "name": "Olten", "pop": "19k", "yes": 58.1, "points": [[-1.0401, 2.0], [-0.7938, 2.04], [-0.8212, 2.24], [-1.0675, 2.2]]}]}, {"id": "BS", "name": "Basel-Stadt", "capital": "Basel", "pop": "200 000", "yes": 73.6, "points": [[-1.8613, 2.84], [-1.6149, 2.84], [-1.6423, 3.12], [-1.8613, 3.08], [-1.8613, 2.84]], "cities": [{"id": "BS_1", "name": "Basel Város", "pop": "175k", "yes": 74.8, "points": [[-1.8339, 2.88], [-1.6697, 2.88], [-1.697, 3.08], [-1.8613, 3.04]]}, {"id": "BS_2", "name": "Riehen & Bettingen", "pop": "25k", "yes": 66.2, "points": [[-1.6697, 2.96], [-1.5328, 2.96], [-1.5602, 3.12], [-1.697, 3.12]]}]}, {"id": "BL", "name": "Basel-Landschaft", "capital": "Liestal", "pop": "295 000", "yes": 62.3, "points": [[-1.9981, 2.64], [-1.3138, 2.92], [-0.9033, 2.64], [-1.177, 2.52], [-1.8613, 2.32], [-1.9981, 2.64]], "cities": [{"id": "BL_1", "name": "Allschwil & Reinach", "pop": "60k", "yes": 65.0, "points": [[-1.8886, 2.56], [-1.6149, 2.6], [-1.6423, 2.84], [-1.916, 2.8]]}, {"id": "BL_2", "name": "Liestal", "pop": "15k", "yes": 60.5, "points": [[-1.5054, 2.52], [-1.2317, 2.56], [-1.2865, 2.76], [-1.5602, 2.72]]}]}, {"id": "SH", "name": "Schaffhausen", "capital": "Schaffhausen", "pop": "85 000", "yes": 52.8, "points": [[0.6843, 3.44], [1.3412, 3.84], [1.6149, 3.44], [1.1496, 3.32], [0.6843, 3.44]], "cities": [{"id": "SH_1", "name": "Schaffhausen Város", "pop": "37k", "yes": 56.4, "points": [[0.958, 3.44], [1.2317, 3.48], [1.177, 3.68], [0.9033, 3.64]]}]}, {"id": "AR_AI", "name": "Appenzell (AR & AI)", "capital": "Herisau / Appenzell", "pop": "73 000", "yes": 49.2, "points": [[2.7919, 2.0], [3.3393, 2.24], [3.4215, 1.72], [2.9288, 1.84], [2.7919, 2.0]], "cities": [{"id": "AR_1", "name": "Herisau (Ausserrhoden)", "pop": "32k", "yes": 51.0, "points": [[2.7645, 2.08], [2.9835, 2.12], [2.9561, 2.32], [2.7372, 2.28]]}, {"id": "AI_1", "name": "Appenzell (Innerrhoden)", "pop": "16k", "yes": 44.8, "points": [[3.1204, 1.84], [3.3667, 1.88], [3.3393, 2.12], [3.093, 2.08]]}]}, {"id": "SG", "name": "St. Gallen", "capital": "St. Gallen", "pop": "525 000", "yes": 54.3, "points": [[1.7792, 2.52], [2.7919, 2.52], [3.7499, 2.64], [3.6131, 0.92], [2.874, 0.72], [1.9708, 1.32], [1.5054, 1.52], [1.7792, 2.52]], "cities": [{"id": "SG_1", "name": "St. Gallen Város", "pop": "76k", "yes": 64.8, "points": [[2.9835, 2.28], [3.2572, 2.32], [3.2025, 2.56], [2.9288, 2.52]]}, {"id": "SG_2", "name": "Rapperswil-Jona", "pop": "28k", "yes": 58.2, "points": [[1.5054, 1.52], [1.7792, 1.56], [1.7244, 1.76], [1.4507, 1.72]]}, {"id": "SG_3", "name": "Rheintal & Sarganserland", "pop": "80k", "yes": 49.6, "points": [[3.3393, 0.92], [3.6404, 0.96], [3.5857, 1.72], [3.2846, 1.68]]}]}, {"id": "GR", "name": "Graubünden (Grisons)", "capital": "Chur", "pop": "203 000", "yes": 52.6, "points": [[2.2445, 0.12], [2.874, 0.72], [3.6131, 0.92], [4.2974, 0.32], [6.0765, 0.12], [6.0765, -1.08], [5.2554, -2.08], [3.7499, -1.88], [2.3813, -2.88], [2.2445, -1.48], [1.5602, -0.56], [2.2445, 0.12]], "cities": [{"id": "GR_1", "name": "Chur", "pop": "38k", "yes": 61.2, "points": [[3.4215, 0.0], [3.6952, 0.04], [3.6404, 0.28], [3.3667, 0.24]]}, {"id": "GR_2", "name": "Davos & Klosters", "pop": "15k", "yes": 52.0, "points": [[4.1879, -0.24], [4.5163, -0.2], [4.4616, 0.08], [4.1331, 0.04]]}, {"id": "GR_3", "name": "Engadin & St. Moritz", "pop": "25k", "yes": 50.8, "points": [[4.2974, -1.48], [4.9817, -1.4], [4.9269, -0.96], [4.2426, -1.04]]}]}, {"id": "AG", "name": "Aargau", "capital": "Aarau", "pop": "710 000", "yes": 53.9, "points": [[-1.177, 2.52], [-0.9033, 2.64], [0.0547, 3.12], [0.4653, 2.92], [0.5201, 1.72], [-0.219, 1.44], [-0.7664, 2.24], [-1.177, 2.52]], "cities": [{"id": "AG_1", "name": "Aarau & Lenzburg", "pop": "50k", "yes": 59.4, "points": [[-0.6295, 2.16], [-0.219, 2.2], [-0.2737, 2.48], [-0.6843, 2.44]]}, {"id": "AG_2", "name": "Baden & Wettingen", "pop": "45k", "yes": 62.1, "points": [[0.0547, 2.48], [0.3558, 2.52], [0.3011, 2.76], [0.0, 2.72]]}]}, {"id": "TG", "name": "Thurgau", "capital": "Frauenfeld", "pop": "288 000", "yes": 51.4, "points": [[1.1496, 3.32], [1.6149, 3.44], [3.0656, 3.04], [2.7919, 2.52], [1.7792, 2.52], [1.1496, 3.32]], "cities": [{"id": "TG_1", "name": "Frauenfeld", "pop": "26k", "yes": 54.0, "points": [[1.697, 2.8], [1.9708, 2.84], [1.916, 3.04], [1.6423, 3.0]]}, {"id": "TG_2", "name": "Kreuzlingen (Bodensee)", "pop": "23k", "yes": 52.8, "points": [[2.4635, 3.2], [2.7372, 3.24], [2.6824, 3.44], [2.4087, 3.4]]}]}, {"id": "TI", "name": "Ticino (Tessin)", "capital": "Bellinzona", "pop": "355 000", "yes": 46.8, "points": [[0.5201, -0.96], [0.8759, -0.96], [2.2445, -1.48], [2.3813, -2.88], [2.1076, -4.0], [1.697, -3.48], [0.8759, -2.88], [0.4653, -1.48], [0.5201, -0.96]], "cities": [{"id": "TI_1", "name": "Lugano", "pop": "63k", "yes": 48.5, "points": [[1.8339, -3.4], [2.1076, -3.36], [2.0529, -3.08], [1.7792, -3.12]]}, {"id": "TI_2", "name": "Bellinzona", "pop": "44k", "yes": 47.9, "points": [[2.0529, -2.64], [2.2992, -2.6], [2.2445, -2.32], [1.9981, -2.36]]}, {"id": "TI_3", "name": "Locarno & Ascona", "pop": "30k", "yes": 49.1, "points": [[1.396, -2.72], [1.6697, -2.68], [1.6149, -2.44], [1.3412, -2.48]]}]}, {"id": "VD", "name": "Vaud (Waadt)", "capital": "Lausanne", "pop": "830 000", "yes": 64.2, "points": [[-5.6933, -1.88], [-3.7773, -2.36], [-3.0383, -1.88], [-3.093, -1.36], [-3.9142, -1.2], [-3.5036, -0.08], [-4.3247, 0.24], [-4.8722, -0.4], [-5.967, -1.36], [-5.6933, -1.88]], "cities": [{"id": "VD_1", "name": "Lausanne", "pop": "142k", "yes": 73.4, "points": [[-4.5163, -1.32], [-4.2152, -1.28], [-4.27, -1.04], [-4.5711, -1.08]]}, {"id": "VD_2", "name": "Montreux & Vevey (Riviera)", "pop": "50k", "yes": 65.8, "points": [[-3.8868, -1.6], [-3.5857, -1.56], [-3.6404, -1.32], [-3.9415, -1.36]]}, {"id": "VD_3", "name": "Yverdon-les-Bains", "pop": "30k", "yes": 61.5, "points": [[-4.4616, -0.32], [-4.1879, -0.28], [-4.2426, -0.04], [-4.5163, -0.08]]}, {"id": "VD_4", "name": "Nyon", "pop": "22k", "yes": 66.0, "points": [[-5.5565, -1.88], [-5.3375, -1.84], [-5.3922, -1.6], [-5.6112, -1.64]]}]}, {"id": "VS", "name": "Valais (Wallis)", "capital": "Sion", "pop": "355 000", "yes": 48.5, "points": [[-3.7773, -2.36], [-3.0383, -1.88], [-1.9981, -1.76], [-0.6295, -1.28], [0.5201, -0.96], [0.4653, -1.48], [-0.219, -2.68], [-1.4507, -3.6], [-3.093, -3.68], [-3.7773, -2.36]], "cities": [{"id": "VS_1", "name": "Sion & Sierre (Central)", "pop": "55k", "yes": 52.0, "points": [[-2.4908, -2.48], [-1.9981, -2.4], [-2.0529, -2.08], [-2.5456, -2.16]]}, {"id": "VS_2", "name": "Brig-Glis & Visp (Oberwallis)", "pop": "32k", "yes": 44.5, "points": [[-1.0401, -2.2], [-0.5748, -2.12], [-0.6295, -1.8], [-1.0949, -1.88]]}, {"id": "VS_3", "name": "Martigny & Monthey (Bas-Valais)", "pop": "40k", "yes": 53.2, "points": [[-3.4215, -2.88], [-3.0383, -2.8], [-3.093, -2.48], [-3.4762, -2.56]]}]}, {"id": "NE", "name": "Neuchâtel (Neuenburg)", "capital": "Neuchâtel", "pop": "176 000", "yes": 63.1, "points": [[-4.8722, -0.4], [-4.3247, 0.24], [-3.2299, 1.04], [-3.7773, 1.32], [-4.5984, 0.52], [-4.8722, -0.4]], "cities": [{"id": "NE_1", "name": "Neuchâtel Város", "pop": "45k", "yes": 68.2, "points": [[-3.6952, 0.56], [-3.4215, 0.6], [-3.4762, 0.88], [-3.7499, 0.84]]}, {"id": "NE_2", "name": "La Chaux-de-Fonds", "pop": "37k", "yes": 64.5, "points": [[-3.9689, 1.0], [-3.6952, 1.04], [-3.7499, 1.28], [-4.0236, 1.24]]}]}, {"id": "GE", "name": "Genève (Genf)", "capital": "Genève", "pop": "510 000", "yes": 67.4, "points": [[-6.2134, -2.76], [-5.7481, -2.8], [-5.3922, -2.44], [-5.2554, -2.08], [-5.6659, -1.96], [-5.9944, -2.28], [-6.2134, -2.76]], "cities": [{"id": "GE_1", "name": "Genève Város", "pop": "203k", "yes": 73.1, "points": [[-5.8302, -2.56], [-5.6112, -2.56], [-5.6386, -2.32], [-5.8575, -2.36]]}, {"id": "GE_2", "name": "Carouge & Lancy", "pop": "55k", "yes": 68.0, "points": [[-5.8302, -2.72], [-5.6386, -2.72], [-5.6659, -2.52], [-5.8575, -2.56]]}, {"id": "GE_3", "name": "Vernier & Meyrin", "pop": "60k", "yes": 65.2, "points": [[-5.9944, -2.48], [-5.8028, -2.48], [-5.8302, -2.24], [-6.0218, -2.28]]}]}, {"id": "JU", "name": "Jura", "capital": "Delémont", "pop": "74 000", "yes": 61.0, "points": [[-3.7773, 1.32], [-3.2299, 1.04], [-2.4087, 1.72], [-1.9981, 2.64], [-3.093, 2.52], [-3.6404, 2.12], [-3.7773, 1.32]], "cities": [{"id": "JU_1", "name": "Delémont", "pop": "13k", "yes": 64.0, "points": [[-2.5456, 2.04], [-2.2719, 2.08], [-2.3266, 2.32], [-2.6003, 2.28]]}, {"id": "JU_2", "name": "Porrentruy (Ajoie)", "pop": "18k", "yes": 59.8, "points": [[-3.2846, 2.24], [-2.9835, 2.28], [-3.0383, 2.52], [-3.3393, 2.48]]}]}];
+
+    // --- 2. HÁROMDIMENZIÓS TÉR ÉS KAMERA KONFIGURÁCIÓJA ---
+    // A térkép a vízszintes X-Z síkon fekszik (X: Nyugat-Kelet, Z: Észak(-)-Dél(+))
+    // A 30 fokos déli rálátáshoz:
+    // Kamera pozíció: Z = +16.5 (délről), Y = +9.5 (felfelé döntve 30°-ban), X = 0
+    const INITIAL_CAM_POS = { x: 0, y: 9.5, z: 16.5 };
+    const INITIAL_TARGET = { x: 0, y: 0, z: -0.2 };
+
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x030712, 0.025);
+
+    const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(INITIAL_CAM_POS.x, INITIAL_CAM_POS.y, INITIAL_CAM_POS.z);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    container.appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.target.set(INITIAL_TARGET.x, INITIAL_TARGET.y, INITIAL_TARGET.z);
+    controls.maxPolarAngle = Math.PI / 2.05; // Föld alá nem engedi a kamerát
+
+    // --- 3. VILÁGÍTÁS ÉS ÁTTETSZŐ ALAPZAT ---
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+    scene.add(ambientLight);
+
+    const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.9);
+    dirLight1.position.set(10, 20, 15);
+    dirLight1.castShadow = true;
+    scene.add(dirLight1);
+
+    const dirLight2 = new THREE.DirectionalLight(0x38bdf8, 0.4);
+    dirLight2.position.set(-15, 10, -10);
+    scene.add(dirLight2);
+
+    // Finom diszkrét rácsháló a mélység érzékeltetéséhez
+    const grid = new THREE.GridHelper(36, 36, 0x1e293b, 0x0f172a);
+    grid.position.y = -0.05;
+    scene.add(grid);
+
+    // --- 4. 3D POLIGON ÉS ÁTTETSZŐ ÜVEG ANYAG GENERÁLÁS ---
+    const mainMapGroup = new THREE.Group();
+    const subDistrictGroup = new THREE.Group();
+    scene.add(mainMapGroup);
+    scene.add(subDistrictGroup);
+
+    // Anyagstílusok: Áttetsző monokróm üveg alapállapotban
+    const BASE_GLASS_MATERIAL = new THREE.MeshStandardMaterial({
+      color: 0x1e293b,
+      roughness: 0.1,
+      metalness: 0.05,
+      transparent: true,
+      opacity: 0.42,
+      polygonOffset: true,
+      polygonOffsetFactor: 1,
+      polygonOffsetUnits: 1
+    });
+
+    const BASE_EDGE_COLOR = 0x64748b;
+    const HOVER_GLOW_COLOR = 0x38bdf8;
+    const HOVER_EMISSIVE = 0x0284c7;
+
+    function build3DMesh(points, depth, data, isCity = false) {
+      const shape = new THREE.Shape();
+      shape.moveTo(points[0][0], points[0][1]);
+      for (let i = 1; i < points.length; i++) {
+        shape.lineTo(points[i][0], points[i][1]);
+      }
+      shape.closePath();
+
+      const extrudeSettings = {
+        depth: depth,
+        bevelEnabled: true,
+        bevelSegments: 2,
+        steps: 1,
+        bevelSize: 0.03,
+        bevelThickness: 0.03
+      };
+
+      const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+      geometry.computeBoundingBox();
+
+      // Alapértelmezett áttetsző anyag klónozása
+      const material = BASE_GLASS_MATERIAL.clone();
+
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+
+      // Elforgatjuk -90 fokkal X körül, hogy a vízszintes X-Z síkra feküdjön (Észak: -Z, Magasság: +Y)
+      mesh.rotation.x = -Math.PI / 2;
+
+      // Határvonalak (Élek) áttetsző fehér/szürke rajzolattal
+      const edges = new THREE.EdgesGeometry(geometry);
+      const edgeMaterial = new THREE.LineBasicMaterial({
+        color: BASE_EDGE_COLOR,
+        transparent: true,
+        opacity: 0.45
+      });
+      const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
+      mesh.add(edgeLines);
+
+      mesh.userData = {
+        ...data,
+        baseY: 0,
+        edgeLines: edgeLines,
+        isCity: isCity,
+        origColor: 0x1e293b,
+        origOpacity: isCity ? 0.6 : 0.42
+      };
+
+      return mesh;
+    }
+
+    // Kantonok betöltése a fő csoportba
+    const cantonMeshes = [];
+    SWISS_CANTONS.forEach(canton => {
+      const mesh = build3DMesh(canton.points, 0.35, canton, false);
+      mainMapGroup.add(mesh);
+      cantonMeshes.push(mesh);
+    });
+
+    // --- 5. INTERAKCIÓK: 3D HOVER KIUGROTTATÁS ÉS SZÍNVÁLTÁS ---
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let currentHovered = null;
+    let selectedCanton = null;
+    let selectedCity = null;
+
+    const tooltip = document.getElementById('tooltip');
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+      // Tooltip követés
+      tooltip.style.left = e.clientX + 'px';
+      tooltip.style.top = e.clientY + 'px';
+
+      raycaster.setFromCamera(mouse, camera);
+      const activeTargets = selectedCanton ? subDistrictGroup.children : mainMapGroup.children;
+      const intersects = raycaster.intersectObjects(activeTargets, false);
+
+      if (intersects.length > 0) {
+        const hitMesh = intersects[0].object;
+        if (currentHovered !== hitMesh) {
+          if (currentHovered) resetMeshHover(currentHovered);
+          currentHovered = hitMesh;
+          applyMeshHover(currentHovered);
+        }
+      } else {
+        if (currentHovered) {
+          resetMeshHover(currentHovered);
+          currentHovered = null;
+        }
+      }
+    });
+
+    function applyMeshHover(mesh) {
+      document.body.style.cursor = 'pointer';
+      
+      // 1. Fizikai 3D kiugrás a +Y tengelyen felfelé (0.6 egység)
+      gsap.to(mesh.position, { y: mesh.userData.baseY + 0.65, duration: 0.28, ease: 'power2.out' });
+
+      // 2. Anyag finom áttetsző ciánkék színre és enyhe fénykibocsátásra vált
+      gsap.to(mesh.material.color, { r: 0.22, g: 0.74, b: 0.97, duration: 0.2 });
+      gsap.to(mesh.material, { opacity: 0.82, duration: 0.2 });
+      mesh.material.emissive.setHex(HOVER_EMISSIVE);
+      mesh.material.emissiveIntensity = 0.45;
+
+      // 3. Élek kivilágosodása
+      mesh.userData.edgeLines.material.color.setHex(0xe0f2fe);
+      mesh.userData.edgeLines.material.opacity = 0.95;
+
+      // Tooltip megjelenítése
+      const d = mesh.userData;
+      tooltip.style.display = 'block';
+      tooltip.innerHTML = `
+        <strong>${d.name}</strong>
+        Népesség: ${d.pop}<br/>
+        Támogatottság: <span style="color:#38bdf8; font-weight:700;">${d.yes}% IGEN</span>
+      `;
+
+      updatePanelStats(d);
+    }
+
+    function resetMeshHover(mesh) {
+      document.body.style.cursor = 'default';
+      tooltip.style.display = 'none';
+
+      // Visszasüllyedés az alap pozícióba
+      gsap.to(mesh.position, { y: mesh.userData.baseY, duration: 0.25, ease: 'power2.out' });
+
+      // Visszaáll az áttetsző alap üveg megjelenés
+      const orig = new THREE.Color(mesh.userData.origColor);
+      gsap.to(mesh.material.color, { r: orig.r, g: orig.g, b: orig.b, duration: 0.25 });
+      gsap.to(mesh.material, { opacity: mesh.userData.origOpacity, duration: 0.25 });
+      mesh.material.emissive.setHex(0x000000);
+      mesh.material.emissiveIntensity = 0;
+
+      // Élek visszaállítása
+      mesh.userData.edgeLines.material.color.setHex(BASE_EDGE_COLOR);
+      mesh.userData.edgeLines.material.opacity = 0.45;
+    }
+
+    function updatePanelStats(d) {
+      document.getElementById('stat-target').innerText = d.name;
+      document.getElementById('stat-pop').innerText = d.pop;
+      document.getElementById('vote-yes-label').innerText = `IGEN: ${d.yes}%`;
+      const noVal = (100 - d.yes).toFixed(1);
+      document.getElementById('vote-no-label').innerText = `NEM: ${noVal}%`;
+      document.getElementById('vote-bar-fill').style.width = `${d.yes}%`;
+    }
+
+    // --- 6. KATTINTÁS ÉS KAMERA RÁZÚMOLÁS (DRILL-DOWN) ---
+    window.addEventListener('click', () => {
+      if (!currentHovered) return;
+      const data = currentHovered.userData;
+
+      // 1. KANTON SZINTRE LÉPÉS
+      if (!selectedCanton && !data.isCity) {
+        selectedCanton = currentHovered;
+
+        // Kanton középpontjának számítása a 3D térben
+        const box = new THREE.Box3().setFromObject(selectedCanton);
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+
+        // Kamera sima átmenete (30 fokos rálátás megőrzésével a fókuszált kantonra)
+        gsap.to(camera.position, {
+          x: center.x,
+          y: center.y + 4.2,
+          z: center.z + 7.2,
+          duration: 1.3,
+          ease: 'power3.inOut'
+        });
+        gsap.to(controls.target, {
+          x: center.x,
+          y: center.y,
+          z: center.z,
+          duration: 1.3,
+          ease: 'power3.inOut'
+        });
+
+        // Nem kiválasztott kantonok elhalványítása és lesüllyesztése
+        mainMapGroup.children.forEach(c => {
+          if (c !== selectedCanton) {
+            gsap.to(c.position, { y: -0.6, duration: 0.5 });
+            gsap.to(c.material, { opacity: 0.08, duration: 0.5 });
+          }
+        });
+
+        // Városok / Körzetek betöltése a kiválasztott kantonba
+        subDistrictGroup.clear();
+        if (data.cities && data.cities.length > 0) {
+          data.cities.forEach(city => {
+            const cityMesh = build3DMesh(city.points, 0.45, city, true);
+            cityMesh.position.y = 0.4;
+            cityMesh.userData.baseY = 0.4;
+            subDistrictGroup.add(cityMesh);
+          });
+        }
+
+        // UI frissítés
+        document.getElementById('bc-trail').innerHTML = `SVÁJC <span>/</span> ${data.name.toUpperCase()}`;
+        document.getElementById('panel-title').innerText = `${data.name} kanton`;
+        document.getElementById('panel-desc').innerText = 'Körzeti adatok megnyitva. Vidd az egeret egy város/körzet fölé, vagy kattints rá a részletekhez!';
+        document.getElementById('back-btn').style.display = 'block';
+        return;
+      }
+
+      // 2. VÁROS SZINTRE LÉPÉS
+      if (selectedCanton && data.isCity && !selectedCity) {
+        selectedCity = currentHovered;
+
+        const box = new THREE.Box3().setFromObject(selectedCity);
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+
+        gsap.to(camera.position, {
+          x: center.x,
+          y: center.y + 2.5,
+          z: center.z + 4.0,
+          duration: 1.1,
+          ease: 'power3.inOut'
+        });
+        gsap.to(controls.target, {
+          x: center.x,
+          y: center.y,
+          z: center.z,
+          duration: 1.1,
+          ease: 'power3.inOut'
+        });
+
+        // Egyéb városok elhalványítása
+        subDistrictGroup.children.forEach(cm => {
+          if (cm !== selectedCity) {
+            gsap.to(cm.material, { opacity: 0.1, duration: 0.4 });
+          }
+        });
+
+        document.getElementById('bc-trail').innerHTML = `SVÁJC <span>/</span> ${selectedCanton.userData.name.toUpperCase()} <span>/</span> ${data.name.toUpperCase()}`;
+        document.getElementById('panel-title').innerText = data.name;
+        document.getElementById('panel-desc').innerText = 'Települési szintű szavazóköri végeredmény.';
+      }
+    });
+
+    // --- 7. VISSZANAVIGÁLÁS (BREADCRUMB / BACK) ---
+    window.handleBack = function() {
+      if (selectedCity) {
+        // Városból vissza a kanton nézetbe
+        selectedCity = null;
+        const box = new THREE.Box3().setFromObject(selectedCanton);
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+
+        gsap.to(camera.position, {
+          x: center.x,
+          y: center.y + 4.2,
+          z: center.z + 7.2,
+          duration: 1.0,
+          ease: 'power2.inOut'
+        });
+        gsap.to(controls.target, {
+          x: center.x,
+          y: center.y,
+          z: center.z,
+          duration: 1.0,
+          ease: 'power2.inOut'
+        });
+
+        subDistrictGroup.children.forEach(cm => {
+          gsap.to(cm.material, { opacity: 0.6, duration: 0.4 });
+        });
+
+        document.getElementById('bc-trail').innerHTML = `SVÁJC <span>/</span> ${selectedCanton.userData.name.toUpperCase()}`;
+        document.getElementById('panel-title').innerText = `${selectedCanton.userData.name} kanton`;
+        document.getElementById('panel-desc').innerText = 'Körzeti adatok megnyitva. Vidd az egeret a városok fölé a kiemeléshez!';
+        updatePanelStats(selectedCanton.userData);
+      } else if (selectedCanton) {
+        // Kantonból vissza az országos nézetbe
+        selectedCanton = null;
+        subDistrictGroup.clear();
+
+        gsap.to(camera.position, {
+          x: INITIAL_CAM_POS.x,
+          y: INITIAL_CAM_POS.y,
+          z: INITIAL_CAM_POS.z,
+          duration: 1.2,
+          ease: 'power2.inOut'
+        });
+        gsap.to(controls.target, {
+          x: INITIAL_TARGET.x,
+          y: INITIAL_TARGET.y,
+          z: INITIAL_TARGET.z,
+          duration: 1.2,
+          ease: 'power2.inOut'
+        });
+
+        mainMapGroup.children.forEach(c => {
+          gsap.to(c.position, { y: 0, duration: 0.6 });
+          gsap.to(c.material, { opacity: 0.42, duration: 0.6 });
+        });
+
+        document.getElementById('bc-trail').innerHTML = 'SVÁJC';
+        document.getElementById('panel-title').innerText = 'Svájci Államszövetség';
+        document.getElementById('panel-desc').innerText = 'Vidd az egeret egy kanton fölé a 3D kiemeléshez, majd kattints a kantonon belüli városok felfedezéséhez!';
+        document.getElementById('stat-target').innerText = '26 Kanton';
+        document.getElementById('stat-pop').innerText = '8.9 Millió';
+        document.getElementById('vote-yes-label').innerText = 'IGEN: 61.4%';
+        document.getElementById('vote-no-label').innerText = 'NEM: 38.6%';
+        document.getElementById('vote-bar-fill').style.width = '61.4%';
+        document.getElementById('back-btn').style.display = 'none';
+      }
+    };
+
+    // --- 8. RENDERELÉSI CIKLUS ÉS ÁTMÉRETEZÉS ---
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
