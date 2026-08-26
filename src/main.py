@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -10,11 +12,22 @@ from src.services.geo_converter import lv95_to_wgs84
 from src.services.place_service import PlaceService
 from src.services.politics_service import PoliticsService
 
+_DEFAULT_CORS_ORIGINS = "http://localhost:3000"
+
+
+def _allowed_origins() -> list[str]:
+    """Engedélyezett CORS originek — `SWISSPM_CORS_ORIGINS` (vesszővel tagolt) felülírhatja."""
+    raw = os.environ.get("SWISSPM_CORS_ORIGINS", "").strip()
+    if not raw:
+        return [_DEFAULT_CORS_ORIGINS]
+    return [item.strip() for item in raw.split(",") if item.strip()]
+
+
 app = FastAPI(title="Swiss P Map", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=_allowed_origins(),
     allow_methods=["*"],
     allow_headers=["*"],
 )
