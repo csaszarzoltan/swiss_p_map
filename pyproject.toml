@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "swiss-p-map"
+version = "0.1.0"
+description = "Swiss P Map — Interaktív svájci környéki döntéstámogató térkép (Politics, Place, Planning)"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "Swiss P Map Team" }
+]
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.28.0",
+    "pydantic>=2.6.0",
+    "httpx>=0.27.0",
+    "pyproj>=3.6.0",
+    "shapely>=2.0.0",
+    "python-dotenv>=1.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "playwright>=1.40.0",
+    "mypy>=1.8.0",
+    "ruff>=0.3.0"
+]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests", ".agent-pipeline/03_e2e_suites"]
+python_files = ["test_*.py"]
+asyncio_mode = "auto"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
