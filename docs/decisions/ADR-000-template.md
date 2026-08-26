@@ -26,5 +26,5 @@ Mit választottunk és miért. 3-5 bullet.
 
 ## Kapcsolódó
 - Research: `docs/research/...`
-- Kód: `control_plane/...`
+- Kód: `src/...`
 - Következő ADR: ADR-XXX
