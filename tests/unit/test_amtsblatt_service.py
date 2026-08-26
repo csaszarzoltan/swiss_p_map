@@ -90,11 +90,7 @@ async def test_fetch_http_error_returns_empty() -> None:
 @pytest.mark.asyncio
 async def test_fetch_skips_malformed_entry() -> None:
     """One OK, one missing title — only the valid one is returned."""
-    xml = SAMPLE_XML.replace(
-        "<title><de>Seefeldstrasse 6",
-        "<title><de>Good</de></title></publication><publication><id>bad",
-    )
-    # Simpler: two pubs, second without postcode -> skip
+    # malformed: one ok, one without valid postcode -> skip second
     xml2 = """<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <result><total>2</total><publications>
   <publication><id>ok-1</id><title><de>Ok</de></title><registrationOffice><swissZipCode>8004</swissZipCode><town>Zürich</town></registrationOffice><publicationDate>2026-08-26</publicationDate><expirationDate>2027-08-26</expirationDate><cantons><canton>ZH</canton></cantons></publication>

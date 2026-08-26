@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.models.geo import CoordinateWGS84
 from src.services.geo_converter import lv95_to_wgs84
 from src.services.place_service import PlaceService
+from src.services.planning_service import PlanningService
 from src.services.politics_service import PoliticsService
 
 _DEFAULT_CORS_ORIGINS = "http://localhost:3000"
@@ -34,6 +35,7 @@ app.add_middleware(
 
 _politics = PoliticsService()
 _place = PlaceService()
+_planning = PlanningService()
 
 
 @app.get("/health")
@@ -68,3 +70,12 @@ def place_info(postcode: str) -> dict[str, object]:
     if data is None:
         raise HTTPException(status_code=404, detail=f"no data for postcode {postcode}")
     return data.model_dump()
+
+
+@app.get("/api/v1/planning/baugesuche")
+def planning_baugesuche(
+    postcode: str | None = Query(default=None, min_length=4, max_length=4),
+    active_only: bool = Query(default=True),
+) -> dict[str, object]:
+    items = _planning.list_items(postcode=postcode, active_only=active_only)
+    return {"items": [b.model_dump(mode="json") for b in items]}

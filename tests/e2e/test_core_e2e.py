@@ -46,3 +46,23 @@ def test_cors_preflight() -> None:
     )
     assert r.status_code in (200, 204)
     assert r.headers.get("access-control-allow-origin") == "http://localhost:3000"
+
+
+def test_planning_baugesuche_empty_ok() -> None:
+    r = client.get("/api/v1/planning/baugesuche")
+    assert r.status_code == 200
+    assert "items" in r.json()
+    assert isinstance(r.json()["items"], list)
+
+
+def test_planning_baugesuche_postcode_filter() -> None:
+    r = client.get("/api/v1/planning/baugesuche", params={"postcode": "8004"})
+    assert r.status_code == 200
+    for item in r.json()["items"]:
+        assert item["postcode"] == "8004"
+
+
+def test_planning_baugesuche_active_only_param() -> None:
+    r = client.get("/api/v1/planning/baugesuche", params={"active_only": "false"})
+    assert r.status_code == 200
+    assert "items" in r.json()

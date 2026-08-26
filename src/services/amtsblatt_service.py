@@ -119,7 +119,7 @@ def _parse_publications(xml_text: str) -> list[Baugesuch]:
                 source_url=f"https://amtsblattportal.ch/api/v1/publications/{pid}/xml",
             )
             out.append(b)
-        except Exception:
+        except (ValueError, TypeError, KeyError, AttributeError):
             continue
     return out
 
