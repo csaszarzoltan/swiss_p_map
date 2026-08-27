@@ -71,7 +71,7 @@ export const api = {
   place: (postcode: string, live = true) =>
     getJson<PlaceInfo>(`/api/v1/place/${postcode}${live ? "?live=true" : ""}`),
   politics: (postcode: string, live = true) =>
-    getJson<DistrictRepresentatives>(`/api/v1/politics?postcode=${postcode}${live ? "&live=true" : ""}`),
+    getJson<DistrictRepresentatives>(`/api/v1/politics/representatives?postcode=${postcode}${live ? "&live=true" : ""}`),
   planning: (postcode?: string, activeOnly = true) =>
     getJson<{ items: Baugesuch[] }>(
       `/api/v1/planning/baugesuche?${new URLSearchParams({
@@ -89,7 +89,7 @@ export async function fetchPlace(postcode: string, live = false): Promise<PlaceI
 }
 
 export async function fetchPolitics(postcode: string, live = false): Promise<DistrictRepresentatives | null> {
-  const url = `${BASE}/api/v1/politics?postcode=${postcode}${live ? "&live=true" : ""}`;
+  const url = `${BASE}/api/v1/politics/representatives?postcode=${postcode}${live ? "&live=true" : ""}`;
   const res = await fetch(url);
   if (!res.ok) return null;
   return res.json() as Promise<DistrictRepresentatives>;

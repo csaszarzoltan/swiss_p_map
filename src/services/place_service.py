@@ -238,7 +238,13 @@ class PlaceService:
         self._client = client
 
     def get_by_postcode(self, postcode: str) -> PlaceInfo | None:
-        return _STUBS.get(postcode.strip())
+        stub = _STUBS.get(postcode.strip())
+        if stub is None:
+            return None
+        lvl, reason = self._risk_for(stub, stub.steuerfuss_percent, stub.noise_db_day, stub.solar_kwh_m2, stub.oereb_zone)
+        if stub.risk_level is not None:
+            return stub
+        return stub.model_copy(update={"risk_level": lvl, "risk_reason": reason})
 
     def list_postcodes(self) -> list[str]:
         return sorted(_STUBS.keys())
@@ -357,6 +363,9 @@ class PlaceService:
                     steuerfuss = parsed_pct
                     steuerfuss_src = parsed_src or "zh-steueramt-html"
 
+        # ADR-020: risk scoring (deterministic, no upstream dependency)
+        risk_level, risk_reason = self._risk_for(base, steuerfuss, laerm, solar_kwh, oereb_zone)
+
         return PlaceInfo(
             postcode=code,
             municipality=base.municipality,
@@ -369,4 +378,38 @@ class PlaceService:
             solar_class=solar_klasse,
             oereb_zone=oereb_zone,
             steuerfuss_source=steuerfuss_src,
+            risk_level=risk_level,
+            risk_reason=risk_reason,
         )
+
+    @staticmethod
+    def _risk_for(
+        base: PlaceInfo,
+        steuerfuss: float | None,
+        laerm: float | None,
+        solar_kwh: float | None,
+        oereb_zone: str | None,
+    ) -> tuple[str | None, str | None]:
+        """ADR-020 risk heuristic: high/medium/low + reason (5 words max).
+
+        Rules (in priority order):
+        - Kernzone → high (ÖREB preservation)
+        - Lärm >70 dB → high, >60 dB → medium
+        - Solar sehr gut + low noise → low (good micro-location)
+        - Otherwise medium for non-trivial, low when everything quiet.
+        """
+        laerm_eff = laerm if laerm is not None else base.noise_db_day
+        zone = (oereb_zone or base.oereb_zone or "").lower()
+        if "kernzone" in zone:
+            return "high", "Kernzone — heightened preservation requirements"
+        if laerm_eff is not None:
+            if laerm_eff > 70:
+                return "high", "Straßenlärm >70 dB — elevated noise exposure"
+            if laerm_eff > 60:
+                return "medium", "Straßenlärm >60 dB — moderate noise exposure"
+        if solar_kwh is not None and solar_kwh >= 1200 and (laerm_eff is None or laerm_eff < 55):
+            return "low", "Sehr gut solar + quiet location"
+        # Default: low when nothing elevated
+        if laerm_eff is not None and laerm_eff >= 55:
+            return "medium", "Moderate environmental indicators"
+        return "low", "No elevated indicator"

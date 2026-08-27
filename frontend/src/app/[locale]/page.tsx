@@ -9,8 +9,10 @@ import TopicSidebar, { type Topic } from "@/components/TopicSidebar";
 import TopicList from "@/components/TopicList";
 import DetailPanel from "@/components/DetailPanel";
 import MapLegend from "@/components/MapLegend";
+import RiskBadge from "@/components/RiskBadge";
 import WatchZone from "@/components/WatchZone";
 import ShareButton from "@/components/ShareButton";
+import { parseShareableState, useShareableState } from "@/hooks/useShareableState";
 import type { Baugesuch, DistrictRepresentatives, PlaceInfo } from "@/lib/api";
 
 const Map3D = dynamic(() => import("../Map3D"), { ssr: false });
@@ -30,6 +32,48 @@ export default function Home() {
   const [activeTopic, setActiveTopic] = useState<Topic>("overview");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const [watchRadius, setWatchRadius] = useState<number>(500);
+
+  // ADR-022: deep-link state ↔ URL (plz/topic/selected/radius)
+  useShareableState(
+    {
+      plz: result?.place?.postcode,
+      topic: activeTopic,
+      selected: selectedId,
+      radius: watchRadius,
+    },
+    (shared) => {
+      if (shared.topic) setActiveTopic(shared.topic);
+      if (shared.selected != null) setSelectedId(shared.selected);
+      if (shared.radius) setWatchRadius(shared.radius);
+    },
+  );
+
+  // ADR-022: restore search on mount if ?plz= is present
+  const didRestoreRef = useState(() => ({ done: false }))[0];
+  useEffect(() => {
+    if (didRestoreRef.done) return;
+    const parsed = parseShareableState(typeof window !== "undefined" ? window.location.search : "");
+    if (parsed.plz) {
+      didRestoreRef.done = true;
+      const base = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8310";
+      Promise.all([
+        fetch(`${base}/api/v1/place/${parsed.plz}?live=true`).then((r) => (r.ok ? r.json() : null)).catch(() => null) as Promise<PlaceInfo | null>,
+        fetch(`${base}/api/v1/politics?postcode=${parsed.plz}&live=true`).then((r) => (r.ok ? r.json() : null)).catch(() => null) as Promise<DistrictRepresentatives | null>,
+        fetch(`${base}/api/v1/planning/baugesuche?postcode=${parsed.plz}&active_only=true`).then((r) => (r.ok ? r.json() : null)).catch(() => null) as Promise<{ items: Baugesuch[] } | null>,
+      ]).then(([place, politics, planning]) => {
+        if (!place) return;
+        void import("../postcode_coords").then((m) => {
+          m.resolvePostcode(place.postcode).then((lngLat) => {
+            setResult({ place, politics: politics ?? undefined, baugesuche: planning?.items ?? [], lngLat });
+          });
+        });
+      });
+      if (parsed.topic) setActiveTopic(parsed.topic);
+      if (parsed.selected != null) setSelectedId(parsed.selected);
+      if (parsed.radius) setWatchRadius(parsed.radius);
+    }
+  }, [didRestoreRef]);
 
   const mapLocale = useMemo(
     () => ({
@@ -176,9 +220,26 @@ export default function Home() {
 
       {/* Lista + Részletező — a térkép alatt */}
       <div className="mx-auto max-w-[1280px] border-t border-white/10 bg-[#080c18]">
+        {result?.place && (result.place.risk_level || result.place.risk_reason) && (
+          <div className="px-4 py-3">
+            <RiskBadge
+              level={result.place.risk_level as "low" | "medium" | "high" | null}
+              reason={result.place.risk_reason}
+            />
+          </div>
+        )}
         <TopicList topic={activeTopic} result={result} selectedId={selectedId} onSelect={setSelectedId} />
-        <WatchZone center={result?.lngLat} radius={500} onRadiusChange={() => undefined} />
-        <ShareButton getUrl={() => typeof window === "undefined" ? "" : window.location.href} />
+        <WatchZone center={result?.lngLat} radius={watchRadius} onRadiusChange={setWatchRadius} />
+        <ShareButton
+          getUrl={() => {
+            const u = new URL(window.location.href);
+            if (result?.place?.postcode) u.searchParams.set("plz", result.place.postcode);
+            u.searchParams.set("topic", activeTopic);
+            if (selectedId) u.searchParams.set("selected", selectedId);
+            if (watchRadius !== 500) u.searchParams.set("radius", String(watchRadius));
+            return u.toString();
+          }}
+        />
         <DetailPanel topic={activeTopic} selectedId={selectedId} result={result} summary={summary} aiSummary={aiSummary} />
       </div>
 
