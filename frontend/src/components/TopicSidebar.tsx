@@ -22,8 +22,7 @@ const TOPICS: { id: Topic; icon: string; labelKey: string }[] = [
 export default function TopicSidebar({ activeTopic, onSelect, counts }: TopicSidebarProps) {
   const t = useTranslations();
   return (
-    <nav data-testid="topic-sidebar" className="flex w-[200px] shrink-0 flex-col gap-1 border-r border-white/10 bg-[#0b1220] p-3">
-      <p className="mb-2 px-2 text-[10px] font-semibold tracking-[0.18em] text-slate-500">THEMEN</p>
+    <nav data-testid="topic-sidebar" className="flex flex-wrap gap-1.5 border-y border-white/10 bg-[#0b1220] px-4 py-3">
       {TOPICS.map(({ id, icon, labelKey }) => {
         const active = activeTopic === id;
         const count = counts[id] ?? 0;
@@ -32,21 +31,19 @@ export default function TopicSidebar({ activeTopic, onSelect, counts }: TopicSid
             key={id}
             data-testid={`menu-${id}`}
             onClick={() => onSelect(id)}
-            className={`flex items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm transition ${
+            className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition ${
               active
                 ? "bg-white text-slate-900 shadow"
-                : "text-slate-300 hover:bg-white/10 hover:text-white"
+                : "border border-white/10 bg-white/[0.06] text-slate-200 hover:bg-white/15 hover:text-white"
             }`}
           >
-            <span className="flex items-center gap-2.5">
-              <span className="text-base leading-none">{icon}</span>
-              <span className="font-medium">{t(labelKey)}</span>
-            </span>
+            <span className="text-base leading-none">{icon}</span>
+            <span>{t(labelKey)}</span>
             {count > 0 && (
               <span
                 data-testid={`menu-count-${id}`}
                 className={`rounded-full px-1.5 py-0.5 text-[11px] font-bold leading-none ${
-                  active ? "bg-slate-900 text-white" : "bg-white/15 text-slate-200"
+                  active ? "bg-slate-900 text-white" : "bg-sky-500/20 text-sky-200"
                 }`}
               >
                 {count}

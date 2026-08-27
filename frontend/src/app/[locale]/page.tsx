@@ -110,9 +110,10 @@ export default function Home() {
     return () => ctrl.abort();
   }, [result, locale]);
 
+  const selectedBaugesuch = selectedId ? (result?.baugesuche ?? []).find((b) => b.id === selectedId) : null;
+
   return (
     <main className="min-h-screen bg-[#030712] text-gray-100">
-      {/* Header + Search */}
       <div className="border-b border-white/10 bg-[#0b1220]/80 backdrop-blur">
         <div className="mx-auto max-w-[1280px] px-6 py-4">
           <SearchPanel onResult={handleResult} />
@@ -120,24 +121,23 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Sidebar + Map + List */}
-      <div className="mx-auto flex max-w-[1280px] flex-col md:flex-row">
-        {/* Left: sidebar + list stacked */}
-        <div className="flex w-full shrink-0 flex-col border-white/10 md:w-[280px] md:border-r">
-          <TopicSidebar activeTopic={activeTopic} onSelect={handleTopicSelect} counts={counts} />
-          <div className="flex-1 overflow-y-auto border-t border-white/10 bg-[#080c18]">
-            <TopicList topic={activeTopic} result={result} selectedId={selectedId} onSelect={setSelectedId} />
-          </div>
-        </div>
-
-        {/* Right: map */}
-        <div className="flex min-h-[420px] flex-1 flex-col bg-black">
-          <Map3D selectedPostcode={result?.place?.postcode ?? null} baugesuche={result?.baugesuche ?? []} mapLocale={mapLocale} />
-        </div>
+      {/* Menü fölül — teljes szélesség */}
+      <div className="mx-auto max-w-[1280px]">
+        <TopicSidebar activeTopic={activeTopic} onSelect={handleTopicSelect} counts={counts} />
       </div>
 
-      {/* Bottom detail panel */}
-      <div className="mx-auto max-w-[1280px]">
+      {/* Térkép — teljes szélesség, a lehető legszélesebb */}
+      <div className="mx-auto w-full max-w-[1600px]">
+        <Map3D
+          selectedPostcode={result?.place?.postcode ?? null}
+          baugesuche={activeTopic === "planung" && selectedBaugesuch ? [selectedBaugesuch] : (result?.baugesuche ?? [])}
+          mapLocale={mapLocale}
+        />
+      </div>
+
+      {/* Lista + Részletező — a térkép alatt */}
+      <div className="mx-auto max-w-[1280px] border-t border-white/10 bg-[#080c18]">
+        <TopicList topic={activeTopic} result={result} selectedId={selectedId} onSelect={setSelectedId} />
         <DetailPanel topic={activeTopic} selectedId={selectedId} result={result} summary={summary} aiSummary={aiSummary} />
       </div>
 
