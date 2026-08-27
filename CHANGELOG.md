@@ -4,7 +4,9 @@ Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Ch
 
 ## [Unreleased]
 
-## [0.2.1] - 2026-08-27
+### Fixed
+- CORS default originek bővítése: `localhost:3310` és `127.0.0.1:3310` támogatása alapértelmezettként a böngészős fetch hibák megelőzésére
+
 
 ### Added
 - OGD 2982 backfill: `GET daten.statistik.zh.ch/.../KTZH_00002982_00006183.csv` **22k sor**, `POST /api/v1/planning/backfill → {count 22141, source ogd}` — `ADR-009` hibrid 4.25/5

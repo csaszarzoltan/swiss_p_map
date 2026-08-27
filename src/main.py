@@ -14,15 +14,16 @@ from src.services.place_service import PlaceService
 from src.services.planning_service import PlanningService
 from src.services.politics_service import PoliticsService
 
-_DEFAULT_CORS_ORIGINS = "http://localhost:3000"
+_DEFAULT_CORS_ORIGINS = (
+    "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3310,http://127.0.0.1:3310"
+)
 
 
 def _allowed_origins() -> list[str]:
     """Engedélyezett CORS originek — `SWISSPM_CORS_ORIGINS` (vesszővel tagolt) felülírhatja."""
     raw = os.environ.get("SWISSPM_CORS_ORIGINS", "").strip()
-    if not raw:
-        return [_DEFAULT_CORS_ORIGINS]
-    return [item.strip() for item in raw.split(",") if item.strip()]
+    source = raw if raw else _DEFAULT_CORS_ORIGINS
+    return [item.strip() for item in source.split(",") if item.strip()]
 
 
 app = FastAPI(title="Swiss P Map", version="0.2.1")

@@ -4,10 +4,13 @@ from src.main import _allowed_origins
 
 
 class TestCorsOrigins:
-    def test_default_origin_is_localhost_3000(self, monkeypatch):  # type: ignore[no-untyped-def]
-        """Alapértelmezett engedélyezett origin: localhost:3000."""
+    def test_default_origins_include_3000_and_3310(self, monkeypatch):  # type: ignore[no-untyped-def]
+        """Alapértelmezett engedélyezett originek: localhost:3000, 3310 és 127.0.0.1."""
         monkeypatch.delenv("SWISSPM_CORS_ORIGINS", raising=False)
-        assert _allowed_origins() == ["http://localhost:3000"]
+        origins = _allowed_origins()
+        assert "http://localhost:3000" in origins
+        assert "http://localhost:3310" in origins
+        assert "http://127.0.0.1:3310" in origins
 
     def test_origins_from_env_comma_separated(self, monkeypatch):  # type: ignore[no-untyped-def]
         """Env-ből vesszővel tagolt lista, whitespace levágva."""
@@ -23,4 +26,5 @@ class TestCorsOrigins:
     def test_empty_env_falls_back_to_default(self, monkeypatch):  # type: ignore[no-untyped-def]
         """Üres env érték → alapértelmezés."""
         monkeypatch.setenv("SWISSPM_CORS_ORIGINS", "  ")
-        assert _allowed_origins() == ["http://localhost:3000"]
+        origins = _allowed_origins()
+        assert "http://localhost:3310" in origins
