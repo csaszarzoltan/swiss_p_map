@@ -2,47 +2,51 @@
 
 > **Cél:** egyetlen dokumentum, ami az auditort 5 percen belül képbe hoz. Részletes tervek: lásd linkek.
 
-- **Dátum:** 2026-08-26
-- **Állapot:** Phase 1 KÉSZ + API↔Map integráció végrehajtva (`aa634ac`) + Planning kutatás/ADR-002 proposed (`ae2099f`)
-- **Board:** `swiss-p-map` kanban — 6 done + 1 blocked (ADR-002 jóváhagyásra vár)
+- **Dátum:** 2026-08-27 (frissítve)
+- **Állapot:** Phase 1+2 KÉSZ — i18n + Politics/Place live + AI summary + Ort expansion + Planning refresh (678a056)
+- **Board:** `swiss-p-map` kanban — 11 done, 0 blocked
+- **Következő:** Stabilizálás (FE dev wrapper DBUS-fix + BE prod supervisord) + dokumentum konszolidáció
 
 ---
 
-## 1. Hol tartunk (faktok)
+## 1. Hol tartunk (faktok, 2026-08-27)
 
 | Réteg | Állapot | Bizonyíték |
 |---|---|---|
-| Docs (research/ADR/competitor) | ✅ kész | ADR-001 accepted, W35 scan, kickoff, **ADR-002 proposed** |
-| Backend domain modellek | ✅ kész | `src/models/{geo,place,politics}.py` |
-| Backend szolgáltatások | ✅ kész (stub adatokkal) | `src/services/*` — Swisstopo DI+mockolt httpx |
-| FastAPI | ✅ fut | `/health`, geo/convert, politics, place + **CORS env-állítható** |
-| Tesztek | ✅ **23 passed** | 12 unit (+3 CORS cfg) + E2E (+1 preflight) |
-| Minőségkapuk | ✅ zöldek | mypy strict clean (17 file), ruff clean |
+| Docs (research/ADR/competitor) | ✅ 8 ADR, 8 research | ADR-001…007 mind accepted, W35 scan, kickoff, ai-summary-live, ort-expansion |
+| Backend domain modellek | ✅ bővítve | `place.py` +4 mező (solar_kwh_m2/solar_class/oereb_zone/steuerfuss_source) |
+| Backend szolgáltatások | ✅ élő OGD | `place_service 273 sor` (ARE/BAFU/BFE + OEREB), `politics_service 197 sor` (PARIS CQL), `ai_summary 64 sor` (8013 gateway), `amtsblatt_service` (XML 1.24/1.26 toleráns) |
+| FastAPI | ✅ 9 endpoint | `/health`, geo/convert, politics?live, place/{pc}?live, planning/baugesuche + /refresh, ai/summary, CORS env |
+| Tesztek | ✅ 43 passed | 41→43, test_place_ort_expansion + test_planning_refresh mock + test_ai_summary 2/2 |
+| Minőségkapuk | ✅ zöldek | mypy 17 clean, ruff clean, build SSG 4 nyelv |
 | CI | ✅ 2 job | backend (ruff/mypy/pytest) + frontend (npm ci/lint/build) |
-| Frontend | ✅ **integrálva** | kereső (PLZ/szabad szöveg) → panel + fly-to marker, élő Swisstopo geokódolás |
-| Élő füst | ✅ bizonyított | uvicorn 8310 (/health, /place, /politics, CORS) + FE 3310 (HTML OK) |
+| Frontend | ✅ 4 nyelv élő | de/en/fr/it `always`, SearchPanel+Ort 6 csempe (solar sárga + öreb lila), aiSummary fetch 8013→fallback, KI-ZUSAMMENFASSUNG mind 4 nyelven |
+| Élő füst | ✅ bizonyított | 8310 health ok + place 8004?live A/62.5dB + planning/refresh count 100 ZH + FE 3310 lang de 200 + 4/4 PW 21s |
 
-## 2. Ami MÉG stub / mock (őszintén, audit szempontból fontos)
+## 2. Ami MÉG stub / mock (őszintén)
 
-- **`politics_service.py`**: 2 postcode (8004, 8001) beégetett stub — PARIS-API még NINCS bekötve
-- **`place_service.py`**: Steuerfuss/zaj/ÖV számok példaadatok, nem hivatalos forrásból
-- **`swisstopo_service.py`** (backend): tesztek mockolják; élő Swisstopo hívás egyelőre a frontend geokódolásban fut (`postcode_coords.ts`)
-- **Adattár nincs** — minden memóriában; PostGIS az ADR-001-ben eldöntve, de még nem épült (ADR-002: SQLite MVP)
-- **AI réteg (LLM összefoglalók)** — csak az ADR-ben szerepel, nulla implementáció
-- **Planning pillér** — kutatás kész, ADR-002 **proposed**; kód CSAK jóváhagyás után
+- **Steuerfuss ZH:** `ZH-CSV Opendatasoft` wiring hiányzik (oereb_zone stub fallback), ma még 119% stub — ZH OGD join a következő kártya (ADR-007 követő)
+- **FE dev wrapper:** production `next start -p 3310` stabil (Ready 637ms), de `next dev` Hermès DBUS-wrapper EADDRINUSE-ral hal — workshop-körben productionnel megy (known, non-blocking)
+- **ÖREB WFS:** `ch.vd.oereb` Identify layer minta, kanton-független WFS `maps.zh.ch/wfs/OerebKatasterZHWFS` wiring a következő ADR-003
+- **OGD 2982 backfill:** történeti Baugesuche JSON előtt `?live` demo seed + napi poll; backfill külön kártya
 
-## 3. Következő lépések (tervek)
+## 3. Következő lépések (minden research→ADR→kód)
 
-| Terv | Fájl | Scope | Becslés |
+| Terv | Fájl | Scope | Állapot |
 |---|---|---|---|
-| ~~API ↔ Map integráció~~ | `docs/plans/2026-08-26-api-map-integration.md` | ✅ VÉGREHAJTVA (`aa634ac`) | done |
-| Planning pillér (Phase 2) | `docs/plans/2026-08-26-planning-pillar-phase2.md` | Task 0 kutatás ✅ + ADR-002 proposed → **jóváhagyásra vár** | gate |
-| Roadmap utána | — | ÖREB M2M (ADR-003), OGD 2982 backfill, Audit-C live OGD, AI összefoglalók | külön ADR-ek |
+| ~~API ↔ Map integráció~~ | `2026-08-26-api-map-integration.md` | kereső+marker+geokódolás | ✅ done |
+| ~~Planning PH2~~ | `2026-08-26-planning-pillar-phase2.md` | Baugesuch + SQLite + /refresh | ✅ 678a056 |
+| ~~i18n 4 nyelv~~ | ADR-004 | next-intl always | ✅ 2ba49b6 |
+| ~~Politics/Place live~~ | ADR-005 | PARIS + api3 ARE/BAFU | ✅ 02c57bd+561e1ea |
+| ~~AI summary~~ | ADR-006 | gateway 8013 4.62/5 | ✅ bd68613 |
+| ~~Ort expansion~~ | ADR-007 | Solar+ÖREB 4.50/5 | ✅ cbfebf3 |
+| Stabilizálás | — | FE dev DBUS wrapper + BE supervisord + roadmap 2. szekció | ⏳ ez a kör |
 
-## 4. Audit-checklist (mit nézzen)
+## 4. Audit-checklist
 
-1. **Módszertan betartás:** research → ADR → scaffold → RED→GREEN (git log láncolat végigkövethető)
-2. **Teszt-minőség:** van-e hamis teszt? (korábban javítottuk: `test_swiss_bounds_*`) — most minden teszt valódi modult hív
-3. **Stub-transparency:** a 2. szekció listája fed-e mindent?
-4. **Konkurencia-pozicionálás:** W35 scan állításai (Houzy/smartconext) még aktuálisak-e?
-5. **Biztonság:** jelenleg nincs auth — a stub API publikus read-only; POST endpoint nincs. Kockázat: alacsony, de az audit mondjon véleményt.
+1. research → ADR → scaffold → RED→GREEN lánc minden featuren (git log végigkövethető: 12 commit 26-án + 3 27-én)
+2. Tesztek MockTransport-tal, httpx DI, fallback stub → E2E nem törik upstream leállásnál
+3. Stub-transparency: lásd 2. szekció — 3 nyílt tétel maradt
+4. Konkurencia: W35 scan validálva, Houzy/smartconext állítások stimmelnek
+5. Biztonság: publikus read-only API + ai/summary gateway, nincs auth — alacsony kockázat, POST /refresh nincs rate-limit
+
