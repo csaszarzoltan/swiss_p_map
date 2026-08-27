@@ -94,5 +94,41 @@
   "header": {
     "title": "Swiss P Map",
     "subtitle": "Die Schweizer Nachbarschaft auf einer Karte"
+  },
+  "legend": {
+    "title": "Map legend",
+    "highYes": "High YES share",
+    "balanced": "Balanced",
+    "highNo": "High NO share",
+    "solarLow": "Lower solar yield",
+    "solarHigh": "Higher solar yield",
+    "coreZone": "Core zone",
+    "residentialZone": "Residential zone",
+    "openZone": "Open zone",
+    "source": "Official source: {source}"
+  },
+  "risk": {
+    "why": "Why?",
+    "level": {
+      "low": "Low risk",
+      "medium": "Medium risk",
+      "high": "High risk"
+    },
+    "defaultReason": {
+      "low": "No elevated indicator.",
+      "medium": "One indicator needs attention.",
+      "high": "An elevated indicator needs attention."
+    }
+  },
+  "watch": {
+    "title": "Watch zone",
+    "selectPlace": "Search for a place first.",
+    "loading": "Loading nearby applications...",
+    "count": "{count} applications in this radius"
+  },
+  "share": {
+    "button": "Copy link",
+    "copied": "Link copied",
+    "error": "Copy failed"
   }
 }

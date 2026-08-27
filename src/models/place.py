@@ -31,3 +31,5 @@ class PlaceInfo(BaseModel):
     solar_class: str | None = Field(None, description="Solar Eignung Klasse")
     oereb_zone: str | None = Field(None, description="ÖREB Nutzungszone (W2, Kernzone...)")
     steuerfuss_source: str = Field("stub", description="stub|zh-ogd")
+    risk_level: str | None = None
+    risk_reason: str | None = None

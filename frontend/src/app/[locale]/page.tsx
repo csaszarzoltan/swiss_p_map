@@ -8,6 +8,9 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import TopicSidebar, { type Topic } from "@/components/TopicSidebar";
 import TopicList from "@/components/TopicList";
 import DetailPanel from "@/components/DetailPanel";
+import MapLegend from "@/components/MapLegend";
+import WatchZone from "@/components/WatchZone";
+import ShareButton from "@/components/ShareButton";
 import type { Baugesuch, DistrictRepresentatives, PlaceInfo } from "@/lib/api";
 
 const Map3D = dynamic(() => import("../Map3D"), { ssr: false });
@@ -164,16 +167,18 @@ export default function Home() {
 
       {/* Térkép — teljes szélesség, a lehető legszélesebb */}
       <div className="mx-auto w-full max-w-[1600px]">
-        <Map3D
+        <div className="relative"><Map3D
           selectedPostcode={result?.place?.postcode ?? null}
           baugesuche={activeTopic === "planung" && selectedBaugesuch ? [selectedBaugesuch] : (result?.baugesuche ?? [])}
           mapLocale={mapLocale}
-        />
+        /><MapLegend activeTopic={activeTopic} /></div>
       </div>
 
       {/* Lista + Részletező — a térkép alatt */}
       <div className="mx-auto max-w-[1280px] border-t border-white/10 bg-[#080c18]">
         <TopicList topic={activeTopic} result={result} selectedId={selectedId} onSelect={setSelectedId} />
+        <WatchZone center={result?.lngLat} radius={500} onRadiusChange={() => undefined} />
+        <ShareButton getUrl={() => typeof window === "undefined" ? "" : window.location.href} />
         <DetailPanel topic={activeTopic} selectedId={selectedId} result={result} summary={summary} aiSummary={aiSummary} />
       </div>
 

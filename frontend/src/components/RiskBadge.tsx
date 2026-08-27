@@ -1,0 +1,4 @@
+"use client";
+import {useId,useState} from "react";import {useTranslations} from "next-intl";
+export type RiskLevel="low"|"medium"|"high";const style={low:"bg-emerald-500/20",medium:"bg-amber-500/20",high:"bg-red-500/20"};
+export default function RiskBadge({level,reason}:{level?:RiskLevel|null;reason?:string|null}){const t=useTranslations("risk"),[open,setOpen]=useState(false),id=useId();if(!level)return null;return <span className="relative"><button data-testid="risk-badge" aria-expanded={open} aria-describedby={open?id:undefined} onClick={()=>setOpen(!open)} className={`min-h-11 rounded-full border px-3 ${style[level]}`}>{t(`level.${level}`)} · <u>{t("why")}</u></button>{open&&<span id={id} role="tooltip" className="absolute bottom-full left-0 z-30 w-64 rounded bg-slate-950 p-3 text-xs">{reason||t(`defaultReason.${level}`)}</span>}</span>}

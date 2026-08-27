@@ -1,0 +1,6 @@
+"use client";
+import {useTranslations} from "next-intl";
+import type {Topic} from "./TopicSidebar";
+const rows:Partial<Record<Topic,[string,string][]>>={politik:[["#2563eb","highYes"],["#94a3b8","balanced"],["#f97316","highNo"]],solar:[["#fde68a","solarLow"],["#f59e0b","solarHigh"]],oereb:[["#a855f7","coreZone"],["#3b82f6","residentialZone"],["#22c55e","openZone"]]};
+const urls={politik:"https://www.bfs.admin.ch",solar:"https://www.bfe.admin.ch",oereb:"https://www.cadastre.ch"};
+export default function MapLegend({activeTopic}:{activeTopic:Topic}){const t=useTranslations("legend"),items=rows[activeTopic];if(!items)return null;const source=activeTopic==="politik"?"BFS":activeTopic==="solar"?"BFE":"BAFU / ÖREB";return <aside data-testid="map-legend" aria-label={t("title")} className="absolute bottom-4 right-4 z-20 rounded-xl border border-white/20 bg-slate-950/90 p-3 text-xs text-white"><h2 className="mb-2 font-semibold">{t("title")}</h2><ul>{items.map(([c,k])=><li className="flex gap-2 py-1" key={k}><span aria-hidden className="h-3 w-3 rounded" style={{backgroundColor:c}}/>{t(k)}</li>)}</ul><a className="text-sky-300 underline" href={urls[activeTopic as keyof typeof urls]} target="_blank" rel="noreferrer">{t("source",{source})}</a></aside>}

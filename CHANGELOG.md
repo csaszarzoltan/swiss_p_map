@@ -71,3 +71,5 @@ Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Ch
 [0.2.1]: https://github.com/csaszarzoltan/swiss_p_map/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/csaszarzoltan/swiss_p_map/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/csaszarzoltan/swiss_p_map/releases/tag/v0.1.0
+
+- Added ADR-019..022 usability package: legend, risk badge, radius watcher, and share links.

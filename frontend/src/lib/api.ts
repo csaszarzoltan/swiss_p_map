@@ -10,6 +10,8 @@ export interface PlaceInfo {
   solar_class: string | null;
   oereb_zone: string | null;
   steuerfuss_source: string;
+  risk_level?: "low" | "medium" | "high" | null;
+  risk_reason?: string | null;
 }
 
 export interface Representative {

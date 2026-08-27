@@ -77,3 +77,6 @@ cd frontend && npm run build && npx next start -p 3310
 ## Kanban & Docs
 
 Board: `swiss-p-map` — 15 done. Docs: 9 ADR (001…009) + 12 research, mind `accepted`. Master roadmap: `docs/plans/2026-08-26-master-roadmap.md`.
+
+## Usability package
+ADR-019..022 adds a thematic legend, explainable risk metadata, radius controls, and shareable locale-aware state.

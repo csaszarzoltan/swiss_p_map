@@ -1,0 +1,5 @@
+"use client";
+import {useEffect} from "react";import type {Topic} from "@/components/TopicSidebar";
+export type Shared={plz?:string;topic:Topic;selected?:string|null;radius:number};const topics=new Set(["overview","politik","ort","planung","solar","oereb"]);
+export function parseShareableState(s:string):Partial<Shared>{const p=new URLSearchParams(s),plz=p.get("plz"),topic=p.get("topic"),radius=Number(p.get("radius"));return {...(plz&&/^\d{4}$/.test(plz)?{plz}:{}),...(topic&&topics.has(topic)?{topic:topic as Topic}:{}),...(p.get("selected")?{selected:p.get("selected")}:{}),...([300,500,1000].includes(radius)?{radius}:{})}}
+export function useShareableState(state:Shared,restore:(s:Partial<Shared>)=>void){useEffect(()=>restore(parseShareableState(location.search)),[restore]);useEffect(()=>{const p=new URLSearchParams();if(state.plz)p.set("plz",state.plz);if(state.topic!=="overview")p.set("topic",state.topic);if(state.selected)p.set("selected",state.selected);if(state.radius!==500)p.set("radius",String(state.radius));history.replaceState(null,"",location.pathname+(p.size?`?${p}`:""))},[state]);return()=>location.href}
