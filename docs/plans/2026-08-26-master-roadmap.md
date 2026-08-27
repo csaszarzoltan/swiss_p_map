@@ -43,6 +43,9 @@
 | ~~OGD 2982 backfill~~ | ADR-009 | 2982 CSV 22k hibrid | ✅ 6eebd9a (97 sor) |
 | ~~Release 0.2.1~~ | README/CHANGELOG | 47 passed 18 mypy 4/4 PW 21.2s | ✅ 7f57c31 v0.2.1 |
 | ~~Multi-Kanton Place~~ | ADR-011 | Szövetségi ARE/BAFU/BFE (BE/BS/ZH/GE) | ✅ 50 passed 18 mypy |
+| ~~BFS Népszavazási Adatok~~ | ADR-012 | 26 kanton valós szavazati arányai (13. AHV-Rente) | ✅ 54 passed 20 mypy |
+| ~~3D Építési Markerek~~ | ADR-013 | Borostyánsárga 3D pin-ek + raycast + Einsprache számláló | ✅ 8/8 PW passed |
+| ~~Többkantonos Planning~~ | ADR-014 | Bern (3011), Basel (4001), Genf (1201) Baugesuche | ✅ 54 passed 20 mypy |
 
 ## 4. Audit-checklist
 
