@@ -178,6 +178,29 @@ def _parse_oereb_zone(results: list[dict[str, object]]) -> str | None:
     return None
 
 
+def _parse_oereb_xml(xml_text: str) -> str | None:
+    """Parse ZH WFS Nutzungsplanung XML → typ_gde_bezeichnung (Kernzone, Wohnzone etc)."""
+    import xml.etree.ElementTree as ET
+
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError:
+        return None
+    # Namespace-agnostic search for typ_gde_bezeichnung
+    for el in root.iter():
+        tag = el.tag.split("}", 1)[-1] if "}" in el.tag else el.tag
+        if tag == "typ_gde_bezeichnung" and el.text and el.text.strip():
+            return el.text.strip()
+    for el in root.iter():
+        tag = el.tag.split("}", 1)[-1] if "}" in el.tag else el.tag
+        if tag == "typ_zh_bezeichnung" and el.text and el.text.strip():
+            return el.text.strip()
+    return None
+
+
+ZH_WFS_URL = "https://maps.zh.ch/wfs/OerebKatasterZHWFS"
+
+
 ZH_STEUER_URL = "https://www.zh.ch/de/steuern-finanzen/steuern.html"
 
 
@@ -277,13 +300,35 @@ class PlaceService:
                 pass
         for layer_id, kind in (
             ("ch.bfe.solarenergie-eignung-daecher", "solar"),
-            ("ch.vd.oereb", "oereb"),
+            ("zh-wfs", "oereb"),
         ):
-            is_solar = kind == "solar"
-            lon_lat = f"{lon_wgs},{lat_wgs}" if is_solar else f"{easting},{northing}"
-            extent = f"{lon_wgs},{lat_wgs},{lon_wgs},{lat_wgs}" if is_solar else f"{easting},{northing},{easting},{northing}"
-            tol = 10 if is_solar else 0
-            extra = {"sr": 4326} if is_solar else {}
+            if kind == "oereb":
+                # ZH WFS Nutzungsplanung — BBOX 100m around LV95
+                try:
+                    wfs_params: dict[str, str | int] = {
+                        "SERVICE": "WFS",
+                        "VERSION": "2.0.0",
+                        "REQUEST": "GetFeature",
+                        "TYPENAMES": "ms:Nutzungsplanung",
+                        "BBOX": f"{easting},{northing},{easting+100},{northing+100},EPSG:2056",
+                        "COUNT": 5,
+                    }
+                    if self._client is not None:
+                        resp = await self._client.get(ZH_WFS_URL, params=wfs_params)
+                    else:
+                        async with httpx.AsyncClient(timeout=10) as c:
+                            resp = await c.get(ZH_WFS_URL, params=wfs_params)
+                    if resp.status_code == 200:
+                        zone = _parse_oereb_xml(resp.text)
+                        if zone is not None:
+                            oereb_zone = zone
+                except (httpx.HTTPError, ValueError, AttributeError):
+                    pass
+                continue
+            lon_lat = f"{lon_wgs},{lat_wgs}"
+            extent = f"{lon_wgs},{lat_wgs},{lon_wgs},{lat_wgs}"
+            tol = 10
+            extra: dict[str, int] = {"sr": 4326}
             try:
                 if self._client is not None:
                     resp = await self._client.get(
@@ -313,16 +358,11 @@ class PlaceService:
                             },
                         )
                 results = resp.json().get("results") or []
-                if kind == "solar":
-                    kwh, klasse = _parse_solar(results)
-                    if kwh is not None:
-                        solar_kwh = kwh
-                    if klasse is not None:
-                        solar_klasse = klasse
-                else:
-                    zone = _parse_oereb_zone(results)
-                    if zone is not None:
-                        oereb_zone = zone
+                kwh, klasse = _parse_solar(results)
+                if kwh is not None:
+                    solar_kwh = kwh
+                if klasse is not None:
+                    solar_klasse = klasse
             except (httpx.HTTPError, ValueError, KeyError, AttributeError):
                 continue
         # GWR count: use stub value as fallback (live GWR via WFS would be
