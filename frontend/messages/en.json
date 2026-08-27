@@ -45,7 +45,11 @@
     "oevGuete": "PT QUALITY",
     "oevDesc": "A = dense, E = sparse",
     "gebaeude": "BUILDINGS (GWR)",
-    "gebaeudeUnit": "{count} buildings"
+    "gebaeudeUnit": "{count} buildings",
+    "solar": "SOLAR ROOF POTENTIAL",
+    "solarDesc": "BFE · {kwh} kWh/m²",
+    "oereb": "LAND USE ZONE",
+    "oerebDesc": "Per the land-use planning cadastre"
   },
   "planung": {
     "loading": "Loading applications…",

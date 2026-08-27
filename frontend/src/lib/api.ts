@@ -6,6 +6,10 @@ export interface PlaceInfo {
   noise_db_day: number | null;
   oev_class: string;
   gwr_building_count: number | null;
+  solar_kwh_m2: number | null;
+  solar_class: string | null;
+  oereb_zone: string | null;
+  steuerfuss_source: string;
 }
 
 export interface Representative {

@@ -209,6 +209,16 @@ export default function Home() {
                     <p className="text-xs tracking-widest text-slate-500">{t('ort.gebaeude')}</p>
                     <p className="font-semibold text-slate-100">{result.place.gwr_building_count != null ? t('ort.gebaeudeUnit', {count: result.place.gwr_building_count}) : "—"}</p>
                   </div>
+                  <div>
+                    <p className="text-xs tracking-widest text-amber-400/80">{t('ort.solar')}</p>
+                    <p className="font-semibold text-slate-100">{result.place.solar_kwh_m2 != null ? t('ort.solarDesc', {kwh: String(result.place.solar_kwh_m2)}) : "—"}</p>
+                    <p className="text-xs text-slate-500">{result.place.solar_class ?? ""}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs tracking-widest text-purple-400/80">{t('ort.oereb')}</p>
+                    <p className="font-semibold text-slate-100">{result.place.oereb_zone ?? "—"}</p>
+                    <p className="text-xs text-slate-500">{t('ort.oerebDesc')}</p>
+                  </div>
                 </div>
               )}
 

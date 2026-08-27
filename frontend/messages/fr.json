@@ -45,7 +45,11 @@
     "oevGuete": "QUALITÉ TP",
     "oevDesc": "A = dense, E = rare",
     "gebaeude": "BÂTIMENTS (RegBL)",
-    "gebaeudeUnit": "{count} bâtiments"
+    "gebaeudeUnit": "{count} bâtiments",
+    "solar": "POTENTIEL SOLAIRE TOITURE",
+    "solarDesc": "BFE · {kwh} kWh/m²",
+    "oereb": "ZONE D'UTILISATION DU SOL",
+    "oerebDesc": "Selon le cadastre de planification"
   },
   "planung": {
     "loading": "Chargement…",

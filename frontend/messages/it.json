@@ -45,7 +45,11 @@
     "oevGuete": "QUALITÀ TP",
     "oevDesc": "A = denso, E = raro",
     "gebaeude": "EDIFICI (RFE)",
-    "gebaeudeUnit": "{count} edifici"
+    "gebaeudeUnit": "{count} edifici",
+    "solar": "POTENZIALE SOLARE TETTO",
+    "solarDesc": "BFE · {kwh} kWh/m²",
+    "oereb": "ZONA DI UTILIZZAZIONE",
+    "oerebDesc": "Secondo il catasto di pianificazione"
   },
   "planung": {
     "loading": "Caricamento…",

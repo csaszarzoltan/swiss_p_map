@@ -27,3 +27,7 @@ class PlaceInfo(BaseModel):
     noise_db_day: float | None = Field(None, description="sonBASE day noise dB(A)")
     oev_class: OeVGueteklasse = OeVGueteklasse.NONE
     gwr_building_count: int | None = Field(None, ge=0)
+    solar_kwh_m2: float | None = Field(None, ge=0, description="Sonnendach kWh/m2 (BFE)")
+    solar_class: str | None = Field(None, description="Solar Eignung Klasse")
+    oereb_zone: str | None = Field(None, description="ÖREB Nutzungszone (W2, Kernzone...)")
+    steuerfuss_source: str = Field("stub", description="stub|zh-ogd")

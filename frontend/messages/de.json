@@ -45,7 +45,11 @@
     "oevGuete": "ÖV-GÜTEKLASSE",
     "oevDesc": "A = dicht, E = selten",
     "gebaeude": "GEBÄUDE (GWR)",
-    "gebaeudeUnit": "{count} Gebäude"
+    "gebaeudeUnit": "{count} Gebäude",
+    "solar": "SONNENDACH",
+    "solarDesc": "BFE · {kwh} kWh/m²",
+    "oereb": "ÖREB NUTZUNGSZONE",
+    "oerebDesc": "Nutzungsplanung gemäss Kataster"
   },
   "planung": {
     "loading": "Lade Baugesuche…",

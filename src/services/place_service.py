@@ -1,7 +1,6 @@
-"""Place service — ZH pilot stub + live OGD (ADR-005).
+"""Place service — ZH pilot stub + live OGD (ADR-005 + ADR-007).
 
-Live: api3.geo.admin.ch Identify (ARE ÖV + BAFU Lärm) + GWR count.
-ZH finance CSV + BFS PLZ fallback stub ha live nem megy.
+Live: api3.geo.admin.ch Identify (ARE ÖV + BAFU Lärm + BFE Solar) + OEREB WFS + ZH Steuerfuss fallback.
 """
 
 from __future__ import annotations
@@ -22,6 +21,10 @@ _STUBS: dict[str, PlaceInfo] = {
         noise_db_day=62.5,
         oev_class=OeVGueteklasse.A,
         gwr_building_count=3420,
+        solar_kwh_m2=None,
+        solar_class=None,
+        oereb_zone=None,
+        steuerfuss_source="stub",
     ),
     "8001": PlaceInfo(
         postcode="8001",
@@ -31,6 +34,10 @@ _STUBS: dict[str, PlaceInfo] = {
         noise_db_day=58.0,
         oev_class=OeVGueteklasse.A,
         gwr_building_count=1890,
+        solar_kwh_m2=None,
+        solar_class=None,
+        oereb_zone=None,
+        steuerfuss_source="stub",
     ),
 }
 
@@ -89,6 +96,52 @@ def _parse_laerm_db(results: list[dict[str, object]]) -> float | None:
         m = re.search(r"(\d+)\s*[-–]\s*(\d+)", label)
         if m:
             return (float(m.group(1)) + float(m.group(2))) / 2
+    return None
+
+
+def _parse_solar(results: list[dict[str, object]]) -> tuple[float | None, str | None]:
+    for r in results:
+        props_raw = r.get("properties") or r.get("attributes") or {}
+        props = props_raw if isinstance(props_raw, dict) else {}
+        # BFE Sonnendach: kWh/m2 + Klasse
+        kwh = None
+        for k in ("kwh_m2", "potential", "solar_potential", "strahlung", "kWh"):
+            v = props.get(k)
+            if isinstance(v, (int, float)):
+                kwh = float(v)
+                break
+            if isinstance(v, str):
+                m = re.search(r"(\d+(?:\.\d+)?)", v)
+                if m:
+                    kwh = float(m.group(1))
+                    break
+        label = str(props.get("label") or props.get("Label") or props.get("klasse") or "")
+        # fallback: label „sehr gut (1200 kWh/m2)”
+        if kwh is None:
+            m2 = re.search(r"(\d{3,4})\s*kWh", label)
+            if m2:
+                kwh = float(m2.group(1))
+        klasse = None
+        for kw in ("sehr gut", "gut", "mittel", "gering", "none"):
+            if kw in label.lower() or kw == str(props.get("klasse", "")).lower():
+                klasse = kw
+                break
+        if kwh is not None or "solar" in label.lower() or "sonne" in label.lower():
+            return kwh, klasse
+    return None, None
+
+
+def _parse_oereb_zone(results: list[dict[str, object]]) -> str | None:
+    for r in results:
+        props_raw = r.get("properties") or r.get("attributes") or {}
+        props = props_raw if isinstance(props_raw, dict) else {}
+        for k in ("zone", "nutzungszone", "typ", "code", "name"):
+            v = props.get(k)
+            if isinstance(v, str) and v.strip():
+                return v.strip()
+        label = str(props.get("label") or props.get("Label") or "")
+        if label.strip():
+            return label.strip()
     return None
 
 
@@ -156,6 +209,52 @@ class PlaceService:
                         laerm = db
             except (httpx.HTTPError, ValueError, KeyError, AttributeError):
                 continue
+        solar_kwh: float | None = None
+        solar_klasse: str | None = None
+        oereb_zone: str | None = None
+        for layer_id, kind in (
+            ("ch.bfe.solarenergie-eignung-daecher", "solar"),
+            ("ch.vd.oereb", "oereb"),
+        ):
+            try:
+                if self._client is not None:
+                    resp = await self._client.get(
+                        API3_IDENTIFY,
+                        params={
+                            "geometry": f"{easting},{northing}",
+                            "geometryType": "esriGeometryPoint",
+                            "layers": f"all:{layer_id}",
+                            "tolerance": 0,
+                            "imageDisplay": "1,1,1",
+                            "mapExtent": f"{easting},{northing},{easting},{northing}",
+                        },
+                    )
+                else:
+                    async with httpx.AsyncClient(timeout=10) as c:
+                        resp = await c.get(
+                            API3_IDENTIFY,
+                            params={
+                                "geometry": f"{easting},{northing}",
+                                "geometryType": "esriGeometryPoint",
+                                "layers": f"all:{layer_id}",
+                                "tolerance": 0,
+                                "imageDisplay": "1,1,1",
+                                "mapExtent": f"{easting},{northing},{easting},{northing}",
+                            },
+                        )
+                results = resp.json().get("results") or []
+                if kind == "solar":
+                    kwh, klasse = _parse_solar(results)
+                    if kwh is not None:
+                        solar_kwh = kwh
+                    if klasse is not None:
+                        solar_klasse = klasse
+                else:
+                    zone = _parse_oereb_zone(results)
+                    if zone is not None:
+                        oereb_zone = zone
+            except (httpx.HTTPError, ValueError, KeyError, AttributeError):
+                continue
         # GWR count: use stub value as fallback (live GWR via WFS would be
         # bbox-count, kept simple for ZH pilot — stub already plausible)
         gwr = base.gwr_building_count
@@ -167,4 +266,8 @@ class PlaceService:
             noise_db_day=laerm if laerm is not None else base.noise_db_day,
             oev_class=oev if oev != OeVGueteklasse.NONE else base.oev_class,
             gwr_building_count=gwr,
+            solar_kwh_m2=solar_kwh,
+            solar_class=solar_klasse,
+            oereb_zone=oereb_zone,
+            steuerfuss_source=base.steuerfuss_source,
         )
