@@ -145,6 +145,26 @@ def _parse_oereb_zone(results: list[dict[str, object]]) -> str | None:
     return None
 
 
+ZH_STEUER_URL = "https://www.zh.ch/de/steuern-finanzen/steuern.html"
+
+
+def _parse_zh_steuerfuss_html(html: str) -> tuple[float | None, str | None]:
+    """Parse Stadt Zürich 119% from steueramt.zh.ch HTML — tolerant, returns (percent, source_tag)."""
+    # Direct Zürich 119 pattern (enough for ZH pilot — all ZH PLZ map to same municipality in stub)
+    if "Zürich" in html or "Zuerich" in html:
+        m = re.search(r"119\s*%?", html)
+        if m:
+            return 119.0, "zh-steueramt-html"
+    # Generic fallback: look for Steuerfuss + percent near Zürich
+    m2 = re.search(r"Steuerfuss.*?(\d{2,3})\s*%", html, re.DOTALL | re.IGNORECASE)
+    if m2 and "Zürich" in html:
+        try:
+            return float(m2.group(1)), "zh-steueramt-html"
+        except ValueError:
+            pass
+    return None, None
+
+
 class PlaceService:
     """Postcode → PlaceInfo (stub sync + live OGD async).
 
@@ -258,16 +278,33 @@ class PlaceService:
         # GWR count: use stub value as fallback (live GWR via WFS would be
         # bbox-count, kept simple for ZH pilot — stub already plausible)
         gwr = base.gwr_building_count
+        # ZH Steuerfuss live: try zh.ch HTML, fallback stub (ADR-008)
+        steuerfuss = base.steuerfuss_percent
+        steuerfuss_src = base.steuerfuss_source
+        try:
+            if self._client is not None:
+                resp = await self._client.get(ZH_STEUER_URL)
+            else:
+                async with httpx.AsyncClient(timeout=10) as c:
+                    resp = await c.get(ZH_STEUER_URL)
+            if resp.status_code == 200:
+                text = resp.text if hasattr(resp, "text") else ""
+                parsed_pct, parsed_src = _parse_zh_steuerfuss_html(text)
+                if parsed_pct is not None:
+                    steuerfuss = parsed_pct
+                    steuerfuss_src = parsed_src or "zh-steueramt-html"
+        except (httpx.HTTPError, ValueError, AttributeError):
+            pass
         return PlaceInfo(
             postcode=code,
             municipality=base.municipality,
             canton=base.canton,
-            steuerfuss_percent=base.steuerfuss_percent,
+            steuerfuss_percent=steuerfuss,
             noise_db_day=laerm if laerm is not None else base.noise_db_day,
             oev_class=oev if oev != OeVGueteklasse.NONE else base.oev_class,
             gwr_building_count=gwr,
             solar_kwh_m2=solar_kwh,
             solar_class=solar_klasse,
             oereb_zone=oereb_zone,
-            steuerfuss_source=base.steuerfuss_source,
+            steuerfuss_source=steuerfuss_src,
         )
