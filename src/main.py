@@ -159,6 +159,16 @@ def planning_baugesuche(
     return {"items": [b.model_dump(mode="json") for b in items]}
 
 
+@app.post("/api/v1/planning/refresh")
+async def planning_refresh(payload: dict[str, object] | None = None) -> dict[str, object]:
+    canton = str((payload or {}).get("canton") or "ZH")
+    try:
+        count = await _planning.refresh(canton=canton)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"refresh_failed: {exc}") from exc
+    return {"count": count, "refreshed": count}
+
+
 @app.post("/api/v1/ai/summary")
 async def ai_summary(payload: dict[str, object]) -> dict[str, str]:
     locale = str(payload.get("locale") or "de")
