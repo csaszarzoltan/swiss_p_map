@@ -51,7 +51,7 @@ async def test_ogd_backfill_mock_8004_returns_count_and_upserts() -> None:
 
         repo = PlanningRepo(db_path=":memory:")
         ogd = OgdService(client=client)
-        svc = PlanningService(repo=repo, ogd=ogd)  # type: ignore[call-arg]
+        svc = PlanningService(repo=repo, ogd=ogd)
         count = await svc.backfill_ogd()
         assert count == 2
         items_8004 = svc.list_items(postcode="8004", active_only=False)
@@ -75,6 +75,6 @@ async def test_ogd_backfill_empty_csv_returns_0() -> None:
 
         repo = PlanningRepo(db_path=":memory:")
         ogd = OgdService(client=client)
-        svc = PlanningService(repo=repo, ogd=ogd)  # type: ignore[call-arg]
+        svc = PlanningService(repo=repo, ogd=ogd)
         count = await svc.backfill_ogd()
         assert count == 0
