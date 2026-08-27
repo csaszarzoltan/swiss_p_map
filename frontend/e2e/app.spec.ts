@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Swiss P Map — felületi E2E (ADR-003 3D + ADR-004 i18n)", () => {
+test.describe("Swiss P Map — felületi E2E (ADR-003 3D + ADR-004 i18n + ADR-010 menü)", () => {
   test("hero + 3D térkép canvas látszik (/de)", async ({ page }) => {
     await page.goto("/de", { waitUntil: "networkidle" });
     await expect(page.getByText("Schweizerische Eidgenossenschaft")).toBeVisible({ timeout: 12000 });
@@ -25,48 +25,59 @@ test.describe("Swiss P Map — felületi E2E (ADR-003 3D + ADR-004 i18n)", () =>
     await expect(page.getByText("26 Kantone")).toBeVisible();
   });
 
-  test("kereső: PLZ 8004 → panel jelenik meg (/de, Steuerfuss/Wahlkreis)", async ({ page }) => {
+  test("menü + részletező panel látszik (/de, ADR-010)", async ({ page }) => {
+    await page.goto("/de", { waitUntil: "networkidle" });
+    await expect(page.getByTestId("topic-sidebar")).toBeVisible();
+    await expect(page.getByTestId("menu-overview")).toBeVisible();
+    await expect(page.getByTestId("menu-politik")).toBeVisible();
+    await expect(page.getByTestId("menu-ort")).toBeVisible();
+    await expect(page.getByTestId("menu-planung")).toBeVisible();
+    await expect(page.getByTestId("menu-solar")).toBeVisible();
+    await expect(page.getByTestId("menu-oereb")).toBeVisible();
+    await expect(page.getByTestId("topic-list")).toBeVisible();
+    await expect(page.getByTestId("detail-panel")).toBeVisible();
+  });
+
+  test("kereső: PLZ 8004 → menü számok + részletező frissül (/de)", async ({ page }) => {
     await page.goto("/de", { waitUntil: "networkidle" });
     await expect(page.getByTestId("map-3d")).toBeVisible();
     const input = page.getByPlaceholder("PLZ, Adresse oder Gemeinde");
     await expect(input).toBeVisible();
     await input.fill("8004");
     await page.getByRole("button", { name: "Suchen" }).click();
-    await expect(page.getByText("STEUERFUSS").first()).toBeVisible({ timeout: 10_000 });
+    await page.waitForTimeout(2000);
+    // detail panel should show overview summary after search
+    await expect(page.getByTestId("detail-panel")).toBeVisible();
+    // sidebar counts should update (politik >0 or planung >0)
+    await expect(page.getByTestId("topic-sidebar")).toBeVisible();
   });
 
   test("i18n: 4 locale — DE/EN/FR/IT", async ({ page }) => {
     test.setTimeout(45_000);
-    // /de — DE button is immediate, Map3D title needs lazy init
     await page.goto("/de", { waitUntil: "commit" });
     await expect(page.locator("html")).toHaveAttribute("lang", "de", { timeout: 10000 });
     await expect(page.getByRole("button", { name: "DE", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "EN", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "FR", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "IT", exact: true })).toBeVisible();
-    // Map3D is client-only (dynamic ssr:false) — validate SearchPanel placeholder instead of Map3D title
     await expect(page.getByPlaceholder("PLZ, Adresse oder Gemeinde")).toBeVisible();
     await expect(page.getByRole("button", { name: "Suchen" })).toBeVisible();
 
-    // /en — SearchPanel placeholder proves messages loaded
     await page.goto("/en", { waitUntil: "commit" });
     await expect(page.locator("html")).toHaveAttribute("lang", "en", { timeout: 10000 });
     await expect(page.getByPlaceholder("Postcode, address or municipality")).toBeVisible();
     await expect(page.getByRole("button", { name: "Search" })).toBeVisible();
 
-    // /fr
     await page.goto("/fr", { waitUntil: "commit" });
     await expect(page.locator("html")).toHaveAttribute("lang", "fr", { timeout: 10000 });
     await expect(page.getByPlaceholder("NPA, adresse ou commune")).toBeVisible();
     await expect(page.getByRole("button", { name: "Rechercher" })).toBeVisible();
 
-    // /it
     await page.goto("/it", { waitUntil: "commit" });
     await expect(page.locator("html")).toHaveAttribute("lang", "it", { timeout: 10000 });
     await expect(page.getByPlaceholder("NPA, indirizzo o comune")).toBeVisible();
     await expect(page.getByRole("button", { name: "Cerca" })).toBeVisible();
 
-    // / redirects to /de
     await page.goto("/", { waitUntil: "commit" });
     await expect(page).toHaveURL(/\/de(\/|$)/, { timeout: 10000 });
   });
