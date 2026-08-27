@@ -55,6 +55,7 @@ class TestMultiCantonPlanning:
     def test_live_api_returns_multi_canton(self) -> None:
         """A live API endpoint elérhető és adatai koherensek."""
         from fastapi.testclient import TestClient
+
         from src.main import app
         client = TestClient(app)
         resp = client.get("/api/v1/planning/baugesuche?postcode=8004&active_only=true")
