@@ -25,7 +25,7 @@ def _allowed_origins() -> list[str]:
     return [item.strip() for item in raw.split(",") if item.strip()]
 
 
-app = FastAPI(title="Swiss P Map", version="0.1.0")
+app = FastAPI(title="Swiss P Map", version="0.2.1")
 
 app.add_middleware(
     CORSMiddleware,
@@ -104,7 +104,7 @@ except Exception:  # noqa: BLE001,S110 — demo seed nem törheti az app indulá
 
 @app.get("/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "app": "swiss-p-map", "version": "0.1.0"}
+    return {"status": "ok", "app": "swiss-p-map", "version": "0.2.1"}
 
 
 @app.get("/api/v1/geo/convert")

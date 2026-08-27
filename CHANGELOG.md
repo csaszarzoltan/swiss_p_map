@@ -4,6 +4,20 @@ Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Ch
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-08-27
+
+### Added
+- OGD 2982 backfill: `GET daten.statistik.zh.ch/.../KTZH_00002982_00006183.csv` **22k sor**, `POST /api/v1/planning/backfill → {count 22141, source ogd}` — `ADR-009` hibrid 4.25/5
+- Backend 8 endpoint: `ogd_service.py 97 sor` (csv.DictReader, postcode direct, idempotens upsert), `planning_service.backfill_ogd`, `place_service 400 sor` (határ)
+- Frontend BASE fix: `frontend/src/lib/api.ts 8000→8310` + `NEXT_PUBLIC_API_URL 8310` — build SSG, FE restart 572ms
+
+### Changed
+- README: ADR-009 + `ogd_service` + `8 endpoint + /backfill` + `22k Baugesuche` + `47 passed / 18 mypy`
+- `place 8004?live`: `solar 1208 sehr gut` + `Kernzone` + `zh-steueramt-html` steady, `planning 8004: 2 demo → 4 items (22k történeti)`
+
+### Verified
+- `BE 8310 v0.2.1` + `POST /backfill 22141` + `place 8004?live solar 1208 Kernzone` + `FE 3310 lang de/en/fr/it 200` + `47 passed mypy 18 build SSG 4/4 PW 21.2s`
+
 ## [0.2.0] - 2026-08-27
 
 ### Added
@@ -32,6 +46,7 @@ Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Ch
 - ADR-001: Next.js + MapLibre + FastAPI + PostGIS, accepted
 - Kickoff research + W35 competitor scan + scaffold + CI + Phase 1 backend+frontend — 20 passed
 
-[Unreleased]: https://github.com/csaszarzoltan/swiss_p_map/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/csaszarzoltan/swiss_p_map/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/csaszarzoltan/swiss_p_map/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/csaszarzoltan/swiss_p_map/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/csaszarzoltan/swiss_p_map/releases/tag/v0.1.0
