@@ -42,6 +42,7 @@
 | ~~Solar/ÖREB fix~~ | research 2026-08-27 | WGS84 + WFS Kernzone | ✅ a91af31 (400 sor) |
 | ~~OGD 2982 backfill~~ | ADR-009 | 2982 CSV 22k hibrid | ✅ 6eebd9a (97 sor) |
 | ~~Release 0.2.1~~ | README/CHANGELOG | 47 passed 18 mypy 4/4 PW 21.2s | ✅ 7f57c31 v0.2.1 |
+| ~~Multi-Kanton Place~~ | ADR-011 | Szövetségi ARE/BAFU/BFE (BE/BS/ZH/GE) | ✅ 50 passed 18 mypy |
 
 ## 4. Audit-checklist
 

@@ -8,6 +8,7 @@ Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Ch
 - Fejléc branding & integrált vezérlők: `Swiss P Map` logó, svájci kereszt jelvény, integrált fejléc sáv
 - Quick-Pick keresési gyorsgombok (`8004 Aussersihl`, `8001 Altstadt`, `8610 Uster`, `3011 Bern`, `4001 Basel`) azonnali adatbetöltéshez
 - User Story: `docs/stories/US-001-navigation-and-ui.md` 5 elfogadási kritériummal és `gui_flow`-val
+- **ADR-011: Országos Hely- és Körzetfeloldás** (Bern `3011`, Basel `4001`, Uster `8610`, Genf `1201`) szövetségi ARE, BAFU és BFE rétegekkel és kantonális politikai képviselettel
 
 ### Fixed
 - CORS default originek bővítése: `localhost:3310` és `127.0.0.1:3310` támogatása alapértelmezettként a böngészős fetch hibák megelőzésére
@@ -16,8 +17,10 @@ Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Ch
 - Mobilos reszponzivitás: a lebegő nyelvválasztó és 3D panel képernyőmérethez igazítása
 
 ### Verified
-- `pytest tests/`: 47 passed in 1.58s
-- `npx playwright test`: 7/7 passed (39.9s) — Hero, 3D Canvas, N Iránytű, Témák, PLZ 8004 keresés, Quick-Pick 8001, 4 locale (DE/EN/FR/IT)
+- `pytest tests/`: 50 passed in 1.19s
+- `mypy src`: 18 source files clean (0 errors)
+- `ruff check src tests`: All checks passed
+- `npx playwright test`: 7/7 passed (37.2s) — Hero, 3D Canvas, N Iránytű, Témák, PLZ 8004 keresés, Quick-Pick 8001, 4 locale (DE/EN/FR/IT)
 
 
 ### Added
