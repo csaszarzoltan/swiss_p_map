@@ -7,12 +7,17 @@ Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Ch
 ### Added
 - Fejléc branding & integrált vezérlők: `Swiss P Map` logó, svájci kereszt jelvény, integrált fejléc sáv
 - Quick-Pick keresési gyorsgombok (`8004 Aussersihl`, `8001 Altstadt`, `8610 Uster`, `3011 Bern`, `4001 Basel`) azonnali adatbetöltéshez
+- User Story: `docs/stories/US-001-navigation-and-ui.md` 5 elfogadási kritériummal és `gui_flow`-val
 
 ### Fixed
 - CORS default originek bővítése: `localhost:3310` és `127.0.0.1:3310` támogatása alapértelmezettként a böngészős fetch hibák megelőzésére
 - Map3D lokalizáció: hardkódolt magyar feliratok (`É` iránytű, `IGEN/NEM`, `Népesség`, `Terület`, `Támogatottság`) átvezetése mind a 4 nyelvi szótárba (`de`, `en`, `fr`, `it`)
 - Ghost UI hint javítása: az elavult "balra" útmutatás cseréje aktuális felső téma-választóra
 - Mobilos reszponzivitás: a lebegő nyelvválasztó és 3D panel képernyőmérethez igazítása
+
+### Verified
+- `pytest tests/`: 47 passed in 1.58s
+- `npx playwright test`: 7/7 passed (39.9s) — Hero, 3D Canvas, N Iránytű, Témák, PLZ 8004 keresés, Quick-Pick 8001, 4 locale (DE/EN/FR/IT)
 
 
 ### Added

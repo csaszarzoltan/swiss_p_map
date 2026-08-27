@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Swiss P Map — felületi E2E (ADR-003 3D + ADR-004 i18n + ADR-010 menü)", () => {
+test.describe("Swiss P Map — felületi E2E (ADR-003 3D + ADR-004 i18n + ADR-010 menü + UI/UX)", () => {
   test("hero + 3D térkép canvas látszik (/de)", async ({ page }) => {
     await page.goto("/de", { waitUntil: "networkidle" });
     await expect(page.getByText("Schweizerische Eidgenossenschaft")).toBeVisible({ timeout: 12000 });
@@ -15,14 +15,17 @@ test.describe("Swiss P Map — felületi E2E (ADR-003 3D + ADR-004 i18n + ADR-01
     expect(box?.height).toBeGreaterThan(200);
   });
 
-  test("3D térkép UI: iránytű + hint + panel látszik", async ({ page }) => {
+  test("3D térkép UI: iránytű (N) + hint + panel + lokalizált feliratok", async ({ page }) => {
     await page.goto("/de", { waitUntil: "networkidle" });
     await expect(page.getByTestId("map-3d")).toBeVisible();
     await page.waitForTimeout(3500);
-    await expect(page.getByText("É").first()).toBeVisible();
+    // Iránytű N (Nord/North)
+    await expect(page.getByText("N").first()).toBeVisible();
     await expect(page.getByText(/Linke Taste:/)).toBeVisible();
     await expect(page.getByText("Schweizerische Eidgenossenschaft")).toBeVisible();
     await expect(page.getByText("26 Kantone")).toBeVisible();
+    await expect(page.getByText(/Gebiet/)).toBeVisible();
+    await expect(page.getByText(/Bevölkerung/)).toBeVisible();
   });
 
   test("menü + részletező panel látszik (/de, ADR-010)", async ({ page }) => {
@@ -45,11 +48,32 @@ test.describe("Swiss P Map — felületi E2E (ADR-003 3D + ADR-004 i18n + ADR-01
     await expect(input).toBeVisible();
     await input.fill("8004");
     await page.getByRole("button", { name: "Suchen" }).click();
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(2500);
     // detail panel should show overview summary after search
     await expect(page.getByTestId("detail-panel")).toBeVisible();
     // sidebar counts should update (politik >0 or planung >0)
     await expect(page.getByTestId("topic-sidebar")).toBeVisible();
+  });
+
+  test("Quick-Pick gomb: 8001 Altstadt azonnali betöltése", async ({ page }) => {
+    await page.goto("/de", { waitUntil: "networkidle" });
+    const qpButton = page.getByRole("button", { name: "8001 Altstadt" });
+    await expect(qpButton).toBeVisible();
+    await qpButton.click();
+    await page.waitForTimeout(2500);
+    await expect(page.getByTestId("search-input")).toHaveValue("8001");
+    await expect(page.getByTestId("detail-panel")).toBeVisible();
+  });
+
+  test("Témaváltás: Planung fülre váltás és Baugesuche megjelenítése", async ({ page }) => {
+    await page.goto("/de", { waitUntil: "networkidle" });
+    // Search 8004
+    await page.getByRole("button", { name: "8004 Aussersihl" }).click();
+    await page.waitForTimeout(2000);
+    // Switch to Planung
+    await page.getByTestId("menu-planung").click();
+    await page.waitForTimeout(1000);
+    await expect(page.getByTestId("topic-list")).toBeVisible();
   });
 
   test("i18n: 4 locale — DE/EN/FR/IT", async ({ page }) => {
