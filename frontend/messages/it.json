@@ -12,6 +12,21 @@
     "ort": "Luogo",
     "planung": "Pianificazione"
   },
+  "menu": {
+    "overview": "Panoramica",
+    "politik": "Politica",
+    "ort": "Luogo",
+    "planung": "Pianificazione",
+    "solar": "Tetto solare",
+    "oereb": "Zona d'uso"
+  },
+  "list": {
+    "noSelection": "Cerca prima un NPA (es. 8004)."
+  },
+  "detail": {
+    "hint": "Scegli un tema a sinistra e cerca un NPA.",
+    "selectHint": "Scegli un elemento dalla lista."
+  },
   "summary": {
     "label": "RIASSUNTO IA",
     "steuerFallback": "aliquota n.d.",

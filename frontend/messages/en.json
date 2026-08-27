@@ -12,6 +12,21 @@
     "ort": "Place",
     "planung": "Planning"
   },
+  "menu": {
+    "overview": "Overview",
+    "politik": "Politics",
+    "ort": "Place",
+    "planung": "Planning",
+    "solar": "Solar roof",
+    "oereb": "Land-use"
+  },
+  "list": {
+    "noSelection": "Search for a postcode first (e.g. 8004)."
+  },
+  "detail": {
+    "hint": "Pick a topic on the left and search for a postcode.",
+    "selectHint": "Select an item from the list above."
+  },
   "summary": {
     "label": "AI SUMMARY",
     "steuerFallback": "tax rate n/a",

@@ -12,6 +12,21 @@
     "ort": "Lieu",
     "planung": "Planification"
   },
+  "menu": {
+    "overview": "Aperçu",
+    "politik": "Politique",
+    "ort": "Lieu",
+    "planung": "Planification",
+    "solar": "Toiture solaire",
+    "oereb": "Zone d'affectation"
+  },
+  "list": {
+    "noSelection": "Cherche d'abord un NPA (p. ex. 8004)."
+  },
+  "detail": {
+    "hint": "Choisis un thème à gauche et cherche un NPA.",
+    "selectHint": "Choisis un élément dans la liste ci-dessus."
+  },
   "summary": {
     "label": "RÉSUMÉ IA",
     "steuerFallback": "taux fiscal n.d.",

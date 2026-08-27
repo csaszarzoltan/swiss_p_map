@@ -12,6 +12,21 @@
     "ort": "Ort",
     "planung": "Planung"
   },
+  "menu": {
+    "overview": "Übersicht",
+    "politik": "Politik",
+    "ort": "Ort",
+    "planung": "Planung",
+    "solar": "Sonnendach",
+    "oereb": "ÖREB"
+  },
+  "list": {
+    "noSelection": "Suche zuerst nach einer PLZ (z.B. 8004)."
+  },
+  "detail": {
+    "hint": "Wähle ein Thema links und suche nach einer PLZ.",
+    "selectHint": "Wähle ein Element aus der Liste oben."
+  },
   "summary": {
     "label": "KI-ZUSAMMENFASSUNG",
     "steuerFallback": "Steuerfuss k.A.",
