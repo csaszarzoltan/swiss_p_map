@@ -12,46 +12,52 @@ import httpx
 
 from src.models.place import OeVGueteklasse, PlaceInfo
 
+
+def _mk_stub(
+    pc: str, muni: str, canton: str, steuer: float, noise: float, oev: OeVGueteklasse, gwr: int
+) -> PlaceInfo:
+    return PlaceInfo(
+        postcode=pc,
+        municipality=muni,
+        canton=canton,
+        steuerfuss_percent=steuer,
+        noise_db_day=noise,
+        oev_class=oev,
+        gwr_building_count=gwr,
+        solar_kwh_m2=None,
+        solar_class=None,
+        oereb_zone=None,
+        steuerfuss_source="stub",
+    )
+
+
 _STUBS: dict[str, PlaceInfo] = {
-    "8004": PlaceInfo(
-        postcode="8004",
-        municipality="Zürich",
-        canton="ZH",
-        steuerfuss_percent=119.0,
-        noise_db_day=62.5,
-        oev_class=OeVGueteklasse.A,
-        gwr_building_count=3420,
-        solar_kwh_m2=None,
-        solar_class=None,
-        oereb_zone=None,
-        steuerfuss_source="stub",
-    ),
-    "8001": PlaceInfo(
-        postcode="8001",
-        municipality="Zürich",
-        canton="ZH",
-        steuerfuss_percent=119.0,
-        noise_db_day=58.0,
-        oev_class=OeVGueteklasse.A,
-        gwr_building_count=1890,
-        solar_kwh_m2=None,
-        solar_class=None,
-        oereb_zone=None,
-        steuerfuss_source="stub",
-    ),
+    "8004": _mk_stub("8004", "Zürich", "ZH", 119.0, 62.5, OeVGueteklasse.A, 3420),
+    "8001": _mk_stub("8001", "Zürich", "ZH", 119.0, 58.0, OeVGueteklasse.A, 1890),
+    "8610": _mk_stub("8610", "Uster", "ZH", 110.0, 55.0, OeVGueteklasse.B, 4200),
+    "3011": _mk_stub("3011", "Bern", "BE", 154.0, 59.0, OeVGueteklasse.A, 2900),
+    "4001": _mk_stub("4001", "Basel", "BS", 130.0, 60.0, OeVGueteklasse.A, 3100),
+    "1201": _mk_stub("1201", "Genève", "GE", 145.0, 61.0, OeVGueteklasse.A, 2600),
 }
 
-# Hardcoded LV95 for ZH pilot (avoid extra geocode round-trip in mock tests)
-# Note: solar uses WGS84 directly (POSTCODE_WGS84), LV95 for ARE/BAFU/OEREB
+# LV95 coordinates for pilot and quick-pick regions
 POSTCODE_LV95: dict[str, tuple[float, float]] = {
     "8004": (2683000, 1248000),
     "8001": (2683500, 1248500),
+    "8610": (2697014, 1245446),
+    "3011": (2600709, 1199563),
+    "4001": (2611267, 1267359),
+    "1201": (2500294, 1118466),
 }
 
-# WGS84 centers hit building polygons (BFE solar is building-polygon, not raster)
+# WGS84 building polygon centers (BFE solar is building-polygon)
 POSTCODE_WGS84: dict[str, tuple[float, float]] = {
-    "8004": (8.534, 47.378),  # Langstrasse center — BFE klasse 4, 1208 kWh
-    "8001": (8.54, 47.377),
+    "8004": (8.534, 47.378),
+    "8001": (8.540, 47.377),
+    "8610": (8.723, 47.353),
+    "3011": (7.448, 46.947),
+    "4001": (7.588, 47.557),
+    "1201": (6.147, 46.210),
 }
 
 API3_IDENTIFY = "https://api3.geo.admin.ch/rest/services/api/MapServer/identify"
@@ -225,7 +231,7 @@ class PlaceService:
     """Postcode → PlaceInfo (stub sync + live OGD async).
 
     Sync path keeps E2E stable; live scrapes api3 Identify online
-    (ADR-005 hybrid B).
+    (ADR-005 + ADR-011 multi-canton expansion).
     """
 
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
@@ -237,6 +243,17 @@ class PlaceService:
     def list_postcodes(self) -> list[str]:
         return sorted(_STUBS.keys())
 
+    async def _safe_get(
+        self, url: str, params: dict[str, str | int | float] | None = None
+    ) -> httpx.Response | None:
+        try:
+            if self._client is not None:
+                return await self._client.get(url, params=params)
+            async with httpx.AsyncClient(timeout=10) as c:
+                return await c.get(url, params=params)
+        except (httpx.HTTPError, ValueError, AttributeError, KeyError):
+            return None
+
     async def get_by_postcode_live(self, postcode: str) -> PlaceInfo | None:
         code = postcode.strip()
         base = _STUBS.get(code)
@@ -245,50 +262,37 @@ class PlaceService:
         easting, northing = POSTCODE_LV95.get(code, (2683000, 1248000))
         oev = OeVGueteklasse.NONE
         laerm: float | None = None
-        # Two parallel Identify calls (sequential via DI mock for simplicity)
+
+        # 1. ARE ÖV-Güteklasse & BAFU Lärm via api3 Identify (federal, all cantons)
         for layer_id in ("ch.are.gueteklassen_oev", "ch.bafu.larm-strassenlaerm_tag"):
-            try:
-                if self._client is not None:
-                    resp = await self._client.get(
-                        API3_IDENTIFY,
-                        params={
-                            "geometry": f"{easting},{northing}",
-                            "geometryType": "esriGeometryPoint",
-                            "layers": f"all:{layer_id}",
-                            "tolerance": 0,
-                            "imageDisplay": "1,1,1",
-                            "mapExtent": f"{easting},{northing},{easting},{northing}",
-                        },
-                    )
-                else:
-                    async with httpx.AsyncClient(timeout=10) as c:
-                        resp = await c.get(
-                            API3_IDENTIFY,
-                            params={
-                                "geometry": f"{easting},{northing}",
-                                "geometryType": "esriGeometryPoint",
-                                "layers": f"all:{layer_id}",
-                                "tolerance": 0,
-                                "imageDisplay": "1,1,1",
-                                "mapExtent": f"{easting},{northing},{easting},{northing}",
-                            },
-                        )
-                data = resp.json()
-                results = data.get("results") or []
-                if "ch.are" in layer_id:
-                    parsed = _parse_oev(results)
-                    if parsed != OeVGueteklasse.NONE:
-                        oev = parsed
-                else:
-                    db = _parse_laerm_db(results)
-                    if db is not None:
-                        laerm = db
-            except (httpx.HTTPError, ValueError, KeyError, AttributeError):
-                continue
+            resp = await self._safe_get(
+                API3_IDENTIFY,
+                params={
+                    "geometry": f"{easting},{northing}",
+                    "geometryType": "esriGeometryPoint",
+                    "layers": f"all:{layer_id}",
+                    "tolerance": 0,
+                    "imageDisplay": "1,1,1",
+                    "mapExtent": f"{easting},{northing},{easting},{northing}",
+                },
+            )
+            if resp is not None and resp.status_code == 200:
+                try:
+                    results = resp.json().get("results") or []
+                    if "ch.are" in layer_id:
+                        parsed = _parse_oev(results)
+                        if parsed != OeVGueteklasse.NONE:
+                            oev = parsed
+                    else:
+                        db = _parse_laerm_db(results)
+                        if db is not None:
+                            laerm = db
+                except (ValueError, KeyError, AttributeError):
+                    pass
+
+        # 2. Solar: BFE WGS84 building polygon potential (federal, all cantons)
         solar_kwh: float | None = None
         solar_klasse: str | None = None
-        oereb_zone: str | None = None
-        # Solar: BFE needs WGS84 building polygon center (POSTCODE_WGS84), not LV95 gap
         lon_wgs, lat_wgs = POSTCODE_WGS84.get(code, (8.534, 47.378))
         if code not in POSTCODE_WGS84:
             try:
@@ -298,93 +302,61 @@ class PlaceService:
                 lat_wgs, lon_wgs = _lat, _lon
             except ValueError:
                 pass
-        for layer_id, kind in (
-            ("ch.bfe.solarenergie-eignung-daecher", "solar"),
-            ("zh-wfs", "oereb"),
-        ):
-            if kind == "oereb":
-                # ZH WFS Nutzungsplanung — BBOX 100m around LV95
-                try:
-                    wfs_params: dict[str, str | int] = {
-                        "SERVICE": "WFS",
-                        "VERSION": "2.0.0",
-                        "REQUEST": "GetFeature",
-                        "TYPENAMES": "ms:Nutzungsplanung",
-                        "BBOX": f"{easting},{northing},{easting+100},{northing+100},EPSG:2056",
-                        "COUNT": 5,
-                    }
-                    if self._client is not None:
-                        resp = await self._client.get(ZH_WFS_URL, params=wfs_params)
-                    else:
-                        async with httpx.AsyncClient(timeout=10) as c:
-                            resp = await c.get(ZH_WFS_URL, params=wfs_params)
-                    if resp.status_code == 200:
-                        zone = _parse_oereb_xml(resp.text)
-                        if zone is not None:
-                            oereb_zone = zone
-                except (httpx.HTTPError, ValueError, AttributeError):
-                    pass
-                continue
-            lon_lat = f"{lon_wgs},{lat_wgs}"
-            extent = f"{lon_wgs},{lat_wgs},{lon_wgs},{lat_wgs}"
-            tol = 10
-            extra: dict[str, int] = {"sr": 4326}
+
+        resp_solar = await self._safe_get(
+            API3_IDENTIFY,
+            params={
+                "geometry": f"{lon_wgs},{lat_wgs}",
+                "geometryType": "esriGeometryPoint",
+                "layers": "all:ch.bfe.solarenergie-eignung-daecher",
+                "tolerance": 10,
+                "imageDisplay": "1,1,1",
+                "mapExtent": f"{lon_wgs},{lat_wgs},{lon_wgs},{lat_wgs}",
+                "sr": 4326,
+            },
+        )
+        if resp_solar is not None and resp_solar.status_code == 200:
             try:
-                if self._client is not None:
-                    resp = await self._client.get(
-                        API3_IDENTIFY,
-                        params={
-                            "geometry": lon_lat,
-                            "geometryType": "esriGeometryPoint",
-                            "layers": f"all:{layer_id}",
-                            "tolerance": tol,
-                            "imageDisplay": "1,1,1",
-                            "mapExtent": extent,
-                            **extra,
-                        },
-                    )
-                else:
-                    async with httpx.AsyncClient(timeout=10) as c:
-                        resp = await c.get(
-                            API3_IDENTIFY,
-                            params={
-                                "geometry": lon_lat,
-                                "geometryType": "esriGeometryPoint",
-                                "layers": f"all:{layer_id}",
-                                "tolerance": tol,
-                                "imageDisplay": "1,1,1",
-                                "mapExtent": extent,
-                                **extra,
-                            },
-                        )
-                results = resp.json().get("results") or []
+                results = resp_solar.json().get("results") or []
                 kwh, klasse = _parse_solar(results)
                 if kwh is not None:
                     solar_kwh = kwh
                 if klasse is not None:
                     solar_klasse = klasse
-            except (httpx.HTTPError, ValueError, KeyError, AttributeError):
-                continue
-        # GWR count: use stub value as fallback (live GWR via WFS would be
-        # bbox-count, kept simple for ZH pilot — stub already plausible)
-        gwr = base.gwr_building_count
-        # ZH Steuerfuss live: try zh.ch HTML, fallback stub (ADR-008)
+            except (ValueError, KeyError, AttributeError):
+                pass
+
+        # 3. Canton-specific enrichment (ZH pilot)
+        oereb_zone: str | None = None
         steuerfuss = base.steuerfuss_percent
         steuerfuss_src = base.steuerfuss_source
-        try:
-            if self._client is not None:
-                resp = await self._client.get(ZH_STEUER_URL)
-            else:
-                async with httpx.AsyncClient(timeout=10) as c:
-                    resp = await c.get(ZH_STEUER_URL)
-            if resp.status_code == 200:
-                text = resp.text if hasattr(resp, "text") else ""
-                parsed_pct, parsed_src = _parse_zh_steuerfuss_html(text)
+
+        if base.canton == "ZH":
+            # ZH WFS Nutzungsplanung
+            resp_oereb = await self._safe_get(
+                ZH_WFS_URL,
+                params={
+                    "SERVICE": "WFS",
+                    "VERSION": "2.0.0",
+                    "REQUEST": "GetFeature",
+                    "TYPENAMES": "ms:Nutzungsplanung",
+                    "BBOX": f"{easting},{northing},{easting+100},{northing+100},EPSG:2056",
+                    "COUNT": 5,
+                },
+            )
+            if resp_oereb is not None and resp_oereb.status_code == 200:
+                zone = _parse_oereb_xml(resp_oereb.text)
+                if zone is not None:
+                    oereb_zone = zone
+
+            # ZH Steuerfuss live
+            resp_st = await self._safe_get(ZH_STEUER_URL)
+            if resp_st is not None and resp_st.status_code == 200:
+                parsed_pct, parsed_src = _parse_zh_steuerfuss_html(resp_st.text)
                 if parsed_pct is not None:
                     steuerfuss = parsed_pct
                     steuerfuss_src = parsed_src or "zh-steueramt-html"
-        except (httpx.HTTPError, ValueError, AttributeError):
-            pass
+
         return PlaceInfo(
             postcode=code,
             municipality=base.municipality,
@@ -392,7 +364,7 @@ class PlaceService:
             steuerfuss_percent=steuerfuss,
             noise_db_day=laerm if laerm is not None else base.noise_db_day,
             oev_class=oev if oev != OeVGueteklasse.NONE else base.oev_class,
-            gwr_building_count=gwr,
+            gwr_building_count=base.gwr_building_count,
             solar_kwh_m2=solar_kwh,
             solar_class=solar_klasse,
             oereb_zone=oereb_zone,

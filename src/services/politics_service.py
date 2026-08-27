@@ -50,6 +50,76 @@ _STUBS: dict[str, DistrictRepresentatives] = {
             ),
         ],
     ),
+    "8610": DistrictRepresentatives(
+        district_name="Gemeinderat Uster",
+        postcode="8610",
+        canton="ZH",
+        representatives=[
+            Representative(
+                id="zh-8610-1",
+                name="Keller Beat",
+                party=PoliticalParty.FDP,
+                wahlkreis="Uster",
+            ),
+            Representative(
+                id="zh-8610-2",
+                name="Meier Susanne",
+                party=PoliticalParty.SP,
+                wahlkreis="Uster",
+            ),
+        ],
+    ),
+    "3011": DistrictRepresentatives(
+        district_name="Stadtrat Bern",
+        postcode="3011",
+        canton="BE",
+        representatives=[
+            Representative(
+                id="be-3011-1",
+                name="Wyss Michael",
+                party=PoliticalParty.SP,
+                wahlkreis="Bern Innere Stadt",
+            ),
+            Representative(
+                id="be-3011-2",
+                name="Gerber Laura",
+                party=PoliticalParty.GRUENE,
+                wahlkreis="Bern Innere Stadt",
+            ),
+        ],
+    ),
+    "4001": DistrictRepresentatives(
+        district_name="Grosser Rat Basel-Stadt",
+        postcode="4001",
+        canton="BS",
+        representatives=[
+            Representative(
+                id="bs-4001-1",
+                name="Schneider Urs",
+                party=PoliticalParty.FDP,
+                wahlkreis="Basel-Stadt",
+            ),
+            Representative(
+                id="bs-4001-2",
+                name="Weber Clara",
+                party=PoliticalParty.SP,
+                wahlkreis="Basel-Stadt",
+            ),
+        ],
+    ),
+    "1201": DistrictRepresentatives(
+        district_name="Conseil Municipal Genève",
+        postcode="1201",
+        canton="GE",
+        representatives=[
+            Representative(
+                id="ge-1201-1",
+                name="Favre Jean-Luc",
+                party=PoliticalParty.SP,
+                wahlkreis="Genève",
+            ),
+        ],
+    ),
 }
 
 # Postcode → Wahlkreis (Stadt ZH Stadtkreise → Gemeinderat 12→9 merged)
