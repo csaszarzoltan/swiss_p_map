@@ -36,6 +36,29 @@ class PlanningService:
     def get_by_postcode(self, postcode: str, active_only: bool = True, on: date | None = None) -> list[Baugesuch]:
         return self.list_items(postcode=postcode, active_only=active_only, on=on)
 
+    def find_by_radius(
+        self,
+        lat: float,
+        lon: float,
+        radius_m: float = 1000.0,
+        active_only: bool = True,
+        on: date | None = None,
+    ) -> list[tuple[Baugesuch, float]]:
+        return self._repo.find_by_radius(lat=lat, lon=lon, radius_m=radius_m, active_only=active_only, on=on)
+
+    def find_by_bbox(
+        self,
+        min_lat: float,
+        min_lon: float,
+        max_lat: float,
+        max_lon: float,
+        active_only: bool = True,
+        on: date | None = None,
+    ) -> list[Baugesuch]:
+        return self._repo.find_by_bbox(
+            min_lat=min_lat, min_lon=min_lon, max_lat=max_lat, max_lon=max_lon, active_only=active_only, on=on
+        )
+
     async def refresh(self, canton: str = "ZH", since: date | None = None) -> int:
         """Poll Amtsblatt and upsert — returns count."""
         items = await self._fetcher.fetch_publications(canton=canton, since=since)

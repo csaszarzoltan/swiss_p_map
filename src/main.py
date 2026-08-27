@@ -248,6 +248,40 @@ def planning_baugesuche(
     return {"items": [b.model_dump(mode="json") for b in items]}
 
 
+@app.get("/api/v1/planning/radius")
+def planning_radius(
+    lat: float = Query(..., ge=45.0, le=48.0, description="WGS84 latitude"),
+    lon: float = Query(..., ge=5.0, le=11.0, description="WGS84 longitude"),
+    radius_m: float = Query(default=1000.0, ge=50.0, le=50000.0, description="Search radius in meters"),
+    active_only: bool = Query(default=True),
+) -> dict[str, object]:
+    """Térbeli sugárkeresés adott koordináta körül méterben (ADR-018)."""
+    items_with_dist = _planning.find_by_radius(lat=lat, lon=lon, radius_m=radius_m, active_only=active_only)
+    return {
+        "count": len(items_with_dist),
+        "radius_m": radius_m,
+        "items": [
+            {**b.model_dump(mode="json"), "distance_m": round(dist, 1)}
+            for b, dist in items_with_dist
+        ],
+    }
+
+
+@app.get("/api/v1/planning/bbox")
+def planning_bbox(
+    min_lat: float = Query(..., ge=45.0, le=48.0),
+    min_lon: float = Query(..., ge=5.0, le=11.0),
+    max_lat: float = Query(..., ge=45.0, le=48.0),
+    max_lon: float = Query(..., ge=5.0, le=11.0),
+    active_only: bool = Query(default=True),
+) -> dict[str, object]:
+    """Térképnézeti befoglaló téglalap lekérdezés (ADR-018)."""
+    items = _planning.find_by_bbox(
+        min_lat=min_lat, min_lon=min_lon, max_lat=max_lat, max_lon=max_lon, active_only=active_only
+    )
+    return {"count": len(items), "items": [b.model_dump(mode="json") for b in items]}
+
+
 @app.post("/api/v1/planning/refresh")
 async def planning_refresh(payload: dict[str, object] | None = None) -> dict[str, object]:
     canton = str((payload or {}).get("canton") or "ZH")

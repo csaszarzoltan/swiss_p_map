@@ -130,3 +130,70 @@ class PlanningRepo:
         sql += " ORDER BY publication_date DESC"
         rows = self._conn.execute(sql, params).fetchall()
         return [_row_to_bg(r) for r in rows]
+
+    def find_by_radius(
+        self,
+        lat: float,
+        lon: float,
+        radius_m: float = 1000.0,
+        active_only: bool = True,
+        on: date | None = None,
+    ) -> list[tuple[Baugesuch, float]]:
+        """Return items within radius_m meters of (lat, lon), sorted by distance ascending."""
+        from src.services.geo_converter import haversine_distance_m
+
+        # Rough bounding box pre-filter
+        d_lat = (radius_m / 111_000.0) * 1.15
+        d_lon = (radius_m / 75_000.0) * 1.15
+
+        ref = (on or date.today()).isoformat()  # noqa: DTZ011
+        where = ["lat IS NOT NULL", "lon IS NOT NULL", "lat BETWEEN ? AND ?", "lon BETWEEN ? AND ?"]
+        params: list[object] = [lat - d_lat, lat + d_lat, lon - d_lon, lon + d_lon]
+
+        if active_only:
+            where.append("auflage_end >= ?")
+            params.append(ref)
+            where.append("auflage_start <= ?")
+            params.append(ref)
+
+        sql = f"SELECT * FROM baugesuche WHERE {' AND '.join(where)}"
+        rows = self._conn.execute(sql, params).fetchall()
+
+        results: list[tuple[Baugesuch, float]] = []
+        for r in rows:
+            bg = _row_to_bg(r)
+            if bg.lat is not None and bg.lon is not None:
+                dist = haversine_distance_m(lat, lon, bg.lat, bg.lon)
+                if dist <= radius_m:
+                    results.append((bg, dist))
+
+        results.sort(key=lambda x: x[1])
+        return results
+
+    def find_by_bbox(
+        self,
+        min_lat: float,
+        min_lon: float,
+        max_lat: float,
+        max_lon: float,
+        active_only: bool = True,
+        on: date | None = None,
+    ) -> list[Baugesuch]:
+        """Return items within geographical bounding box."""
+        ref = (on or date.today()).isoformat()  # noqa: DTZ011
+        where = [
+            "lat IS NOT NULL",
+            "lon IS NOT NULL",
+            "lat BETWEEN ? AND ?",
+            "lon BETWEEN ? AND ?",
+        ]
+        params: list[object] = [min_lat, max_lat, min_lon, max_lon]
+        if active_only:
+            where.append("auflage_end >= ?")
+            params.append(ref)
+            where.append("auflage_start <= ?")
+            params.append(ref)
+
+        sql = f"SELECT * FROM baugesuche WHERE {' AND '.join(where)} ORDER BY publication_date DESC"
+        rows = self._conn.execute(sql, params).fetchall()
+        return [_row_to_bg(r) for r in rows]
