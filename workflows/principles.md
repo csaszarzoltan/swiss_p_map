@@ -7,6 +7,8 @@
 - Stack: **még nincs eldöntve** — az ADR-001 dönt (kickoff research alapján)
 - Teszt: az ADR-001 választja (pytest / vitest / go test...); amíg nincs kód: `docs/*.md` → példa-ellenőrzés
 
+> **Új agent?** `docs/methodology/AGENT-BOOTSTRAP-PROMPT.md` — másold egyben az ELSŐ üzenetbe.
+
 ## Validációs scope
 | Változás | Mit kell futtatni |
 |---|---|
