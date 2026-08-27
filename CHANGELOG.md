@@ -11,6 +11,7 @@ Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Ch
 - **ADR-011: Országos Hely- és Körzetfeloldás** (Bern `3011`, Basel `4001`, Uster `8610`, Genf `1201`) szövetségi ARE, BAFU és BFE rétegekkel és kantonális politikai képviselettel
 
 ### Fixed
+- **3D Térkép kanton határok helyreállítása**: 7 kanton (BE Bern, FR Fribourg, SO Solothurn, BL Basel-Landschaft, SH Schaffhausen, TG Thurgau, OW Obwalden) csonka/exklávé poligonjainak helyreállítása teljes 26-kantonos szilárd 3D geometriára
 - CORS default originek bővítése: `localhost:3310` és `127.0.0.1:3310` támogatása alapértelmezettként a böngészős fetch hibák megelőzésére
 - Map3D lokalizáció: hardkódolt magyar feliratok (`É` iránytű, `IGEN/NEM`, `Népesség`, `Terület`, `Támogatottság`) átvezetése mind a 4 nyelvi szótárba (`de`, `en`, `fr`, `it`)
 - Ghost UI hint javítása: az elavult "balra" útmutatás cseréje aktuális felső téma-választóra
