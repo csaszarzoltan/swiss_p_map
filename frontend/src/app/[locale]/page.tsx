@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useLocale, useTranslations } from "next-intl";
 import SearchPanel from "../SearchPanel";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import TopicSidebar, { type Topic } from "@/components/TopicSidebar";
 import TopicList from "@/components/TopicList";
 import DetailPanel from "@/components/DetailPanel";
@@ -122,12 +123,39 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#030712] text-gray-100">
-      <div className="border-b border-white/10 bg-[#0b1220]/80 backdrop-blur">
-        <div className="mx-auto max-w-[1280px] px-6 py-4">
-          <SearchPanel onResult={handleResult} />
-          {result?.error && <p className="mt-2 text-sm text-amber-400">{result.error}</p>}
+      {/* Fejléc Branding + Search + Nyelvválasztó */}
+      <header className="border-b border-white/10 bg-[#0b1220]/90 backdrop-blur sticky top-0 z-30 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          {/* Logo & Brand */}
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-600 font-bold text-white shadow-md shadow-red-900/40">
+              <span className="text-xl leading-none">✚</span>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-base font-bold tracking-tight text-white">{t("header.title")}</span>
+                <span className="rounded bg-sky-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-sky-400 border border-sky-500/30">v0.2.1</span>
+              </div>
+              <p className="text-[11px] text-slate-400 hidden sm:block">{t("header.subtitle")}</p>
+            </div>
+          </div>
+
+          {/* Search + Language Switcher */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <SearchPanel onResult={handleResult} />
+            <div className="flex justify-end pt-1 sm:pt-0">
+              <LanguageSwitcher />
+            </div>
+          </div>
         </div>
-      </div>
+        {result?.error && (
+          <div className="mx-auto max-w-[1280px] px-4 pb-3 sm:px-6">
+            <p className="text-xs font-medium text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-md px-3 py-1.5 inline-block">
+              {result.error}
+            </p>
+          </div>
+        )}
+      </header>
 
       {/* Menü fölül — teljes szélesség */}
       <div className="mx-auto max-w-[1280px]">

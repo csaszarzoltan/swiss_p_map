@@ -5,7 +5,6 @@ import localFont from "next/font/local";
 import "../globals.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 import {routing} from '@/i18n/routing';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 const geistSans = localFont({
   src: "../fonts/GeistVF.woff",
@@ -47,11 +46,8 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale}>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#030712]`}>
         <NextIntlClientProvider messages={messages}>
-          <div className="flex justify-end px-6 pt-3">
-            <LanguageSwitcher />
-          </div>
           {children}
         </NextIntlClientProvider>
       </body>
