@@ -12,7 +12,7 @@ async function main() {
   const page = await browser.newPage({ viewport: { width: 1440, height: 950 } });
 
   console.log('1. Loading home page...');
-  await page.goto('http://127.0.0.1:3310/de', { waitUntil: 'networkidle' });
+  await page.goto('http://127.0.0.1:3410/de', { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(3000);
   await page.screenshot({ path: path.join(outDir, '01_initial_de.png'), fullPage: true });
 

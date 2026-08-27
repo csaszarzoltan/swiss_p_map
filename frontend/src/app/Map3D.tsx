@@ -122,7 +122,7 @@ export default function Map3D(
   const [subtitle, setSubtitle] = useState(() => ml.subtitle);
   const [statTarget, setStatTarget] = useState(() => ml.cantons);
   const [statPop, setStatPop] = useState(() => ml.population);
-  const [voteYes, setVoteYes] = useState(61.4);
+  const [voteYes, setVoteYes] = useState(58.2);
   const [showBack, setShowBack] = useState(false);
 
   useEffect(() => {
@@ -161,7 +161,11 @@ export default function Map3D(
     mouse: new THREE.Vector2(),
   });
 
-  const tip = (d: { name: string; pop: string; yes: number } | null, x?: number, y?: number) => {
+  const tip = (
+    d: { name: string; pop: string; yes: number; customHtml?: string } | null,
+    x?: number,
+    y?: number,
+  ) => {
     const el = tooltipRef.current;
     if (!el) return;
     if (!d) {
@@ -173,7 +177,11 @@ export default function Map3D(
       el.style.left = x + "px";
       el.style.top = y + "px";
     }
-    el.innerHTML = `<strong>${d.name}</strong>${d.pop ? ` · ${d.pop}` : ""}<br/>${ml.support}: <span style="color:#38bdf8;font-weight:700;">${d.yes}% ${ml.voteYes}</span>`;
+    if (d.customHtml) {
+      el.innerHTML = d.customHtml;
+    } else {
+      el.innerHTML = `<strong>${d.name}</strong>${d.pop ? ` · ${d.pop}` : ""}<br/>${ml.support}: <span style="color:#38bdf8;font-weight:700;">${d.yes}% ${ml.voteYes}</span>`;
+    }
   };
 
   const applyHover = (mesh: THREE.Mesh) => {
@@ -454,6 +462,29 @@ export default function Map3D(
       }
       stateRef.current.raycaster.setFromCamera(stateRef.current.mouse, camera);
       const s = stateRef.current;
+
+      // 1. Check 3D Baugesuch pins first (ADR-013)
+      if (s.pinGroup && s.pinGroup.children.length > 0) {
+        const pinHits = stateRef.current.raycaster.intersectObjects(s.pinGroup.children, true);
+        if (pinHits.length > 0) {
+          let pObj: THREE.Object3D | null = pinHits[0].object;
+          while (pObj && !pObj.userData?.baugesuch && pObj.parent) {
+            pObj = pObj.parent;
+          }
+          if (pObj?.userData?.baugesuch) {
+            const bg = pObj.userData.baugesuch as Baugesuch;
+            document.body.style.cursor = "pointer";
+            tip({
+              name: bg.title,
+              pop: bg.municipality,
+              yes: 0,
+              customHtml: `<strong>🏗 ${bg.title}</strong><br/><span style="color:#fbbf24;font-size:11px;font-weight:600;">PLZ ${bg.postcode} ${bg.municipality} · ${bg.auflage_end ? `Auflage bis ${bg.auflage_end}` : "Aktiv"}</span>`,
+            });
+            return;
+          }
+        }
+      }
+
       const targets = s.selectedCanton ? subGroup.children : mainGroup.children;
       const hits = stateRef.current.raycaster.intersectObjects(targets as THREE.Object3D[], false);
       if (hits.length > 0) {
@@ -471,6 +502,28 @@ export default function Map3D(
 
     const onClick = () => {
       const s = stateRef.current;
+
+      // 1. Click on 3D Baugesuch pin (ADR-013)
+      if (s.pinGroup && s.pinGroup.children.length > 0) {
+        const pinHits = stateRef.current.raycaster.intersectObjects(s.pinGroup.children, true);
+        if (pinHits.length > 0) {
+          let pObj: THREE.Object3D | null = pinHits[0].object;
+          while (pObj && !pObj.userData?.baugesuch && pObj.parent) {
+            pObj = pObj.parent;
+          }
+          if (pObj?.userData?.baugesuch) {
+            const bg = pObj.userData.baugesuch as Baugesuch;
+            setTitle(bg.title);
+            setSubtitle(
+              `Baugesuch ${bg.postcode} ${bg.municipality} — ${bg.auflage_end ? `Einsprachefrist bis ${bg.auflage_end}` : "Aktiv im 20-Tage Fenster"}`,
+            );
+            setStatTarget(`${bg.postcode} ${bg.municipality}`);
+            setStatPop("Bauprojekt");
+            return;
+          }
+        }
+      }
+
       if (!s.currentHovered) return;
       let data = s.currentHovered.userData as {
         isCity?: boolean;
@@ -695,6 +748,9 @@ export default function Map3D(
             <span className="font-semibold text-slate-100">{statPop}</span>
           </div>
           <div className="mt-2">
+            <div className="mb-1 flex items-center justify-between text-[11px]">
+              <span className="font-semibold text-slate-300">🗳 13. AHV-Rente (BFS)</span>
+            </div>
             <div className="mb-1 flex justify-between text-[11px] font-semibold">
               <span className="text-[#38bdf8]">{ml.voteYes}: {voteYes.toFixed(1)}%</span>
               <span className="text-[#f87171]">{ml.voteNo}: {noPct}%</span>

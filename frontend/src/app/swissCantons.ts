@@ -8,7 +8,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Zürich",
     "capital": "Zürich",
     "pop": "1.58M",
-    "yes": 68.9,
+    "yes": 52.1,
     "points": [
       [
         0.4237,
@@ -3131,7 +3131,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Bern",
     "capital": "Bern",
     "pop": "1.04M",
-    "yes": 56.7,
+    "yes": 56.3,
     "points": [
       [
         -1.3939,
@@ -5670,7 +5670,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Luzern",
     "capital": "Luzern",
     "pop": "0.42M",
-    "yes": 61,
+    "yes": 46.6,
     "points": [
       [
         -0.8095,
@@ -6997,7 +6997,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Uri",
     "capital": "Altdorf",
     "pop": "0.04M",
-    "yes": 48,
+    "yes": 43.6,
     "points": [
       [
         0.481,
@@ -7632,7 +7632,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Schwyz",
     "capital": "Schwyz",
     "pop": "0.16M",
-    "yes": 52,
+    "yes": 42.4,
     "points": [
       [
         1.0272,
@@ -8963,7 +8963,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Obwalden",
     "capital": "Sarnen",
     "pop": "0.04M",
-    "yes": 50,
+    "yes": 44.2,
     "points": [
       [
         -0.325,
@@ -9522,7 +9522,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Nidwalden",
     "capital": "Stans",
     "pop": "0.04M",
-    "yes": 51,
+    "yes": 44.6,
     "points": [
       [
         0.3587,
@@ -9853,7 +9853,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Glarus",
     "capital": "Glarus",
     "pop": "0.04M",
-    "yes": 55,
+    "yes": 54.5,
     "points": [
       [
         1.3552,
@@ -10344,7 +10344,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Zug",
     "capital": "Zug",
     "pop": "0.13M",
-    "yes": 58,
+    "yes": 41.4,
     "points": [
       [
         0.9253,
@@ -10863,7 +10863,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Fribourg",
     "capital": "Fribourg",
     "pop": "0.33M",
-    "yes": 57,
+    "yes": 62.8,
     "points": [
       [
         -2.3735,
@@ -12862,7 +12862,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Solothurn",
     "capital": "Solothurn",
     "pop": "0.28M",
-    "yes": 60,
+    "yes": 57.1,
     "points": [
       [
         -1.4156,
@@ -15089,7 +15089,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Basel-Stadt",
     "capital": "Basel",
     "pop": "0.20M",
-    "yes": 65,
+    "yes": 64.5,
     "points": [
       [
         -1.4009,
@@ -15380,7 +15380,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Basel-Landschaft",
     "capital": "Liestal",
     "pop": "0.29M",
-    "yes": 60,
+    "yes": 55.2,
     "points": [
       [
         -1.6817,
@@ -16723,7 +16723,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Schaffhausen",
     "capital": "Schaffhausen",
     "pop": "0.08M",
-    "yes": 62,
+    "yes": 54.8,
     "points": [
       [
         0.8246,
@@ -17806,7 +17806,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Appenzell Ausserrhoden",
     "capital": "Herisau",
     "pop": "0.06M",
-    "yes": 59,
+    "yes": 44.8,
     "points": [
       [
         2.9192,
@@ -18693,7 +18693,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Appenzell Innerrhoden",
     "capital": "Appenzell",
     "pop": "0.02M",
-    "yes": 45,
+    "yes": 31.5,
     "points": [
       [
         2.6287,
@@ -19080,7 +19080,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "St. Gallen",
     "capital": "St. Gallen",
     "pop": "0.53M",
-    "yes": 60,
+    "yes": 48.4,
     "points": [
       [
         2.6868,
@@ -21895,7 +21895,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Graubünden",
     "capital": "Chur",
     "pop": "0.20M",
-    "yes": 54,
+    "yes": 52.6,
     "points": [
       [
         2.6221,
@@ -25014,7 +25014,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Aargau",
     "capital": "Aarau",
     "pop": "0.70M",
-    "yes": 61,
+    "yes": 49.8,
     "points": [
       [
         -1.0686,
@@ -28569,7 +28569,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Thurgau",
     "capital": "Frauenfeld",
     "pop": "0.29M",
-    "yes": 60,
+    "yes": 47.9,
     "points": [
       [
         1.0554,
@@ -29940,7 +29940,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Ticino",
     "capital": "Bellinzona",
     "pop": "0.35M",
-    "yes": 49,
+    "yes": 71.1,
     "points": [
       [
         1.959,
@@ -32047,7 +32047,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Vaud",
     "capital": "Lausanne",
     "pop": "0.83M",
-    "yes": 58,
+    "yes": 74.4,
     "points": [
       [
         -2.9385,
@@ -34686,7 +34686,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Valais",
     "capital": "Sion",
     "pop": "0.35M",
-    "yes": 53,
+    "yes": 61.5,
     "points": [
       [
         0.3366,
@@ -38361,7 +38361,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Neuchâtel",
     "capital": "Neuchâtel",
     "pop": "0.18M",
-    "yes": 60,
+    "yes": 78.4,
     "points": [
       [
         -3.6946,
@@ -38836,7 +38836,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Genève",
     "capital": "Genève",
     "pop": "0.51M",
-    "yes": 62,
+    "yes": 75.1,
     "points": [
       [
         -4.1981,
@@ -39371,7 +39371,7 @@ export const SWISS_CANTONS: SwissCanton[] = [
     "name": "Jura",
     "capital": "Delémont",
     "pop": "0.07M",
-    "yes": 55,
+    "yes": 82.5,
     "points": [
       [
         -2.8591,
