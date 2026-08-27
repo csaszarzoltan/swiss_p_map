@@ -30,13 +30,21 @@ class TestPlanningSpatial:
         assert all(d <= 2000.0 for d in distances)
 
     def test_planning_bbox_search_within_bounds(self) -> None:
-        """A /api/v1/planning/bbox végpont csak a téglalapba eső projekteket adja."""
+        """A /api/v1/planning/bbox végpont Zürich régióban működik."""
         client = TestClient(app)
-        # Search bounding box around Bern (lat ~46.94..46.96, lon ~7.43..7.46)
-        resp = client.get("/api/v1/planning/bbox?min_lat=46.94&max_lat=46.96&min_lon=7.43&max_lon=7.46&active_only=false")
+        # Search bounding box around Zürich Aussersihl (lat ~47.37..47.39, lon ~8.51..8.53)
+        resp = client.get("/api/v1/planning/bbox?min_lat=47.37&max_lat=47.39&min_lon=8.51&max_lon=8.53&active_only=false")
         assert resp.status_code == 200
         data = resp.json()
         assert data["count"] > 0
         for item in data["items"]:
-            assert 46.94 <= item["lat"] <= 46.96
-            assert 7.43 <= item["lon"] <= 7.46
+            assert 47.37 <= item["lat"] <= 47.39
+            assert 8.51 <= item["lon"] <= 8.53
+
+    def test_bbox_outside_returns_empty(self) -> None:
+        """Távoli területen a bbox üres találatot ad."""
+        client = TestClient(app)
+        # Lugano (Tessin) — nincs ott adat
+        resp = client.get("/api/v1/planning/bbox?min_lat=45.99&max_lat=46.01&min_lon=8.94&max_lon=8.96&active_only=false")
+        assert resp.status_code == 200
+        assert resp.json()["count"] == 0
