@@ -8,6 +8,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.models.geo import CoordinateWGS84
+from src.services.ai_summary_service import AiSummaryService
 from src.services.geo_converter import lv95_to_wgs84
 from src.services.place_service import PlaceService
 from src.services.planning_service import PlanningService
@@ -36,6 +37,7 @@ app.add_middleware(
 _politics = PoliticsService()
 _place = PlaceService()
 _planning = PlanningService()
+_ai = AiSummaryService()
 # Demo seed — amíg nincs napi Amtsblatt poll, 8004-en legyen aktív Baugesuch a bemutatóhoz
 try:
     from datetime import date as _d
@@ -155,3 +157,16 @@ def planning_baugesuche(
 ) -> dict[str, object]:
     items = _planning.list_items(postcode=postcode, active_only=active_only)
     return {"items": [b.model_dump(mode="json") for b in items]}
+
+
+@app.post("/api/v1/ai/summary")
+async def ai_summary(payload: dict[str, object]) -> dict[str, str]:
+    locale = str(payload.get("locale") or "de")
+    postcode = str(payload.get("postcode") or "")
+    place = payload.get("place") if isinstance(payload.get("place"), dict) else {}
+    politics = payload.get("politics") if isinstance(payload.get("politics"), dict) else {}
+    baugesuche = payload.get("baugesuche") if isinstance(payload.get("baugesuche"), list) else []
+    summary = await _ai.summarize(locale, postcode, place, politics, baugesuche)  # type: ignore[arg-type]
+    if summary is None:
+        raise HTTPException(status_code=502, detail="ai_unavailable")
+    return {"summary": summary}

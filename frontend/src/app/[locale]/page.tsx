@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import {useTranslations} from 'next-intl';
+import {useLocale, useTranslations} from 'next-intl';
 import SearchPanel from "../SearchPanel";
 import type { Baugesuch, DistrictRepresentatives, PlaceInfo } from "@/lib/api";
 
@@ -26,8 +26,10 @@ function daysLeft(auflageEnd: string): number {
 
 export default function Home() {
   const t = useTranslations();
+  const locale = useLocale();
   const [result, setResult] = useState<Result | null>(null);
   const [tab, setTab] = useState<Tab>("overview");
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
 
   const mapLocale = useMemo(() => ({
     title: t('map.title'),
@@ -60,7 +62,33 @@ export default function Home() {
   const handleResult = (r: Result) => {
     setResult(r);
     setTab("overview");
+    setAiSummary(null);
   };
+
+  useEffect(() => {
+    if (!result?.place) return;
+    const ctrl = new AbortController();
+    const payload = {
+      locale,
+      postcode: result.place.postcode,
+      place: result.place,
+      politics: result.politics ?? {},
+      baugesuche: result.baugesuche ?? [],
+    };
+    const base = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8310";
+    fetch(`${base}/api/v1/ai/summary`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      signal: ctrl.signal,
+    })
+      .then((res) => (res.ok ? res.json() as Promise<{ summary: string }> : null))
+      .then((data) => {
+        if (data?.summary) setAiSummary(data.summary);
+      })
+      .catch(() => {});
+    return () => ctrl.abort();
+  }, [result, locale]);
 
   const hasResult = !!result?.place;
 
@@ -75,10 +103,10 @@ export default function Home() {
 
         {hasResult && result.place && (
           <div className="mt-4 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] backdrop-blur-[12px]">
-            {summary && (
+            {(summary || aiSummary) && (
               <div className="border-b border-white/10 bg-gradient-to-r from-sky-500/10 via-transparent to-amber-500/10 px-4 py-3">
                 <p className="text-[11px] font-semibold tracking-widest text-sky-300/80">{t('summary.label')}</p>
-                <p className="mt-1 text-sm leading-relaxed text-slate-200">{summary}</p>
+                <p className="mt-1 text-sm leading-relaxed text-slate-200">{aiSummary ?? summary}</p>
               </div>
             )}
 
