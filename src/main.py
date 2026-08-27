@@ -169,6 +169,16 @@ async def planning_refresh(payload: dict[str, object] | None = None) -> dict[str
     return {"count": count, "refreshed": count}
 
 
+@app.post("/api/v1/planning/backfill")
+async def planning_backfill(payload: dict[str, object] | None = None) -> dict[str, object]:
+    _ = payload  # future: source filter
+    try:
+        count = await _planning.backfill_ogd()
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"backfill_failed: {exc}") from exc
+    return {"count": count, "source": "ogd"}
+
+
 @app.post("/api/v1/ai/summary")
 async def ai_summary(payload: dict[str, object]) -> dict[str, str]:
     locale = str(payload.get("locale") or "de")
