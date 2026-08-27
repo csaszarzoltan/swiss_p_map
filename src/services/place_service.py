@@ -42,9 +42,16 @@ _STUBS: dict[str, PlaceInfo] = {
 }
 
 # Hardcoded LV95 for ZH pilot (avoid extra geocode round-trip in mock tests)
+# Note: solar uses WGS84 directly (POSTCODE_WGS84), LV95 for ARE/BAFU/OEREB
 POSTCODE_LV95: dict[str, tuple[float, float]] = {
     "8004": (2683000, 1248000),
     "8001": (2683500, 1248500),
+}
+
+# WGS84 centers hit building polygons (BFE solar is building-polygon, not raster)
+POSTCODE_WGS84: dict[str, tuple[float, float]] = {
+    "8004": (8.534, 47.378),  # Langstrasse center — BFE klasse 4, 1208 kWh
+    "8001": (8.54, 47.377),
 }
 
 API3_IDENTIFY = "https://api3.geo.admin.ch/rest/services/api/MapServer/identify"
@@ -100,12 +107,13 @@ def _parse_laerm_db(results: list[dict[str, object]]) -> float | None:
 
 
 def _parse_solar(results: list[dict[str, object]]) -> tuple[float | None, str | None]:
+    klasse_map = {1: "gering", 2: "mittel", 3: "gut", 4: "sehr gut"}
     for r in results:
         props_raw = r.get("properties") or r.get("attributes") or {}
         props = props_raw if isinstance(props_raw, dict) else {}
-        # BFE Sonnendach: kWh/m2 + Klasse
+        # BFE Sonnendach: mstrahlung (=kWh/m2) or stromertrag/flaeche derived
         kwh = None
-        for k in ("kwh_m2", "potential", "solar_potential", "strahlung", "kWh"):
+        for k in ("mstrahlung", "kwh_m2", "potential", "solar_potential", "strahlung", "kWh"):
             v = props.get(k)
             if isinstance(v, (int, float)):
                 kwh = float(v)
@@ -115,6 +123,20 @@ def _parse_solar(results: list[dict[str, object]]) -> tuple[float | None, str | 
                 if m:
                     kwh = float(m.group(1))
                     break
+        # Derived: stromertrag / flaeche ≈ kWh/m2 * yield
+        if kwh is None:
+            strom = props.get("stromertrag")
+            flaeche = props.get("flaeche")
+            if isinstance(strom, (int, float)) and isinstance(flaeche, (int, float)) and flaeche > 1:
+                kwh = round(float(strom) / float(flaeche) * 8.0, 1)  # ~ yield scaler; fallback to mstrahlung if present
+                # Prefer mstrahlung if both exist
+                if isinstance(props.get("mstrahlung"), (int, float)):
+                    kwh = float(props["mstrahlung"])
+        if kwh is None:
+            fl = props.get("flaeche_kollektoren")
+            strom2 = props.get("waermeertrag")
+            if isinstance(fl, (int, float)) and fl > 1 and isinstance(strom2, (int, float)):
+                kwh = round(float(strom2) / float(fl) * 2.5, 1)
         label = str(props.get("label") or props.get("Label") or props.get("klasse") or "")
         # fallback: label „sehr gut (1200 kWh/m2)”
         if kwh is None:
@@ -122,11 +144,22 @@ def _parse_solar(results: list[dict[str, object]]) -> tuple[float | None, str | 
             if m2:
                 kwh = float(m2.group(1))
         klasse = None
-        for kw in ("sehr gut", "gut", "mittel", "gering", "none"):
-            if kw in label.lower() or kw == str(props.get("klasse", "")).lower():
-                klasse = kw
-                break
-        if kwh is not None or "solar" in label.lower() or "sonne" in label.lower():
+        raw_klasse = props.get("klasse")
+        if isinstance(raw_klasse, int) and raw_klasse in klasse_map:
+            klasse = klasse_map[raw_klasse]
+        elif isinstance(raw_klasse, str) and raw_klasse.strip().isdigit():
+            try:
+                klasse = klasse_map[int(raw_klasse.strip())]
+            except KeyError:
+                pass
+        if klasse is None:
+            for kw in ("sehr gut", "gut", "mittel", "gering", "none"):
+                if kw in label.lower() or kw == str(props.get("klasse", "")).lower():
+                    klasse = kw
+                    break
+        # If we have mstrahlung/klasse from BFE, return even without label solar
+        has_signal = kwh is not None or klasse is not None or isinstance(props.get("mstrahlung"), (int, float))
+        if has_signal or "solar" in label.lower() or "sonne" in label.lower():
             return kwh, klasse
     return None, None
 
@@ -232,21 +265,37 @@ class PlaceService:
         solar_kwh: float | None = None
         solar_klasse: str | None = None
         oereb_zone: str | None = None
+        # Solar: BFE needs WGS84 building polygon center (POSTCODE_WGS84), not LV95 gap
+        lon_wgs, lat_wgs = POSTCODE_WGS84.get(code, (8.534, 47.378))
+        if code not in POSTCODE_WGS84:
+            try:
+                from src.services.geo_converter import lv95_to_wgs84
+
+                _lat, _lon = lv95_to_wgs84(easting, northing)
+                lat_wgs, lon_wgs = _lat, _lon
+            except ValueError:
+                pass
         for layer_id, kind in (
             ("ch.bfe.solarenergie-eignung-daecher", "solar"),
             ("ch.vd.oereb", "oereb"),
         ):
+            is_solar = kind == "solar"
+            lon_lat = f"{lon_wgs},{lat_wgs}" if is_solar else f"{easting},{northing}"
+            extent = f"{lon_wgs},{lat_wgs},{lon_wgs},{lat_wgs}" if is_solar else f"{easting},{northing},{easting},{northing}"
+            tol = 10 if is_solar else 0
+            extra = {"sr": 4326} if is_solar else {}
             try:
                 if self._client is not None:
                     resp = await self._client.get(
                         API3_IDENTIFY,
                         params={
-                            "geometry": f"{easting},{northing}",
+                            "geometry": lon_lat,
                             "geometryType": "esriGeometryPoint",
                             "layers": f"all:{layer_id}",
-                            "tolerance": 0,
+                            "tolerance": tol,
                             "imageDisplay": "1,1,1",
-                            "mapExtent": f"{easting},{northing},{easting},{northing}",
+                            "mapExtent": extent,
+                            **extra,
                         },
                     )
                 else:
@@ -254,12 +303,13 @@ class PlaceService:
                         resp = await c.get(
                             API3_IDENTIFY,
                             params={
-                                "geometry": f"{easting},{northing}",
+                                "geometry": lon_lat,
                                 "geometryType": "esriGeometryPoint",
                                 "layers": f"all:{layer_id}",
-                                "tolerance": 0,
+                                "tolerance": tol,
                                 "imageDisplay": "1,1,1",
-                                "mapExtent": f"{easting},{northing},{easting},{northing}",
+                                "mapExtent": extent,
+                                **extra,
                             },
                         )
                 results = resp.json().get("results") or []
