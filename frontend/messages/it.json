@@ -24,7 +24,7 @@
     "noSelection": "Cerca prima un NPA (es. 8004)."
   },
   "detail": {
-    "hint": "Scegli un tema a sinistra e cerca un NPA.",
+    "hint": "Seleziona un argomento e cerca un NPA.",
     "selectHint": "Scegli un elemento dalla lista."
   },
   "summary": {
@@ -81,7 +81,15 @@
     "breadcrumb": "SVIZZERA",
     "cantons": "26 Cantoni",
     "population": "8,9 milioni",
-    "hint": "Sinistro: ruota · Destro: panoramica · Rotella: zoom"
+    "hint": "Sinistro: ruota · Destro: panoramica · Rotella: zoom",
+    "compass": "N",
+    "areaLabel": "Area / Unità",
+    "popLabel": "Popolazione",
+    "voteYes": "SÌ",
+    "voteNo": "NO",
+    "support": "Supporto",
+    "cantonSubtitle": "Dati distrettuali aperti. Passa il mouse sui distretti per i dettagli!",
+    "citySubtitle": "Risultati comunali."
   },
   "header": {
     "title": "Swiss P Map",

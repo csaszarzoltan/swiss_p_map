@@ -24,7 +24,7 @@
     "noSelection": "Search for a postcode first (e.g. 8004)."
   },
   "detail": {
-    "hint": "Pick a topic on the left and search for a postcode.",
+    "hint": "Pick a topic and search for a postcode.",
     "selectHint": "Select an item from the list above."
   },
   "summary": {
@@ -81,7 +81,15 @@
     "breadcrumb": "SWITZERLAND",
     "cantons": "26 Cantons",
     "population": "8.9 Million",
-    "hint": "Left: Rotate · Right: Pan · Wheel: Zoom"
+    "hint": "Left: Rotate · Right: Pan · Wheel: Zoom",
+    "compass": "N",
+    "areaLabel": "Area / Unit",
+    "popLabel": "Population",
+    "voteYes": "YES",
+    "voteNo": "NO",
+    "support": "Support",
+    "cantonSubtitle": "District data open. Hover over districts for details!",
+    "citySubtitle": "Municipal results."
   },
   "header": {
     "title": "Swiss P Map",

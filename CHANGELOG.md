@@ -6,6 +6,8 @@ Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Ch
 
 ### Fixed
 - CORS default originek bővítése: `localhost:3310` és `127.0.0.1:3310` támogatása alapértelmezettként a böngészős fetch hibák megelőzésére
+- Map3D lokalizáció: hardkódolt magyar feliratok (`É` iránytű, `IGEN/NEM`, `Népesség`, `Terület`, `Támogatottság`) átvezetése mind a 4 nyelvi szótárba (`de`, `en`, `fr`, `it`)
+- Ghost UI hint javítása: az elavult "balra" útmutatás cseréje aktuális felső téma-választóra
 
 
 ### Added

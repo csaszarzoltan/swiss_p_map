@@ -24,7 +24,7 @@
     "noSelection": "Suche zuerst nach einer PLZ (z.B. 8004)."
   },
   "detail": {
-    "hint": "Wähle ein Thema links und suche nach einer PLZ.",
+    "hint": "Wähle ein Thema und suche nach einer PLZ.",
     "selectHint": "Wähle ein Element aus der Liste oben."
   },
   "summary": {
@@ -81,7 +81,15 @@
     "breadcrumb": "SCHWEIZ",
     "cantons": "26 Kantone",
     "population": "8.9 Millionen",
-    "hint": "Linke Taste: Drehen · Rechts: Schwenken · Rad: Zoom"
+    "hint": "Linke Taste: Drehen · Rechts: Schwenken · Rad: Zoom",
+    "compass": "N",
+    "areaLabel": "Gebiet / Einheit",
+    "popLabel": "Bevölkerung",
+    "voteYes": "JA",
+    "voteNo": "NEIN",
+    "support": "Zustimmung",
+    "cantonSubtitle": "Bezirksdaten geöffnet. Bewege die Maus über die Bezirke für Details!",
+    "citySubtitle": "Gemeindeweite Ergebnisse."
   },
   "header": {
     "title": "Swiss P Map",

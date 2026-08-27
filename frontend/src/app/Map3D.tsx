@@ -78,6 +78,14 @@ interface MapLocale {
   cantons: string;
   population: string;
   hint: string;
+  compass: string;
+  areaLabel: string;
+  popLabel: string;
+  voteYes: string;
+  voteNo: string;
+  support: string;
+  cantonSubtitle: string;
+  citySubtitle: string;
 }
 
 export default function Map3D(
@@ -91,7 +99,22 @@ export default function Map3D(
     mapLocale?: MapLocale;
   } = {},
 ) {
-  const ml = mapLocale ?? {title:"Schweizerische Eidgenossenschaft",breadcrumb:"SCHWEIZ",subtitle:"Bewege die Maus über einen Kanton für die 3D-Hervorhebung, dann klicke, um die Städte im Kanton zu entdecken!",cantons:"26 Kantone",population:"8,9 Millionen",hint:"Linke Taste: Drehen · Rechts: Schwenken · Rad: Zoom"};
+  const ml: MapLocale = mapLocale ?? {
+    title: "Schweizerische Eidgenossenschaft",
+    breadcrumb: "SCHWEIZ",
+    subtitle: "Bewege die Maus über einen Kanton für die 3D-Hervorhebung, dann klicke, um die Städte im Kanton zu entdecken!",
+    cantons: "26 Kantone",
+    population: "8.9 Millionen",
+    hint: "Linke Taste: Drehen · Rechts: Schwenken · Rad: Zoom",
+    compass: "N",
+    areaLabel: "Gebiet / Einheit",
+    popLabel: "Bevölkerung",
+    voteYes: "JA",
+    voteNo: "NEIN",
+    support: "Zustimmung",
+    cantonSubtitle: "Bezirksdaten geöffnet. Bewege die Maus über die Bezirke für Details!",
+    citySubtitle: "Gemeindeweite Ergebnisse.",
+  };
   const containerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [breadcrumb, setBreadcrumb] = useState(() => ml.breadcrumb);
@@ -101,6 +124,15 @@ export default function Map3D(
   const [statPop, setStatPop] = useState(() => ml.population);
   const [voteYes, setVoteYes] = useState(61.4);
   const [showBack, setShowBack] = useState(false);
+
+  useEffect(() => {
+    setBreadcrumb(ml.breadcrumb);
+    setTitle(ml.title);
+    setSubtitle(ml.subtitle);
+    setStatTarget(ml.cantons);
+    setStatPop(ml.population);
+  }, [ml.breadcrumb, ml.title, ml.subtitle, ml.cantons, ml.population]);
+
   const stateRef = useRef<{
     selectedCanton: THREE.Mesh | null;
     selectedCity: THREE.Mesh | null;
@@ -141,7 +173,7 @@ export default function Map3D(
       el.style.left = x + "px";
       el.style.top = y + "px";
     }
-    el.innerHTML = `<strong>${d.name}</strong>${d.pop ? ` · ${d.pop}` : ""}<br/>Támogatottság: <span style="color:#38bdf8;font-weight:700;">${d.yes}% IGEN</span>`;
+    el.innerHTML = `<strong>${d.name}</strong>${d.pop ? ` · ${d.pop}` : ""}<br/>${ml.support}: <span style="color:#38bdf8;font-weight:700;">${d.yes}% ${ml.voteYes}</span>`;
   };
 
   const applyHover = (mesh: THREE.Mesh) => {
@@ -191,9 +223,9 @@ export default function Map3D(
       s.subGroup!.children.forEach((cm) => {
         gsap.to((cm as THREE.Mesh).material as THREE.MeshStandardMaterial, { opacity: 0.34, duration: 0.4 });
       });
-      setBreadcrumb(`SVÁJC / ${(s.selectedCanton!.userData as { name: string }).name.toUpperCase()}`);
-      setTitle(`${(s.selectedCanton!.userData as { name: string }).name} kanton`);
-      setSubtitle("Körzeti adatok megnyitva. Vidd az egeret a körzetek fölé a kiemeléshez!");
+      setBreadcrumb(`${ml.breadcrumb} / ${(s.selectedCanton!.userData as { name: string }).name.toUpperCase()}`);
+      setTitle((s.selectedCanton!.userData as { name: string }).name);
+      setSubtitle(ml.cantonSubtitle);
       const d = s.selectedCanton!.userData as { name: string; pop: string; yes: number };
       setStatTarget(d.name);
       setStatPop(d.pop);
@@ -235,11 +267,11 @@ export default function Map3D(
       prevCanton.visible = true;
       gsap.to(s.camera!.position, { x: INITIAL_CAM.x, y: INITIAL_CAM.y, z: INITIAL_CAM.z, duration: 1.15, ease: "power2.inOut" });
       gsap.to(s.controls!.target, { x: INITIAL_TARGET.x, y: INITIAL_TARGET.y, z: INITIAL_TARGET.z, duration: 1.15, ease: "power2.inOut" });
-      setBreadcrumb("SVÁJC");
-      setTitle("Svájci Államszövetség");
-      setSubtitle("Vidd az egeret egy kanton fölé a 3D kiemeléshez, majd kattints a kantonon belüli városok felfedezéséhez!");
-      setStatTarget("26 Kanton");
-      setStatPop("8.9 Millió");
+      setBreadcrumb(ml.breadcrumb);
+      setTitle(ml.title);
+      setSubtitle(ml.subtitle);
+      setStatTarget(ml.cantons);
+      setStatPop(ml.population);
       setVoteYes(61.4);
       setShowBack(false);
     }
@@ -456,9 +488,9 @@ export default function Map3D(
         subGroup.children.forEach((cm) => {
           if (cm !== s.selectedCity) gsap.to((cm as THREE.Mesh).material as THREE.MeshStandardMaterial, { opacity: 0.12, duration: 0.4 });
         });
-        setBreadcrumb(`SVÁJC / ${(s.selectedCanton.userData as { name: string }).name.toUpperCase()} / ${data.name.toUpperCase()}`);
+        setBreadcrumb(`${ml.breadcrumb} / ${(s.selectedCanton.userData as { name: string }).name.toUpperCase()} / ${data.name.toUpperCase()}`);
         setTitle(data.name);
-        setSubtitle("Települési szintű szavazóköri végeredmény.");
+        setSubtitle(ml.citySubtitle);
         return;
       }
       // Kanton szintre lépés — izolálás + Wahlkreis-darabolás
@@ -638,11 +670,11 @@ export default function Map3D(
       {/* Iránytű */}
       <div className="pointer-events-none absolute right-4 top-4 z-10 flex h-12 w-12 flex-col items-center justify-center rounded-full border border-white/10 bg-[rgba(17,24,39,0.7)] shadow-[0_4px_20px_rgba(0,0,0,0.4)] backdrop-blur-[12px]">
         <div className="mb-0.5 h-0 w-0 border-x-[5px] border-b-[9px] border-x-transparent border-b-[#38bdf8]" />
-        <span className="text-[11px] font-bold text-[#38bdf8]">É</span>
+        <span className="text-[11px] font-bold text-[#38bdf8]">{ml.compass}</span>
       </div>
 
       {/* Glassmorphism panel */}
-      <div className="absolute left-4 top-4 z-10 w-[320px] rounded-[14px] border border-white/10 bg-[rgba(15,23,42,0.75)] p-[22px] shadow-[0_20px_40px_rgba(0,0,0,0.6)] backdrop-blur-[16px]">
+      <div className="absolute left-4 top-4 z-10 w-[calc(100%-2rem)] max-w-[320px] rounded-[14px] border border-white/10 bg-[rgba(15,23,42,0.75)] p-4 sm:p-[22px] shadow-[0_20px_40px_rgba(0,0,0,0.6)] backdrop-blur-[16px]">
         <div className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[1px] text-[#38bdf8]">
           {breadcrumb.split(" / ").map((part, i, arr) => (
             <span key={part} className={i === arr.length - 1 ? "text-[#38bdf8]" : "text-slate-500"}>
@@ -651,21 +683,21 @@ export default function Map3D(
             </span>
           ))}
         </div>
-        <h2 className="mb-1.5 text-[20px] font-bold tracking-[-0.3px] text-white">{title}</h2>
-        <p className="mb-4 text-[12px] leading-[1.4] text-slate-400">{subtitle}</p>
+        <h2 className="mb-1.5 text-[18px] sm:text-[20px] font-bold tracking-[-0.3px] text-white">{title}</h2>
+        <p className="mb-3 text-[12px] leading-[1.4] text-slate-400">{subtitle}</p>
         <div className="mb-3 rounded-lg border border-white/5 bg-white/[0.04] p-3">
           <div className="mb-2 flex items-center justify-between text-[13px]">
-            <span className="text-slate-400">Terület / Egység:</span>
+            <span className="text-slate-400">{ml.areaLabel}:</span>
             <span className="font-semibold text-slate-100">{statTarget}</span>
           </div>
           <div className="mb-2 flex items-center justify-between text-[13px]">
-            <span className="text-slate-400">Népesség:</span>
+            <span className="text-slate-400">{ml.popLabel}:</span>
             <span className="font-semibold text-slate-100">{statPop}</span>
           </div>
           <div className="mt-2">
             <div className="mb-1 flex justify-between text-[11px] font-semibold">
-              <span className="text-[#38bdf8]">IGEN: {voteYes.toFixed(1)}%</span>
-              <span className="text-[#f87171]">NEM: {noPct}%</span>
+              <span className="text-[#38bdf8]">{ml.voteYes}: {voteYes.toFixed(1)}%</span>
+              <span className="text-[#f87171]">{ml.voteNo}: {noPct}%</span>
             </div>
             <div className="flex h-1.5 w-full overflow-hidden rounded bg-[rgba(239,68,68,0.5)]">
               <div className="h-full bg-[#38bdf8] transition-[width] duration-300" style={{ width: `${voteYes}%` }} />
@@ -677,7 +709,7 @@ export default function Map3D(
             onClick={handleBack}
             className="w-full rounded-lg border border-[#38bdf8]/40 bg-[#38bdf8]/15 px-3 py-2.5 text-[13px] font-semibold text-[#38bdf8] transition hover:bg-[#38bdf8]/30 hover:text-white"
           >
-            ← Vissza az előző nézethez
+            ← {ml.breadcrumb}
           </button>
         )}
       </div>
