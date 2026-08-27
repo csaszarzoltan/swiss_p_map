@@ -27,7 +27,12 @@ CREATE TABLE IF NOT EXISTS baugesuche (
     source_url TEXT NOT NULL,
     geocode_precision TEXT NOT NULL DEFAULT 'none',
     lat REAL,
-    lon REAL
+    lon REAL,
+    contractor TEXT,
+    architect TEXT,
+    parcel_number TEXT,
+    zone_type TEXT,
+    risk_level TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_baugesuche_postcode ON baugesuche(postcode);
 CREATE INDEX IF NOT EXISTS idx_baugesuche_auflage_end ON baugesuche(auflage_end);
@@ -35,6 +40,7 @@ CREATE INDEX IF NOT EXISTS idx_baugesuche_auflage_end ON baugesuche(auflage_end)
 
 
 def _row_to_bg(row: sqlite3.Row) -> Baugesuch:
+    keys = row.keys()
     return Baugesuch(
         id=row["id"],
         title=row["title"],
@@ -50,6 +56,11 @@ def _row_to_bg(row: sqlite3.Row) -> Baugesuch:
         geocode_precision=row["geocode_precision"] or "none",
         lat=row["lat"],
         lon=row["lon"],
+        contractor=row["contractor"] if "contractor" in keys else None,
+        architect=row["architect"] if "architect" in keys else None,
+        parcel_number=row["parcel_number"] if "parcel_number" in keys else None,
+        zone_type=row["zone_type"] if "zone_type" in keys else None,
+        risk_level=row["risk_level"] if "risk_level" in keys else None,
     )
 
 
@@ -74,15 +85,19 @@ class PlanningRepo:
             INSERT INTO baugesuche
               (id,title,municipality,municipality_id,postcode,canton,
                publication_date,expiration_date,auflage_start,auflage_end,
-               source_url,geocode_precision,lat,lon)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+               source_url,geocode_precision,lat,lon,
+               contractor,architect,parcel_number,zone_type,risk_level)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             ON CONFLICT(id) DO UPDATE SET
               title=excluded.title, municipality=excluded.municipality,
               municipality_id=excluded.municipality_id, postcode=excluded.postcode,
               canton=excluded.canton, publication_date=excluded.publication_date,
               expiration_date=excluded.expiration_date, auflage_start=excluded.auflage_start,
               auflage_end=excluded.auflage_end, source_url=excluded.source_url,
-              geocode_precision=excluded.geocode_precision, lat=excluded.lat, lon=excluded.lon
+              geocode_precision=excluded.geocode_precision, lat=excluded.lat, lon=excluded.lon,
+              contractor=excluded.contractor, architect=excluded.architect,
+              parcel_number=excluded.parcel_number, zone_type=excluded.zone_type,
+              risk_level=excluded.risk_level
             """,
             [
                 (
@@ -100,6 +115,11 @@ class PlanningRepo:
                     b.geocode_precision,
                     b.lat,
                     b.lon,
+                    b.contractor,
+                    b.architect,
+                    b.parcel_number,
+                    b.zone_type,
+                    b.risk_level,
                 )
                 for b in items
             ],

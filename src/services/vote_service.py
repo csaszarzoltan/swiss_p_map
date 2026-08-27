@@ -100,9 +100,50 @@ _DEFAULT_CANTON_YES_PCT: dict[str, tuple[float, float]] = {
 }
 
 
-def _create_default_proposal() -> FederalVoteProposal:
+# 2024-09-22: BVG-Reform (Pensionskassen-Reform)
+_BVG_CANTON_YES_PCT: dict[str, tuple[float, float]] = {
+    "ZH": (34.8, 48.2), "BE": (33.1, 45.1), "LU": (36.2, 46.5), "UR": (31.2, 38.9),
+    "SZ": (38.4, 47.1), "OW": (34.5, 48.0), "NW": (41.0, 49.3), "GL": (32.8, 41.2),
+    "ZG": (42.9, 49.8), "FR": (27.6, 44.5), "SO": (32.1, 43.8), "BS": (31.5, 49.2),
+    "BL": (32.7, 46.0), "SH": (32.4, 61.2), "AR": (37.2, 45.3), "AI": (40.5, 41.0),
+    "SG": (35.6, 44.2), "GR": (36.1, 42.8), "AG": (35.8, 44.5), "TG": (37.4, 43.1),
+    "TI": (30.2, 44.0), "VD": (23.4, 47.2), "VS": (34.8, 46.1), "NE": (20.9, 45.3),
+    "GE": (24.3, 43.8), "JU": (18.6, 44.1),
+}
+
+# 2024-11-24: Ausbauschritt 2023 für die Nationalstrassen (Autobahn-Ausbau)
+_AUTOBAHN_CANTON_YES_PCT: dict[str, tuple[float, float]] = {
+    "ZH": (47.2, 47.8), "BE": (44.6, 44.2), "LU": (51.2, 45.9), "UR": (48.1, 39.5),
+    "SZ": (57.8, 46.8), "OW": (54.1, 47.2), "NW": (56.9, 48.5), "GL": (49.2, 41.0),
+    "ZG": (55.4, 48.6), "FR": (44.8, 43.9), "SO": (48.9, 43.1), "BS": (33.1, 49.8),
+    "BL": (46.2, 45.5), "SH": (48.5, 60.8), "AR": (51.2, 45.0), "AI": (56.0, 40.8),
+    "SG": (52.8, 43.8), "GR": (47.9, 42.1), "AG": (54.3, 44.0), "TG": (55.1, 42.7),
+    "TI": (52.3, 43.5), "VD": (41.2, 46.8), "VS": (55.6, 45.2), "NE": (38.9, 44.9),
+    "GE": (38.1, 43.2), "JU": (39.8, 43.8),
+}
+
+# 2024-06-09: Bundesgesetz über eine sichere Stromversorgung mit erneuerbaren Energien
+_STROM_CANTON_YES_PCT: dict[str, tuple[float, float]] = {
+    "ZH": (72.4, 48.1), "BE": (69.2, 45.3), "LU": (68.5, 46.2), "UR": (64.2, 41.0),
+    "SZ": (46.8, 46.9), "OW": (60.1, 47.5), "NW": (63.8, 48.2), "GL": (65.2, 42.1),
+    "ZG": (66.9, 48.9), "FR": (70.1, 44.8), "SO": (67.4, 43.9), "BS": (76.8, 49.5),
+    "BL": (69.5, 46.1), "SH": (65.4, 61.5), "AR": (66.1, 45.8), "AI": (58.2, 41.5),
+    "SG": (65.9, 44.1), "GR": (73.1, 43.0), "AG": (66.5, 44.8), "TG": (64.8, 43.5),
+    "TI": (74.2, 44.2), "VD": (76.9, 47.8), "VS": (69.8, 46.5), "NE": (77.4, 45.9),
+    "GE": (75.8, 44.0), "JU": (73.2, 44.5),
+}
+
+
+def _build_proposal(
+    prop_id: int,
+    titles: dict[str, str],
+    date_str: str,
+    nat_yes: float,
+    nat_turnout: float,
+    canton_data: dict[str, tuple[float, float]],
+) -> FederalVoteProposal:
     cantons: dict[str, CantonVoteResult] = {}
-    for code, (yes_pct, turnout) in _DEFAULT_CANTON_YES_PCT.items():
+    for code, (yes_pct, turnout) in canton_data.items():
         no_pct = round(100.0 - yes_pct, 1)
         cantons[code] = CantonVoteResult(
             canton=code,
@@ -112,19 +153,71 @@ def _create_default_proposal() -> FederalVoteProposal:
             turnout_percent=turnout,
         )
     return FederalVoteProposal(
-        proposal_id=6670,
-        titles={
-            "de": "Initiative für eine 13. AHV-Rente",
-            "en": "Initiative for a 13th AHV Pension",
-            "fr": "Initiative pour une 13e rente AVS",
-            "it": "Iniziativa per una 13esima mensilità AVS",
-        },
-        date="2024-03-03",
-        national_yes_percent=58.2,
-        national_no_percent=41.8,
-        national_turnout_percent=58.3,
+        proposal_id=prop_id,
+        titles=titles,
+        date=date_str,
+        national_yes_percent=nat_yes,
+        national_no_percent=round(100.0 - nat_yes, 1),
+        national_turnout_percent=nat_turnout,
         cantons=cantons,
     )
+
+
+def _all_default_proposals() -> dict[int, FederalVoteProposal]:
+    return {
+        6670: _build_proposal(
+            6670,
+            {
+                "de": "Initiative für eine 13. AHV-Rente",
+                "en": "Initiative for a 13th AHV Pension",
+                "fr": "Initiative pour une 13e rente AVS",
+                "it": "Iniziativa per una 13esima mensilità AVS",
+            },
+            "2024-03-03",
+            58.2,
+            58.3,
+            _DEFAULT_CANTON_YES_PCT,
+        ),
+        6680: _build_proposal(
+            6680,
+            {
+                "de": "Reform der beruflichen Vorsorge (BVG)",
+                "en": "Occupational Pension Reform (BVG)",
+                "fr": "Réforme de la prévoyance professionnelle (LPP)",
+                "it": "Riforma della previdenza professionale (LPP)",
+            },
+            "2024-09-22",
+            32.9,
+            45.1,
+            _BVG_CANTON_YES_PCT,
+        ),
+        6690: _build_proposal(
+            6690,
+            {
+                "de": "Ausbauschritt 2023 der Nationalstrassen",
+                "en": "Expansion of National Highways 2023",
+                "fr": "Étape d'aménagement 2023 des routes nationales",
+                "it": "Fase di potenziamento 2023 delle strade nazionali",
+            },
+            "2024-11-24",
+            47.3,
+            44.8,
+            _AUTOBAHN_CANTON_YES_PCT,
+        ),
+        6700: _build_proposal(
+            6700,
+            {
+                "de": "Bundesgesetz über eine sichere Stromversorgung (Stromgesetz)",
+                "en": "Federal Act on a Secure Electricity Supply",
+                "fr": "Loi relative à un approvisionnement en électricité sûr",
+                "it": "Legge su un approvvigionamento elettrico sicuro",
+            },
+            "2024-06-09",
+            68.7,
+            45.4,
+            _STROM_CANTON_YES_PCT,
+        ),
+    }
 
 
 class VoteService:
@@ -132,11 +225,29 @@ class VoteService:
 
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
         self._client = client
-        self._cached_proposal = _create_default_proposal()
+        self._proposals = _all_default_proposals()
 
     def get_latest_vote(self) -> FederalVoteProposal:
         """Returns the latest referendum proposal with results for all 26 cantons."""
-        return self._cached_proposal
+        return self._proposals[6670]
+
+    def get_proposal_by_id(self, proposal_id: int) -> FederalVoteProposal | None:
+        """Returns specific proposal by ID."""
+        return self._proposals.get(proposal_id)
+
+    def list_proposals(self) -> list[dict[str, object]]:
+        """Returns lightweight overview list of available federal proposals."""
+        return [
+            {
+                "proposal_id": p.proposal_id,
+                "date": p.date,
+                "titles": p.titles,
+                "national_yes_percent": p.national_yes_percent,
+                "national_no_percent": p.national_no_percent,
+                "national_turnout_percent": p.national_turnout_percent,
+            }
+            for p in sorted(self._proposals.values(), key=lambda x: x.date, reverse=True)
+        ]
 
     def parse_voteinfo_payload(self, data: dict[str, object]) -> FederalVoteProposal | None:
         """Parses a VoteInfo OGD JSON payload."""

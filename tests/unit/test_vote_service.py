@@ -55,3 +55,28 @@ class TestVoteService:
         assert "ZH" in data["cantons"]
         assert "BE" in data["cantons"]
         assert "GE" in data["cantons"]
+
+    def test_vote_proposals_list_and_detail(self) -> None:
+        """A /api/v1/politics/votes/list és /{id} végpontok több referendumot szolgáltatnak (ADR-017)."""
+        client = TestClient(app)
+        resp = client.get("/api/v1/politics/votes/list")
+        assert resp.status_code == 200
+        items = resp.json().get("items", [])
+        assert len(items) >= 4
+        ids = [p["proposal_id"] for p in items]
+        assert 6670 in ids  # AHV
+        assert 6680 in ids  # BVG
+        assert 6690 in ids  # Autobahn
+        assert 6700 in ids  # Strom
+
+        # Detail lookup for BVG
+        bvg_resp = client.get("/api/v1/politics/votes/6680")
+        assert bvg_resp.status_code == 200
+        bvg_data = bvg_resp.json()
+        assert bvg_data["national_yes_percent"] == 32.9
+        assert "ZH" in bvg_data["cantons"]
+        assert bvg_data["cantons"]["ZH"]["yes_percent"] == 34.8
+
+        # 404 for unknown proposal
+        err_resp = client.get("/api/v1/politics/votes/99999")
+        assert err_resp.status_code == 404

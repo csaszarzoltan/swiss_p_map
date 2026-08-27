@@ -53,7 +53,7 @@ try:
         [
             _BG(
                 id="demo-8004-1",
-                title="Umbau Mehrfamilienhaus — Badenerstrasse 100, 8004 Zürich",
+                title="Badenerstrasse 120, 8004 Zürich — Dachausbau & Aufstockung (Amtsblatt ZH)",
                 municipality="Zürich",
                 municipality_id=261,
                 postcode="8004",
@@ -63,25 +63,35 @@ try:
                 auflage_start=_today - _td(days=5),
                 auflage_end=_today + _td(days=15),
                 source_url="https://amtsblattportal.ch/api/v1/publications/demo-8004-1/xml",
-                geocode_precision="locality",
-                lat=47.392,
-                lon=8.517,
+                geocode_precision="address",
+                lat=47.374,
+                lon=8.525,
+                contractor="Immo Zürich AG",
+                architect="EM2N Architekten ETH SIA",
+                parcel_number="Kat.-Nr. 4812 / Assek. 1044",
+                zone_type="Kernzone (K)",
+                risk_level="high",
             ),
             _BG(
                 id="demo-8004-2",
-                title="Neubau Wohnüberbauung — Hardstrasse 12, 8004 Zürich",
+                title="Hohlstrasse 216, 8004 Zürich — Gewerbeumbau & PV-Anlage (Amtsblatt ZH)",
                 municipality="Zürich",
                 municipality_id=261,
                 postcode="8004",
                 canton="ZH",
-                publication_date=_today - _td(days=12),
-                expiration_date=_today + _td(days=353),
-                auflage_start=_today - _td(days=12),
-                auflage_end=_today + _td(days=8),
+                publication_date=_today - _td(days=10),
+                expiration_date=_today + _td(days=355),
+                auflage_start=_today - _td(days=10),
+                auflage_end=_today + _td(days=10),
                 source_url="https://amtsblattportal.ch/api/v1/publications/demo-8004-2/xml",
                 geocode_precision="address",
-                lat=47.388,
-                lon=8.523,
+                lat=47.382,
+                lon=8.515,
+                contractor="Swisscom Immobilien AG",
+                architect="Gigon/Guyer Architekten",
+                parcel_number="Kat.-Nr. 5120",
+                zone_type="Industrie- und Gewerbezone",
+                risk_level="medium",
             ),
             _BG(
                 id="demo-8001-1",
@@ -98,6 +108,11 @@ try:
                 geocode_precision="address",
                 lat=47.376,
                 lon=8.548,
+                contractor="ETH Zürich Bauten",
+                architect="Boltshauser Architekten",
+                parcel_number="Kat.-Nr. 1010",
+                zone_type="Zone für öffentliche Bauten",
+                risk_level="low",
             ),
             _BG(
                 id="demo-8610-1",
@@ -114,6 +129,11 @@ try:
                 geocode_precision="address",
                 lat=47.35,
                 lon=8.72,
+                contractor="Wohnbaugenossenschaft Uster",
+                architect="Meier Partner AG",
+                parcel_number="Assek. Nr. 7325",
+                zone_type="Wohnzone W3",
+                risk_level="medium",
             ),
             _BG(
                 id="demo-3011-1",
@@ -130,6 +150,11 @@ try:
                 geocode_precision="address",
                 lat=46.948,
                 lon=7.449,
+                contractor="Burgergemeinde Bern",
+                architect="Atelier 5 Architekten",
+                parcel_number="Grundbuch Bern 124",
+                zone_type="UNESCO Altstadtzone (A)",
+                risk_level="high",
             ),
             _BG(
                 id="demo-3011-2",
@@ -146,6 +171,11 @@ try:
                 geocode_precision="address",
                 lat=46.947,
                 lon=7.444,
+                contractor="PSP Swiss Property AG",
+                architect="Kämpfen Zinke Partner",
+                parcel_number="Grundbuch Bern 890",
+                zone_type="Geschäftszone Zentrum",
+                risk_level="medium",
             ),
             _BG(
                 id="demo-4001-1",
@@ -162,6 +192,11 @@ try:
                 geocode_precision="address",
                 lat=47.556,
                 lon=7.591,
+                contractor="Basler Kantonalbank Immobilien",
+                architect="Herzog & de Meuron",
+                parcel_number="Sektion 1 / Parz. 402",
+                zone_type="Schonzone Altstadt",
+                risk_level="low",
             ),
             _BG(
                 id="demo-1201-1",
@@ -178,6 +213,11 @@ try:
                 geocode_precision="address",
                 lat=46.210,
                 lon=6.146,
+                contractor="Genève Patrimoine Foncière SA",
+                architect="Bonnard Woeffray Architectes",
+                parcel_number="Feuille 12 / N° 3401",
+                zone_type="Zone de développement 2",
+                risk_level="high",
             ),
         ]
     )
@@ -222,6 +262,21 @@ async def politics_representatives(
 def politics_votes_latest() -> dict[str, object]:
     """Hivatalos szövetségi népszavazási eredmények kantonális bontásban (ADR-012)."""
     return _vote.get_latest_vote().model_dump()
+
+
+@app.get("/api/v1/politics/votes/list")
+def politics_votes_list() -> dict[str, object]:
+    """Elérhető szövetségi népszavazási javaslatok listája (ADR-017)."""
+    return {"items": _vote.list_proposals()}
+
+
+@app.get("/api/v1/politics/votes/{proposal_id}")
+def politics_vote_by_id(proposal_id: int) -> dict[str, object]:
+    """Egy konkrét szövetségi javaslat 26 kantonos adatai (ADR-017)."""
+    item = _vote.get_proposal_by_id(proposal_id)
+    if item is None:
+        raise HTTPException(status_code=404, detail=f"Proposal {proposal_id} not found")
+    return item.model_dump()
 
 
 @app.get("/api/v1/place/{postcode}")
