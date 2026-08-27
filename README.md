@@ -1,78 +1,77 @@
 # Swiss P Map
 
-> **„A svájci környék egyetlen térképén”** — Integrált interaktív döntéstámogató térkép a helyi politika, életminőség és épített környezet metszetében.
+> **„A svájci környék egyetlen térképén”** — Integrált interaktív döntéstámogató térkép a helyi politika, életminőség és épített környezet metszetében. 4 nyelven: **de / en / fr / it**.
 
 ## Áttekintés
 
-A **Swiss P Map** egyesíti a svájci nyílt kormányzati adatokat (**Open Government Data - OGD**):
-- **Politics (MVP Fázis 1 — kész):** Választókerületi képviselők (*Wahlkreis*), `GET /api/v1/politics/representatives?postcode=8004`
-- **Place & Property (MVP Fázis 1 — kész):** Adókulcs, zaj, ÖV-Güteklassen, `GET /api/v1/place/{postcode}`
-- **Geo (kész):** LV95 ↔ WGS84 konverzió, Swisstopo search, `GET /api/v1/geo/convert?easting=&northing=`
-- **Planning (Fázis 2):** Áramló 20 napos építési kérelmek (*Amtsblattportal / eAuflageZH*), *ÖREB* zónák
+A **Swiss P Map** online scrapeli a svájci nyílt kormányzati adatokat (**OGD**):
 
----
+- **Politics:** Választókerületi képviselők (*Wahlkreis → Nationalrat*), PARIS-API CQL (`?live=true` → `GET /api/v1/politics/representatives?postcode=8004`)
+- **Ort / Place (6 csempe):** Steuerfuss (zh.ch HTML 119%), Lärm sonBASE, ÖV-Güteklasse ARE, GWR Gebäudezahl, **Sonnendach** BFE WGS84 (`1208 kWh/m² sehr gut`), **ÖREB** ZH WFS Nutzungsplanung (`Kernzone`) — `GET /api/v1/place/{postcode}?live=true`
+- **Planung:** 20 napos Baugesuche (Amtsblattportal XML 1.24/1.26 + SQLite WAL), `GET /api/v1/planning/baugesuche?postcode=8004` + `POST /api/v1/planning/refresh`
+- **KI-Zusammenfassung:** 2 mondat, 4 nyelven, llm-budget-gateway `8013` → fallback sablon (`POST /api/v1/ai/summary`)
+- **Geo:** LV95 ↔ WGS84 (`GET /api/v1/geo/convert`), Swisstopo Search geokódolás
+- **i18n:** `next-intl 3.26.5`, `localePrefix: always`, `de` default, hreflang/sitemap
 
-## Architektúra & Stack (ADR-001)
+## Architektúra & Stack (ADR-001…008)
 
-- **Backend:** Python 3.11+ (FastAPI, Pydantic, PyProj, Shapely) — kész
-- **Frontend:** Next.js 14 + MapLibre GL JS (Swisstopo Light `vectortiles.geo.admin.ch`) — kész
-- **Adattár (tervezett):** PostgreSQL + PostGIS
-- **AI Réteg (tervezett):** Claude / Gemini — képviselői indítványok közérthető összefoglalója
+- **Backend:** Python 3.11+ (FastAPI, Pydantic, httpx DI MockTransport, pyproj/shapely) — `src/main.py` 9 endpoint, `src/services/*`
+- **Frontend:** Next.js 14 App Router (TS strict) + next-intl + Tailwind + Three.js 0.160 + MapLibre Light + swiss-maps TopoJSON + gsap
+- **Adattár:** SQLite WAL (`data/swisspm.db`), PostGIS később külön ADR
+- **AI:** llm-budget-gateway `8013` (cooldown `502 ai_unavailable` → sablon)
 
----
+## API (BE `8310`)
+
+| Method | Path | Live |
+|---|---|---|
+| GET | `/health` | — |
+| GET | `/api/v1/geo/convert?easting=&northing=` | — |
+| GET | `/api/v1/politics/representatives?postcode=&live=` | PARIS CQL |
+| GET | `/api/v1/place/{postcode}?live=` | ARE/BAFU/BFE+ZH WFS+zh.ch |
+| GET | `/api/v1/planning/baugesuche?postcode=&active_only=` | SQLite |
+| POST | `/api/v1/planning/refresh` `{"canton":"ZH"}` | Amtsblatt XML |
+| POST | `/api/v1/ai/summary` `{"locale","postcode","place","politics","baugesuche"}` | gateway 8013 |
+
+CORS: `SWISSPM_CORS_ORIGINS=http://localhost:3310,http://127.0.0.1:3310`
 
 ## Mappastruktúra
 
 ```
 swiss_p_map/
 ├── src/
-│   ├── main.py                 # FastAPI app (CORS: localhost:3000)
-│   ├── models/geo.py|place.py|politics.py
-│   └── services/geo_converter.py|swisstopo_service.py|politics_service.py|place_service.py
+│   ├── main.py                 # FastAPI 9 endpoint
+│   ├── models/{geo,place,politics,planning}.py
+│   ├── services/{geo_converter,place,politics,planning,amtsblatt,ai_summary}.py
+│   └── db/planning_repo.py     # SQLite WAL upsert_many
 ├── frontend/
-│   ├── src/app/Map.tsx         # MapLibre + Swisstopo Light, flyTo lngLat
-│   ├── src/app/SearchPanel.tsx # PLZ vagy szabad szöveg (audit A)
-│   ├── src/app/postcode_coords.ts # Swisstopo SearchServer élő geokódolás
-│   └── src/lib/api.ts          # típusos fetch wrapper
-├── tests/
-│   ├── conftest.py
-│   ├── unit/test_geo_converter.py|test_domain_models.py|test_swisstopo_service.py
-│   └── e2e/test_core_e2e.py
-├── docs/
-│   ├── decisions/ADR-001-stack-and-architecture.md
-│   ├── research/2026-08-26-kickoff.md
-│   └── competitor/2026-W35-scan.md
+│   ├── src/app/[locale]/page.tsx  # 4 tab: Übersicht/Politik/Ort/Planung + KI-Zusammenfassung
+│   ├── src/app/Map3D.tsx       # Three.js 70° + detailOverlay
+│   └── messages/{de,en,fr,it}.json
+├── tests/{unit,e2e}
+├── docs/{decisions/ADR-00*,research/*.md,plans/master-roadmap.md}
 ├── .github/workflows/ci.yml
-├── AGENTS.md / METHODOLOGY.md / workflows/principles.md
 └── pyproject.toml
 ```
-
-> Nincs `.agent-pipeline/` — a lean módszertan kanban boardon + ADR-en + research-ön alapul. A pipeline (`01_requirements`→`02_specs`→`06_e2e_discovery`) csak 20+ feature-nél / audit-igénynél kell; akkor hozd vissza külön.
-
----
 
 ## Fejlesztés és Tesztelés
 
 ```bash
-pip install -r requirements.txt
-pytest -v          # 20 passed (unit + e2e, CORS preflight)
-mypy src tests --ignore-missing-imports
-ruff check src tests
+# Backend
+.venv/bin/python -m pytest -q          # 45 passed
+.venv/bin/python -m mypy src --ignore-missing-imports  # 17 clean
+.venv/bin/python -m ruff check src tests
 
-# Backend lokálisan
-uvicorn src.main:app --reload --port 8000
-# → http://127.0.0.1:8000/docs  (Swagger)
-# → http://127.0.0.1:8000/health
+# Backend lokálisan (DBUS-clean)
+SWISSPM_CORS_ORIGINS=http://localhost:3310,http://127.0.0.1:3310 \
+  .venv/bin/python -m uvicorn src.main:app --host 127.0.0.1 --port 8310 --log-level warning
+# → http://127.0.0.1:8310/docs + /health
 
-# Frontend lokálisan (külön terminál)
-cd frontend && npm run dev
-# → http://localhost:3000  (kereső: 8004 vagy Bahnhofstrasse 10 — audit A)
+# Frontend lokálisan
+cd frontend && npm run build && npx next start -p 3310
+# → http://127.0.0.1:3310/de  (/en /fr /it)
+# dev: env -u DBUS_SESSION_BUS_ADDRESS -u DBUS_SYSTEM_BUS_ADDRESS npx next dev -p 3310
 ```
 
-## Kanban
+## Kanban & Docs
 
-Board: `swiss-p-map` (`hermes kanban --board swiss-p-map ls`) — 6 done (geo models, swisstopo, politics+place+API, frontend scaffold, map component).
-
-## API ↔ Map Integration (2026-08-26)
-
-6 task (CORS → API client → SearchPanel szabad szöveg → fly-to → élő geokódolás → füstteszt) — `docs/plans/2026-08-26-api-map-integration.md` — végrehajtva, audit A/B/C beépítve.
+Board: `swiss-p-map` — 14 done. Docs: 8 ADR (001…008) + 11 research, mind `accepted`. Master roadmap: `docs/plans/2026-08-26-master-roadmap.md`.
