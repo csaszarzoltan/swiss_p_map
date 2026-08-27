@@ -13,9 +13,10 @@ from src.services.geo_converter import lv95_to_wgs84
 from src.services.place_service import PlaceService
 from src.services.planning_service import PlanningService
 from src.services.politics_service import PoliticsService
+from src.services.vote_service import VoteService
 
 _DEFAULT_CORS_ORIGINS = (
-    "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3310,http://127.0.0.1:3310"
+    "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3310,http://127.0.0.1:3310,http://localhost:3410,http://127.0.0.1:3410"
 )
 
 
@@ -39,6 +40,7 @@ _politics = PoliticsService()
 _place = PlaceService()
 _planning = PlanningService()
 _ai = AiSummaryService()
+_vote = VoteService()
 # Demo seed — amíg nincs napi Amtsblatt poll, 8004-en legyen aktív Baugesuch a bemutatóhoz
 try:
     from datetime import date as _d
@@ -82,6 +84,22 @@ try:
                 lon=8.523,
             ),
             _BG(
+                id="demo-8001-1",
+                title="Rämistrasse 101, 8001 Zürich — Sanierung Laborgebäude (Amtsblatt ZH)",
+                municipality="Zürich",
+                municipality_id=261,
+                postcode="8001",
+                canton="ZH",
+                publication_date=_today - _td(days=3),
+                expiration_date=_today + _td(days=362),
+                auflage_start=_today - _td(days=3),
+                auflage_end=_today + _td(days=17),
+                source_url="https://amtsblattportal.ch/api/v1/publications/demo-8001-1/xml",
+                geocode_precision="address",
+                lat=47.376,
+                lon=8.548,
+            ),
+            _BG(
                 id="demo-8610-1",
                 title="Seefeldstrasse 6, Assek. Nr. 7325, 8610 Uster — Neubau (Demo)",
                 municipality="Uster",
@@ -96,6 +114,70 @@ try:
                 geocode_precision="address",
                 lat=47.35,
                 lon=8.72,
+            ),
+            _BG(
+                id="demo-3011-1",
+                title="Kramgasse 45, 3011 Bern — Sanierung Altstadt-Wohnhaus (Amtsanzeiger Bern)",
+                municipality="Bern",
+                municipality_id=351,
+                postcode="3011",
+                canton="BE",
+                publication_date=_today - _td(days=4),
+                expiration_date=_today + _td(days=361),
+                auflage_start=_today - _td(days=4),
+                auflage_end=_today + _td(days=16),
+                source_url="https://amtsblattportal.ch/api/v1/publications/demo-3011-1/xml",
+                geocode_precision="address",
+                lat=46.948,
+                lon=7.449,
+            ),
+            _BG(
+                id="demo-3011-2",
+                title="Spitalgasse 12, 3011 Bern — Umbau Geschäftsräume (eBau BE)",
+                municipality="Bern",
+                municipality_id=351,
+                postcode="3011",
+                canton="BE",
+                publication_date=_today - _td(days=8),
+                expiration_date=_today + _td(days=357),
+                auflage_start=_today - _td(days=8),
+                auflage_end=_today + _td(days=12),
+                source_url="https://amtsblattportal.ch/api/v1/publications/demo-3011-2/xml",
+                geocode_precision="address",
+                lat=46.947,
+                lon=7.444,
+            ),
+            _BG(
+                id="demo-4001-1",
+                title="Freie Strasse 25, 4001 Basel — Fassadenrenovation & PV (Kantonsblatt BS)",
+                municipality="Basel",
+                municipality_id=2701,
+                postcode="4001",
+                canton="BS",
+                publication_date=_today - _td(days=6),
+                expiration_date=_today + _td(days=359),
+                auflage_start=_today - _td(days=6),
+                auflage_end=_today + _td(days=14),
+                source_url="https://amtsblattportal.ch/api/v1/publications/demo-4001-1/xml",
+                geocode_precision="address",
+                lat=47.556,
+                lon=7.591,
+            ),
+            _BG(
+                id="demo-1201-1",
+                title="Rue du Mont-Blanc 14, 1201 Genève — Surélévation d'immeuble (FAO GE)",
+                municipality="Genève",
+                municipality_id=6621,
+                postcode="1201",
+                canton="GE",
+                publication_date=_today - _td(days=7),
+                expiration_date=_today + _td(days=358),
+                auflage_start=_today - _td(days=7),
+                auflage_end=_today + _td(days=13),
+                source_url="https://amtsblattportal.ch/api/v1/publications/demo-1201-1/xml",
+                geocode_precision="address",
+                lat=46.210,
+                lon=6.146,
             ),
         ]
     )
@@ -134,6 +216,12 @@ async def politics_representatives(
     if data is None:
         raise HTTPException(status_code=404, detail=f"no data for postcode {postcode}")
     return data.model_dump()
+
+
+@app.get("/api/v1/politics/votes/latest")
+def politics_votes_latest() -> dict[str, object]:
+    """Hivatalos szövetségi népszavazási eredmények kantonális bontásban (ADR-012)."""
+    return _vote.get_latest_vote().model_dump()
 
 
 @app.get("/api/v1/place/{postcode}")

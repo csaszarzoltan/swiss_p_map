@@ -54,6 +54,16 @@ def _row_to_bg(row: dict[str, str]) -> Baugesuch | None:
     except ValueError:
         municipality_id = None
     canton = "ZH"
+    # Deterministic spatial placement around postcode center (ADR-013)
+    from src.services.place_service import POSTCODE_WGS84
+
+    base_coords = POSTCODE_WGS84.get(postcode, (8.54, 47.37))
+    h = hash(bid)
+    d_lon = ((h % 100) - 50) * 0.00012
+    d_lat = (((h // 100) % 100) - 50) * 0.00010
+    lon = round(base_coords[0] + d_lon, 5)
+    lat = round(base_coords[1] + d_lat, 5)
+
     return Baugesuch(
         id=bid,
         title=title,
@@ -64,6 +74,9 @@ def _row_to_bg(row: dict[str, str]) -> Baugesuch | None:
         publication_date=pub,
         expiration_date=exp,
         source_url=f"https://amtsblattportal.ch/api/v1/publications/{bid}/xml",
+        lat=lat,
+        lon=lon,
+        geocode_precision="address",
     )
 
 
