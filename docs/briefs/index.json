@@ -1,0 +1,147 @@
+{
+  "version": "1.1",
+  "project": "swiss_p_map",
+  "last_updated": "2026-09-01T14:35:00Z",
+  "briefs": [
+    {
+      "id": "BRIEF-001",
+      "title": "Svájci Térinformatikai Architektúra és Stack",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-001",
+      "file": "BRIEF-001-svajci-terinformatikai-architektura.md"
+    },
+    {
+      "id": "BRIEF-002",
+      "title": "Építési Hirdetmények Betöltése és Adatpipeline",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-002",
+      "file": "BRIEF-002-epitesi-hirdetmenyek-betoltese-es-adatpipeline.md"
+    },
+    {
+      "id": "BRIEF-003",
+      "title": "3D Sematikus Svájci Térkép és Kantonális Navigáció",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-003",
+      "file": "BRIEF-003-3d-sematikus-svajci-terkep-es-kantonalis-navigacio.md"
+    },
+    {
+      "id": "BRIEF-004",
+      "title": "Négynyelvű Nemzeti Hozzáférés és Lokalizáció",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-004",
+      "file": "BRIEF-004-negynyelvu-nemzeti-hozzaferes-es-lokalizacio.md"
+    },
+    {
+      "id": "BRIEF-005",
+      "title": "Élő Szövetségi Körzeti és Politikai Integráció",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-005",
+      "file": "BRIEF-005-elo-szovetsegi-korzeti-es-politikai-integracio.md"
+    },
+    {
+      "id": "BRIEF-006",
+      "title": "AI-Alapú Körzeti Összefoglaló és Generatív Elemzés",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-006",
+      "file": "BRIEF-006-ai-alapu-korzeti-osszefoglalo-es-generativ-elemzes.md"
+    },
+    {
+      "id": "BRIEF-007",
+      "title": "Részletes Helyi Körzetbővítés és Információs Központ",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-007",
+      "file": "BRIEF-007-reszletes-helyi-korzetbovites-es-informacios-kozpont.md"
+    },
+    {
+      "id": "BRIEF-008",
+      "title": "Élő Kantonális Adókulcs Lekérdezés",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-008",
+      "file": "BRIEF-008-elo-kantonalis-adokulcs-lekerdezes.md"
+    },
+    {
+      "id": "BRIEF-009",
+      "title": "Történeti és Tömeges Építési Engedély Backfill",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-009",
+      "file": "BRIEF-009-torteneti-es-tomeges-epitesi-engedely-backfill.md"
+    },
+    {
+      "id": "BRIEF-010",
+      "title": "Intuitív Témaválasztó Sáv és Részletező Drawer",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-010",
+      "file": "BRIEF-010-intuitiv-temavalaszto-sav-es-reszletezo-drawer.md"
+    },
+    {
+      "id": "BRIEF-011",
+      "title": "Országos Szövetségi Helyfeloldás",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-011",
+      "file": "BRIEF-011-orszagos-szovetsegi-helyfeloldas.md"
+    },
+    {
+      "id": "BRIEF-012",
+      "title": "Hivatalos BFS Népszavazási Adatfolyam",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-012",
+      "file": "BRIEF-012-hivatalos-bfs-nepszavazasi-adatfolyam.md"
+    },
+    {
+      "id": "BRIEF-013",
+      "title": "3D Interaktív Építési Markerek és Fellebbezési Számláló",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-013",
+      "file": "BRIEF-013-3d-interaktiv-epitesi-markerek-es-fellebbezesi-szamlalo.md"
+    },
+    {
+      "id": "BRIEF-014",
+      "title": "Többkantonos Építési Engedély Federáció",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-014",
+      "file": "BRIEF-014-tobbkantonos-epitesi-engedely-federacio.md"
+    },
+    {
+      "id": "BRIEF-015",
+      "title": "Tematikus Térképi Hőtérkép és Rétegek",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-015",
+      "file": "BRIEF-015-tematikus-terkepi-hoterkep-es-retegek.md"
+    },
+    {
+      "id": "BRIEF-016",
+      "title": "Építési Projektek Részletező és Kockázatelemző Panel",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-016",
+      "file": "BRIEF-016-epitesi-projektek-reszletezo-es-kockazatelemzo-panel.md"
+    },
+    {
+      "id": "BRIEF-017",
+      "title": "Interaktív Történeti Szavazási Idővonal és Referendum Választó",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-017",
+      "file": "BRIEF-017-interaktiv-torteneti-szavazasi-idovonal-es-referendum-valaszto.md"
+    },
+    {
+      "id": "BRIEF-018",
+      "title": "Térbeli Sugár- és Poligon Keresőmotor",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-018",
+      "file": "BRIEF-018-terbeli-sugar-es-poligon-keresomotor.md"
+    },
+    {
+      "id": "BRIEF-019",
+      "title": "Intelligens Cím- és Geokódolási Kereső",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-001",
+      "file": "BRIEF-019-intelligens-cim-es-geokodolasi-kereso.md"
+    },
+    {
+      "id": "BRIEF-020",
+      "title": "Export és Ingatlanfejlesztői Audit Csomag",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-001",
+      "file": "BRIEF-020-export-es-ingatlanfejlesztoi-audit-csomag.md"
+    }
+  ]
+}
