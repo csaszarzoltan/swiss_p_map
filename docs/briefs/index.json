@@ -1,8 +1,8 @@
 {
   "version": "1.1",
   "project": "swiss_p_map",
-  "last_updated": "2026-09-01T16:53:00+02:00",
-  "brief_count": 33,
+  "last_updated": "2026-09-01T16:54:00+02:00",
+  "brief_count": 43,
   "briefs": [
     {
       "id": "BRIEF-001",
@@ -267,6 +267,86 @@
       "adr": null,
       "feature": "FEAT-033",
       "file": "BRIEF-033-sbb-vasuti-mobilitasi-fohalozat-es-elerhetoseg.md"
+    },
+    {
+      "id": "BRIEF-034",
+      "title": "Svájci Lakásingatlan-Ártrendek és Piaci Index",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-034",
+      "file": "BRIEF-034-svajci-lakasingatlan-artrendek-es-piaci-index.md"
+    },
+    {
+      "id": "BRIEF-035",
+      "title": "Természeti Veszélyek: Árvíz, Felszíni Lefolyás, Lavina és Földcsuszamlás",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-035",
+      "file": "BRIEF-035-termeszeti-veszelyek-arviz-lavina-es-foldcsuszamlas.md"
+    },
+    {
+      "id": "BRIEF-036",
+      "title": "ISOS Műemlékvédelmi és Történeti Településréteg",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-036",
+      "file": "BRIEF-036-isos-muemlekvedelmi-es-torteneti-telepulesreteg.md"
+    },
+    {
+      "id": "BRIEF-037",
+      "title": "Mikroklíma, Városi Hősziget és Klímajövő",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-037",
+      "file": "BRIEF-037-mikroklima-hosziget-es-klimajovo.md"
+    },
+    {
+      "id": "BRIEF-038",
+      "title": "Iskolák, Óvodák és Oktatási Ellátási Körzetek",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-038",
+      "file": "BRIEF-038-iskolak-ovodak-es-ellatasi-korzetek.md"
+    },
+    {
+      "id": "BRIEF-039",
+      "title": "Építési Észrevétel- és Fellebbezési Munkatér",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-039",
+      "file": "BRIEF-039-epitesi-eszrevetel-es-fellebbezesi-munkater.md"
+    },
+    {
+      "id": "BRIEF-040",
+      "title": "Levegőminőség, Pollen és Környezeti Terhelés",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-040",
+      "file": "BRIEF-040-levego-minoseg-pollen-es-kornyezeti-terheles.md"
+    },
+    {
+      "id": "BRIEF-041",
+      "title": "Egészségügyi és Mentési Elérhetőség",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-041",
+      "file": "BRIEF-041-egeszsegugyi-es-mentesi-elerhetoseg.md"
+    },
+    {
+      "id": "BRIEF-042",
+      "title": "Szélessáv, Mobilhálózat és Digitális Elérhetőség",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-042",
+      "file": "BRIEF-042-szelessav-mobilhalozat-es-digitalis-elerhetoseg.md"
+    },
+    {
+      "id": "BRIEF-043",
+      "title": "Épületenergetika, Felújítási Potenciál és Fűtéscsere",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-043",
+      "file": "BRIEF-043-epuletenergetika-felujitasi-potencial-es-futescsere.md"
     }
   ]
 }

@@ -2,7 +2,7 @@
 
 Ez a könyvtár a **Swiss P Map** azonosított, megvalósított és tervezett képességeinek Feature Brief dokumentumait tartalmazza az **RVAD 1.1** szerint.
 
-## Brief állapotleltár (30 db)
+## Brief állapotleltár (43 db)
 
 | ID | Cím | Státusz | Kapcsolódás |
 |---|---|---|---|
@@ -39,6 +39,16 @@ Ez a könyvtár a **Swiss P Map** azonosított, megvalósított és tervezett k�
 | [BRIEF-031](BRIEF-031-svajci-tavak-es-alpesi-domborzat-3d.md) | Svájci Tavak és Alpesi Domborzati Magasságok 3D-ben | READY_FOR_SPEC | FEAT-031 |
 | [BRIEF-032](BRIEF-032-orszagos-kantonalis-adoverseny-es-steuerfuss-hoterkep.md) | Országos Kantonális Adóverseny és Steuerfuss Hőtérkép | READY_FOR_SPEC | FEAT-032 |
 | [BRIEF-033](BRIEF-033-sbb-vasuti-mobilitasi-fohalozat-es-elerhetoseg.md) | SBB Vasúti Mobilitási Főhálózat és Állomási Elérhetőség | READY_FOR_SPEC | FEAT-033 |
+| [BRIEF-034](BRIEF-034-svajci-lakasingatlan-artrendek-es-piaci-index.md) | Svájci Lakásingatlan-Ártrendek és Piaci Index | READY_FOR_SPEC | FEAT-034 |
+| [BRIEF-035](BRIEF-035-termeszeti-veszelyek-arviz-lavina-es-foldcsuszamlas.md) | Természeti Veszélyek: Árvíz, Felszíni Lefolyás, Lavina és Földcsuszamlás | READY_FOR_SPEC | FEAT-035 |
+| [BRIEF-036](BRIEF-036-isos-muemlekvedelmi-es-torteneti-telepulesreteg.md) | ISOS Műemlékvédelmi és Történeti Településréteg | READY_FOR_SPEC | FEAT-036 |
+| [BRIEF-037](BRIEF-037-mikroklima-hosziget-es-klimajovo.md) | Mikroklíma, Városi Hősziget és Klímajövő | READY_FOR_SPEC | FEAT-037 |
+| [BRIEF-038](BRIEF-038-iskolak-ovodak-es-ellatasi-korzetek.md) | Iskolák, Óvodák és Oktatási Ellátási Körzetek | READY_FOR_SPEC | FEAT-038 |
+| [BRIEF-039](BRIEF-039-epitesi-eszrevetel-es-fellebbezesi-munkater.md) | Építési Észrevétel- és Fellebbezési Munkatér | READY_FOR_SPEC | FEAT-039 |
+| [BRIEF-040](BRIEF-040-levego-minoseg-pollen-es-kornyezeti-terheles.md) | Levegőminőség, Pollen és Környezeti Terhelés | READY_FOR_SPEC | FEAT-040 |
+| [BRIEF-041](BRIEF-041-egeszsegugyi-es-mentesi-elerhetoseg.md) | Egészségügyi és Mentési Elérhetőség | READY_FOR_SPEC | FEAT-041 |
+| [BRIEF-042](BRIEF-042-szelessav-mobilhalozat-es-digitalis-elerhetoseg.md) | Szélessáv, Mobilhálózat és Digitális Elérhetőség | READY_FOR_SPEC | FEAT-042 |
+| [BRIEF-043](BRIEF-043-epuletenergetika-felujitasi-potencial-es-futescsere.md) | Épületenergetika, Felújítási Potenciál és Fűtéscsere | READY_FOR_SPEC | FEAT-043 |
 
 ## Karbantartási szabályok
 
