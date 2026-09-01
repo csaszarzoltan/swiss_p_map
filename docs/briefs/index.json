@@ -1,8 +1,8 @@
 {
   "version": "1.1",
   "project": "swiss_p_map",
-  "last_updated": "2026-09-01T15:22:00+02:00",
-  "brief_count": 30,
+  "last_updated": "2026-09-01T16:53:00+02:00",
+  "brief_count": 33,
   "briefs": [
     {
       "id": "BRIEF-001",
@@ -243,6 +243,30 @@
       "adr": null,
       "feature": "FEAT-030",
       "file": "BRIEF-030-mobil-akadalymentes-es-billentyuzetes-hasznalat.md"
+    },
+    {
+      "id": "BRIEF-031",
+      "title": "Svájci Tavak és Alpesi Domborzati Magasságok 3D-ben",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-031",
+      "file": "BRIEF-031-svajci-tavak-es-alpesi-domborzat-3d.md"
+    },
+    {
+      "id": "BRIEF-032",
+      "title": "Országos Kantonális Adóverseny és Steuerfuss Hőtérkép",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-032",
+      "file": "BRIEF-032-orszagos-kantonalis-adoverseny-es-steuerfuss-hoterkep.md"
+    },
+    {
+      "id": "BRIEF-033",
+      "title": "SBB Vasúti Mobilitási Főhálózat és Állomási Elérhetőség",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-033",
+      "file": "BRIEF-033-sbb-vasuti-mobilitasi-fohalozat-es-elerhetoseg.md"
     }
   ]
 }

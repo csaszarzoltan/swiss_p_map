@@ -36,6 +36,9 @@ Ez a könyvtár a **Swiss P Map** azonosított, megvalósított és tervezett k�
 | [BRIEF-028](BRIEF-028-korzetek-osszehasonlitasa-es-statisztikai-elemzes.md) | Körzetek Összehasonlítása és Statisztikai Elemzés | READY_FOR_SPEC | FEAT-028 |
 | [BRIEF-029](BRIEF-029-adatforras-frissesseg-es-bizalmi-allapot.md) | Adatforrás, Frissesség és Bizalmi Állapot | READY_FOR_SPEC | FEAT-029 |
 | [BRIEF-030](BRIEF-030-mobil-akadalymentes-es-billentyuzetes-hasznalat.md) | Mobil, Akadálymentes és Billentyűzetes Használat | READY_FOR_SPEC | FEAT-030 |
+| [BRIEF-031](BRIEF-031-svajci-tavak-es-alpesi-domborzat-3d.md) | Svájci Tavak és Alpesi Domborzati Magasságok 3D-ben | READY_FOR_SPEC | FEAT-031 |
+| [BRIEF-032](BRIEF-032-orszagos-kantonalis-adoverseny-es-steuerfuss-hoterkep.md) | Országos Kantonális Adóverseny és Steuerfuss Hőtérkép | READY_FOR_SPEC | FEAT-032 |
+| [BRIEF-033](BRIEF-033-sbb-vasuti-mobilitasi-fohalozat-es-elerhetoseg.md) | SBB Vasúti Mobilitási Főhálózat és Állomási Elérhetőség | READY_FOR_SPEC | FEAT-033 |
 
 ## Karbantartási szabályok
 
