@@ -16,11 +16,13 @@ Minden svájci állampolgár és nemzetközi érdeklődő a saját anyanyelvén 
 
 Minden felhasználói felület, gomb, keresőmező, információs kártya, hibaüzenet és 3D térképi felirat (iránytű, népszavazási arányok, statisztikák) 100%-ban elérhető és azonnal váltható 4 nyelven (`/de`, `/en`, `/fr`, `/it`).
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-004-01:** Felhasználóként szeretném a fejlécben lévő nyelvválasztóval egyetlen kattintással átváltani a nyelvet DE, EN, FR és IT között.
 - **US-004-02:** Francia vagy olasz felhasználóként szeretném a saját nyelvemen látni a kereső placeholder szövegeket, címkéket és témákat.
 - **US-004-03:** Rendszerként szeretném, hogy az URL automatikusan tartalmazza a nyelvi előtagot (`/de/...`, `/fr/...`), és a gyökér URL (`/`) intelligensen átirányítson.
+
+- **US-004-04:** Felhasználóként szeretném, hogy hibás vagy nem támogatott nyelvi útvonal esetén az alkalmazás biztonságosan az alapértelmezett német nyelvre irányítson.
 
 ## Scope
 

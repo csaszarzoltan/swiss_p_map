@@ -16,11 +16,13 @@ Országos ingatlanfejlesztők, építész irodák és a svájci nagyvárosok lak
 
 Egy federált adatmodell és keresési réteg, amely támogatja Zürich (`8004`, `8001`, `8610`), Bern (`3011`), Basel (`4001`), és Genf (`1201`) aktív építkezéseit mind a 3D térképen, mind a listában.
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-014-01:** Felhasználóként Bernre keresve (`3011`) szeretném látni a berni óvárosi és üzleti átalakítási projekteket.
 - **US-014-02:** Felhasználóként Bázelre keresve (`4001`) szeretném látni a bázeli homlokzatfelújításokat és napelemes projekteket.
 - **US-014-03:** Felhasználóként Genfre keresve (`1201`) franciául szeretném látni a helyi építési engedélyeket (*Surélévation d'immeuble*).
+
+- **US-014-04:** Felhasználóként szeretném, hogy egy kanton forrásának hibája ne akadályozza más kantonok projektjeinek megjelenítését.
 
 ## Scope
 

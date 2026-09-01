@@ -1,13 +1,15 @@
 {
   "version": "1.1",
   "project": "swiss_p_map",
-  "last_updated": "2026-09-01T14:35:00Z",
+  "last_updated": "2026-09-01T15:22:00+02:00",
+  "brief_count": 30,
   "briefs": [
     {
       "id": "BRIEF-001",
       "title": "Svájci Térinformatikai Architektúra és Stack",
       "status": "READY_FOR_SPEC",
       "adr": "ADR-001",
+      "feature": "FEAT-001 (ADR-001)",
       "file": "BRIEF-001-svajci-terinformatikai-architektura.md"
     },
     {
@@ -15,6 +17,7 @@
       "title": "Építési Hirdetmények Betöltése és Adatpipeline",
       "status": "READY_FOR_SPEC",
       "adr": "ADR-002",
+      "feature": "FEAT-002 (ADR-002)",
       "file": "BRIEF-002-epitesi-hirdetmenyek-betoltese-es-adatpipeline.md"
     },
     {
@@ -22,6 +25,7 @@
       "title": "3D Sematikus Svájci Térkép és Kantonális Navigáció",
       "status": "READY_FOR_SPEC",
       "adr": "ADR-003",
+      "feature": "FEAT-003 (ADR-003)",
       "file": "BRIEF-003-3d-sematikus-svajci-terkep-es-kantonalis-navigacio.md"
     },
     {
@@ -29,6 +33,7 @@
       "title": "Négynyelvű Nemzeti Hozzáférés és Lokalizáció",
       "status": "READY_FOR_SPEC",
       "adr": "ADR-004",
+      "feature": "FEAT-004 (ADR-004)",
       "file": "BRIEF-004-negynyelvu-nemzeti-hozzaferes-es-lokalizacio.md"
     },
     {
@@ -36,6 +41,7 @@
       "title": "Élő Szövetségi Körzeti és Politikai Integráció",
       "status": "READY_FOR_SPEC",
       "adr": "ADR-005",
+      "feature": "FEAT-005 (ADR-005)",
       "file": "BRIEF-005-elo-szovetsegi-korzeti-es-politikai-integracio.md"
     },
     {
@@ -43,6 +49,7 @@
       "title": "AI-Alapú Körzeti Összefoglaló és Generatív Elemzés",
       "status": "READY_FOR_SPEC",
       "adr": "ADR-006",
+      "feature": "FEAT-006 (ADR-006)",
       "file": "BRIEF-006-ai-alapu-korzeti-osszefoglalo-es-generativ-elemzes.md"
     },
     {
@@ -50,6 +57,7 @@
       "title": "Részletes Helyi Körzetbővítés és Információs Központ",
       "status": "READY_FOR_SPEC",
       "adr": "ADR-007",
+      "feature": "FEAT-007 (ADR-007)",
       "file": "BRIEF-007-reszletes-helyi-korzetbovites-es-informacios-kozpont.md"
     },
     {
@@ -57,6 +65,7 @@
       "title": "Élő Kantonális Adókulcs Lekérdezés",
       "status": "READY_FOR_SPEC",
       "adr": "ADR-008",
+      "feature": "FEAT-008 (ADR-008)",
       "file": "BRIEF-008-elo-kantonalis-adokulcs-lekerdezes.md"
     },
     {
@@ -64,6 +73,7 @@
       "title": "Történeti és Tömeges Építési Engedély Backfill",
       "status": "READY_FOR_SPEC",
       "adr": "ADR-009",
+      "feature": "FEAT-009 (ADR-009)",
       "file": "BRIEF-009-torteneti-es-tomeges-epitesi-engedely-backfill.md"
     },
     {
@@ -71,6 +81,7 @@
       "title": "Intuitív Témaválasztó Sáv és Részletező Drawer",
       "status": "READY_FOR_SPEC",
       "adr": "ADR-010",
+      "feature": "FEAT-010 (ADR-010)",
       "file": "BRIEF-010-intuitiv-temavalaszto-sav-es-reszletezo-drawer.md"
     },
     {
@@ -78,6 +89,7 @@
       "title": "Országos Szövetségi Helyfeloldás",
       "status": "READY_FOR_SPEC",
       "adr": "ADR-011",
+      "feature": "FEAT-011 (ADR-011)",
       "file": "BRIEF-011-orszagos-szovetsegi-helyfeloldas.md"
     },
     {
@@ -85,6 +97,7 @@
       "title": "Hivatalos BFS Népszavazási Adatfolyam",
       "status": "READY_FOR_SPEC",
       "adr": "ADR-012",
+      "feature": "FEAT-012 (ADR-012)",
       "file": "BRIEF-012-hivatalos-bfs-nepszavazasi-adatfolyam.md"
     },
     {
@@ -92,6 +105,7 @@
       "title": "3D Interaktív Építési Markerek és Fellebbezési Számláló",
       "status": "READY_FOR_SPEC",
       "adr": "ADR-013",
+      "feature": "FEAT-013 (ADR-013)",
       "file": "BRIEF-013-3d-interaktiv-epitesi-markerek-es-fellebbezesi-szamlalo.md"
     },
     {
@@ -99,6 +113,7 @@
       "title": "Többkantonos Építési Engedély Federáció",
       "status": "READY_FOR_SPEC",
       "adr": "ADR-014",
+      "feature": "FEAT-014 (ADR-014)",
       "file": "BRIEF-014-tobbkantonos-epitesi-engedely-federacio.md"
     },
     {
@@ -106,6 +121,7 @@
       "title": "Tematikus Térképi Hőtérkép és Rétegek",
       "status": "READY_FOR_SPEC",
       "adr": "ADR-015",
+      "feature": "FEAT-015 (ADR-015)",
       "file": "BRIEF-015-tematikus-terkepi-hoterkep-es-retegek.md"
     },
     {
@@ -113,6 +129,7 @@
       "title": "Építési Projektek Részletező és Kockázatelemző Panel",
       "status": "READY_FOR_SPEC",
       "adr": "ADR-016",
+      "feature": "FEAT-016 (ADR-016)",
       "file": "BRIEF-016-epitesi-projektek-reszletezo-es-kockazatelemzo-panel.md"
     },
     {
@@ -120,6 +137,7 @@
       "title": "Interaktív Történeti Szavazási Idővonal és Referendum Választó",
       "status": "READY_FOR_SPEC",
       "adr": "ADR-017",
+      "feature": "FEAT-017 (ADR-017)",
       "file": "BRIEF-017-interaktiv-torteneti-szavazasi-idovonal-es-referendum-valaszto.md"
     },
     {
@@ -127,21 +145,104 @@
       "title": "Térbeli Sugár- és Poligon Keresőmotor",
       "status": "READY_FOR_SPEC",
       "adr": "ADR-018",
+      "feature": "FEAT-018 (ADR-018)",
       "file": "BRIEF-018-terbeli-sugar-es-poligon-keresomotor.md"
     },
     {
       "id": "BRIEF-019",
       "title": "Intelligens Cím- és Geokódolási Kereső",
       "status": "READY_FOR_SPEC",
-      "adr": "ADR-001",
+      "adr": null,
+      "feature": "FEAT-019",
       "file": "BRIEF-019-intelligens-cim-es-geokodolasi-kereso.md"
     },
     {
       "id": "BRIEF-020",
       "title": "Export és Ingatlanfejlesztői Audit Csomag",
       "status": "READY_FOR_SPEC",
-      "adr": "ADR-001",
+      "adr": null,
+      "feature": "FEAT-020",
       "file": "BRIEF-020-export-es-ingatlanfejlesztoi-audit-csomag.md"
+    },
+    {
+      "id": "BRIEF-021",
+      "title": "Tematikus Jelmagyarázat és Forráshivatkozás",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-019",
+      "feature": "ADR-019",
+      "file": "BRIEF-021-tematikus-jelmagyarazat-es-forrashivatkozas.md"
+    },
+    {
+      "id": "BRIEF-022",
+      "title": "Építési Kockázatjelzés és „Miért?” Indoklás",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-020",
+      "feature": "ADR-020",
+      "file": "BRIEF-022-epitesi-kockazatjelzes-es-indoklas.md"
+    },
+    {
+      "id": "BRIEF-023",
+      "title": "Térképi Sugár-Figyelő és Közelben Lévő Projektek",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-021",
+      "feature": "ADR-021",
+      "file": "BRIEF-023-terkepi-sugar-figyelo.md"
+    },
+    {
+      "id": "BRIEF-024",
+      "title": "Megosztható Mélylink és Nyelvperzisztencia",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-022",
+      "feature": "ADR-022",
+      "file": "BRIEF-024-megoszthato-melylink-es-allapot.md"
+    },
+    {
+      "id": "BRIEF-025",
+      "title": "Mentett Figyelési Zónák és Építési Értesítések",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-025",
+      "file": "BRIEF-025-mentett-figyelesek-es-ertesitesek.md"
+    },
+    {
+      "id": "BRIEF-026",
+      "title": "Kataszteri Rétegválasztó és Parcella-adatlekérdezés",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-026",
+      "file": "BRIEF-026-kataszteri-retegvalaszto-es-adatlekerdezes.md"
+    },
+    {
+      "id": "BRIEF-027",
+      "title": "Offline PWA és Gyenge Hálózati Mód",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-027",
+      "file": "BRIEF-027-offline-pwa-es-gyenge-halozati-mod.md"
+    },
+    {
+      "id": "BRIEF-028",
+      "title": "Körzetek Összehasonlítása és Statisztikai Elemzés",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-028",
+      "file": "BRIEF-028-korzetek-osszehasonlitasa-es-statisztikai-elemzes.md"
+    },
+    {
+      "id": "BRIEF-029",
+      "title": "Adatforrás, Frissesség és Bizalmi Állapot",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-029",
+      "file": "BRIEF-029-adatforras-frissesseg-es-bizalmi-allapot.md"
+    },
+    {
+      "id": "BRIEF-030",
+      "title": "Mobil, Akadálymentes és Billentyűzetes Használat",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-030",
+      "file": "BRIEF-030-mobil-akadalymentes-es-billentyuzetes-hasznalat.md"
     }
   ]
 }

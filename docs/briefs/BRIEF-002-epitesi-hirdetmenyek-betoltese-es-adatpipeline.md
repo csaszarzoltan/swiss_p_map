@@ -16,11 +16,13 @@ Környékbeli lakosok, építészek és ingatlanfejlesztők, akik időben értes
 
 Automatizált háttérfolyamat és REST végpont, amely letölti az Amtsblatt XML hirdetményeket, kiszámítja a 20 napos Auflage időablakot, kiszűri a lejárt engedélyeket, és geokódolt koordinátákkal látja el a projekteket.
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-002-01:** Felhasználóként szeretném látni az aktív építési engedélyeket az irányítószámom alatt, hogy tudjam, mi épül a közelemben.
 - **US-002-02:** Felhasználóként szeretném látni a fellebbezési határidő kezdetét és végét (`auflage_start` és `auflage_end`), hogy ne késsek le a határidőről.
 - **US-002-03:** Rendszerként szeretném a `POST /api/v1/planning/refresh` végponton keresztül automatikusan frissíteni a hirdetményeket.
+
+- **US-002-04:** Üzemeltetőként szeretném, hogy hibás vagy hiányos upstream rekord esetén a rendszer a rekordot elkülönítse vagy kihagyja, és a többi hirdetmény feldolgozása folytatódjon.
 
 ## Scope
 

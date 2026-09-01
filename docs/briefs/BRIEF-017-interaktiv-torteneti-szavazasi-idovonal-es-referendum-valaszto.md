@@ -21,11 +21,13 @@ Egy interaktív szavazás-választó (Dropdown / Selector) a 3D térkép kárty�
 4. `6700`: Stromgesetz (2024-06-09 — 68.7% Igen)
 Kiválasztáskor a 3D kantonok azonnal az adott szavazás kantonális eredményeire frissülnek és átszíneződnek!
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-017-01:** Felhasználóként szeretnék egy lenyíló listából kiválasztani a legutóbbi 4 szövetségi népszavazás bármelyikét.
 - **US-017-02:** Felhasználóként szeretném látni, ahogy a 3D térkép azonnal átszíneződik a választott referendum kantonális eredményei szerint.
 - **US-017-03:** Rendszerként a `GET /api/v1/politics/votes/list` és `GET /api/v1/politics/votes/{id}` végpontokon keresztül szeretném kiszolgálni az adatokat.
+
+- **US-017-04:** Felhasználóként szeretném, hogy hibás vagy nem létező referendumazonosító esetén a rendszer lokalizált hibaállapotot és visszalépési lehetőséget adjon.
 
 ## Scope
 

@@ -16,11 +16,13 @@ Szomszédok, lakosok és ingatlanpiaci befektetők, akik térben akarják látni
 
 Látványos, borostyánsárga 3D pin-ek a Three.js térképen az aktív projektek pontos helyén, lüktető animációval, föléhúzáskor lebegő címkártyával, és kattintásra azonnali projekt-betöltéssel.
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-013-01:** Felhasználóként szeretném a 3D térképen látni az aktív építkezéseket jelző 3D borostyánsárga tüskéket (pin-eket).
 - **US-013-02:** Felhasználóként az egérrel egy 3D pin fölé mozogva szeretném látni a projekt címét és az Auflagefrist határidejét.
 - **US-013-03:** Felhasználóként rákattintva egy 3D pin-re, a projektnek azonnal ki kell jelölődnie a lenti listában és a részletező panelen.
+
+- **US-013-04:** Mobilfelhasználóként szeretném érintéssel kijelölni a markert és bezárni a részleteket, hogy hover nélkül is teljes legyen a funkció.
 
 ## Scope
 

@@ -16,11 +16,13 @@ Ingatlanfejlesztők, banki hitelbírálók, építészek és tudatos ingatlanvá
 
 Egyetlen kattintással letölthető, professzionálisan formázott körzeti audit csomag (PDF összefoglaló és géppel olvasható JSON/CSV export).
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-020-01:** Felhasználóként szeretném a keresett körzet teljes profilját egy strukturált JSON fájlban letölteni.
 - **US-020-02:** Felhasználóként szeretném az aktív építési engedélyek listáját CSV formátumban exportálni táblázatkezelőhöz (Excel).
 - **US-020-03:** Felhasználóként szeretnék egy tiszta, nyomtatóbarát PDF összefoglaló nézetet kapni a körzet összes mérőszámáról és a 3D térképi pillanatképről.
+
+- **US-020-04:** Felhasználóként szeretném, hogy részleges adat vagy exporthiba esetén a rendszer jelezze a hiányt, és ne állítson elő félrevezető auditcsomagot.
 
 ## Scope
 

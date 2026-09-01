@@ -16,7 +16,7 @@ Környezettudatos lakástulajdonosok, napelem-telepítők és építési telek u
 
 Egy strukturált, 6 csempéből álló interaktív információs központ a "Hely" (Ort) fül alatt, amely kattintásra feltárja az egyes területek mélyebb adatait és forrásait.
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-007-01:** Felhasználóként szeretném megnézni a tetőmre eső éves napelemes besugárzást (pl. "1208 kWh/m² · Klasse Sehr gut").
 - **US-007-02:** Felhasználóként szeretném tudni a körzet kataszteri zónáját (pl. "Kernzone", "Wohnzone W3").

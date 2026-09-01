@@ -16,16 +16,18 @@ Svájci ingatlanbefektetők, lakásvásárlók, helyi lakosok és önkormányzat
 
 Egy modern, típusbiztos és gyors webes alkalmazás, amely Three.js 3D felülettel és FastAPI REST végpontokkal rendelkezik, automatikus geodéziai koordináta-transzformációt biztosít, és megfelel a svájci adatvédelmi és minőségi elvárásoknak.
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-001-01:** Látogatóként szeretném az alkalmazást gyorsan megnyitni a böngészőmben, hogy azonnal interaktív svájci 3D térképet kapjak.
 - **US-001-02:** Felhasználóként szeretném, hogy az LV95 és WGS84 koordináták automatikusan átválthatók legyenek a térképi megjelenítéshez.
 - **US-001-03:** Rendszerként szeretném, hogy a backend Pydantic modellekkel és FastAPI végpontokkal garantálja a típushelyességet és a 0-hiba működést.
 
+- **US-001-04:** Mobil vagy gyengébb eszközt használó látogatóként szeretném, hogy a térkép teljesítményromlás esetén is használható állapotot és érthető hibát adjon, hogy ne maradjak üres képernyőn.
+
 ## Scope
 
 - Next.js 14 (App Router) + TypeScript frontend.
-- FastAPI + Python 3.11+ típusos backend.
+- FastAPI + Python 3.11+ típusos backend; jelenlegi SQLite adattár, jövőbeni PostGIS csak külön elfogadott ADR alapján.
 - LV95 ↔ WGS84 konverter matematikai formulákkal (`geo_converter.py`).
 - Szigorú linter és minőségkapu (mypy strict, ruff, pytest).
 

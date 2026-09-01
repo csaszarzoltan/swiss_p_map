@@ -16,11 +16,13 @@ Munkavállalók, adótanácsadók és cégalapítók, akik a legalacsonyabb adó
 
 Élő, naprakész adókulcs lekérdezés a kantonális forrásokból (pl. Zürich 119%, Uster 110%), pontos forrásmegjelöléssel (`steuerfuss_source: "zh-steueramt-html"`).
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-008-01:** Felhasználóként szeretném látni a település aktuális évi adókulcsát százalékban kifejezve.
 - **US-008-02:** Felhasználóként szeretném látni, hogy az adat hivatalos élő forrásból származik-e.
 - **US-008-03:** Rendszerként szeretném, ha a kantonális adóportál karbantartása esetén a rendszer a legutóbbi validált értékre állna vissza.
+
+- **US-008-04:** Felhasználóként szeretném látni az adókulcs évét és frissességét, hogy elavult adattal ne hozzak pénzügyi döntést.
 
 ## Scope
 

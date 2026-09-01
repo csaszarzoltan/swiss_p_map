@@ -16,11 +16,13 @@ Minden svájci lakos a 26 kanton bármelyik településén.
 
 Egész Svájcra kiterjedő helyfeloldás: bármely érvényes svájci irányítószámra (`3011 Bern`, `4001 Basel`, `1201 Genève`, `8610 Uster`, stb.) azonnal betöltődnek a szövetségi rétegek (zaj, tömegközlekedés, napenergia) és a helyi politikai képviselet.
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-011-01:** Felhasználóként beírva a `3011` irányítószámot, szeretném látni Bern adatait és a berni politikai képviselőket.
 - **US-011-02:** Felhasználóként beírva a `4001` irányítószámot, szeretném látni Basel-Stadt adatait.
 - **US-011-03:** Rendszerként szeretném, hogy az élő szövetségi API lekérdezés a megfelelő kantonális scraperre fusson (pl. zürichi scraperek csak ZH esetén fussanak).
+
+- **US-011-04:** Felhasználóként szeretném, hogy ismeretlen vagy érvénytelen svájci irányítószám esetén lokalizált, javítható hibaüzenetet kapjak.
 
 ## Scope
 

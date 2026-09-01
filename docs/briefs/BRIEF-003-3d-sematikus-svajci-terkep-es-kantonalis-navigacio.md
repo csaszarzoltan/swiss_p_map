@@ -16,7 +16,7 @@ Látogatók és elemzők, akik vizuálisan vonzó, modern és interaktív 3D él
 
 Egy Three.js alapú, sötét tónusú kiber-üveg (cyber-glass) stílusú 3D Svájc-modell, mind a 26 kanton pontos határvonalával, egérmozgatásra reagáló kanton-kiemeléssel, sima kameramozgással és városi alrétegekkel.
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-003-01:** Látogatóként szeretném forgatni, dönteni és zoomolni a 3D svájci térképet az egérrel vagy érintéssel.
 - **US-003-02:** Felhasználóként szeretném, hogy az egér kanton fölé húzásakor a kanton kiemelkedjen és kék fénnyel világítson, miközben megjelennek az adatai (népesség, szavazati arány).

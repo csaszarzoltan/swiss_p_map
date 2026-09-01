@@ -16,11 +16,13 @@ Családok, ingatlanvásárlók és döntéshozók, akik gyorsan meg akarják ér
 
 Egy gombnyomásra elérhető, AI-alapú szöveges értékelés a kiválasztott nyelven (DE, EN, FR, IT), amely összefüggéseiben magyarázza el a Steuerfusst, a zajszintet, a közlekedést és a folyamatban lévő építkezéseket.
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-006-01:** Felhasználóként szeretnék az áttekintő panelen egy 3-4 mondatos AI összefoglalót kapni a keresett körzetről.
 - **US-006-02:** Nyelvváltáskor szeretném, hogy az AI összefoglaló automatikusan az aktív nyelven jelenjen meg.
 - **US-006-03:** Rendszerként szeretném, hogy ha a külső LLM gateway nem elérhető, egy determinisztikus sablon-alapú összefoglaló azonnal helyettesítse.
+
+- **US-006-04:** Felhasználóként szeretném egyértelműen látni, ha az összefoglaló sablonból és nem élő LLM-válaszból származik, hogy ne tévesszem össze a két forrást.
 
 ## Scope
 

@@ -16,11 +16,13 @@ A politikai pillér és a 3D térkép korábban csak példa (mock) szavazási sz
 
 Hivatalos szövetségi népszavazási adatok (pl. 2024.03.03 13. AHV-nyugdíj: 58.2% országos Igen, valós részvétel) mind a 26 kantonra pontosan lebontva, 4 nyelven elérhető előterjesztési címekkel.
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-012-01:** Felhasználóként szeretném a 3D térképen látni a legutóbbi szövetségi népszavazás hivatalos címét és országos jóváhagyási arányát.
 - **US-012-02:** Felhasználóként az egérrel bármely kanton (pl. Vaud, Zürich, Appenzell) fölé mozogva szeretném látni az adott kanton valós Igen/Nem százalékát és részvételi arányát.
 - **US-012-03:** Rendszerként a `GET /api/v1/politics/votes/latest` végponton keresztül strukturált JSON formátumban szeretném kiszolgálni a 26 kanton eredményét.
+
+- **US-012-04:** Felhasználóként szeretném látni a szavazás dátumát, adatforrását és a betöltés állapotát, hogy a megjelenített eredményt ellenőrizni tudjam.
 
 ## Scope
 

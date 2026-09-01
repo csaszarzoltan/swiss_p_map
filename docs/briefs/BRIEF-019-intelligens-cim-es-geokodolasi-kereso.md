@@ -16,11 +16,13 @@ Minden látogató, aki tetszőleges svájci címet vagy látványosságot akar m
 
 Intelligens, automatikusan kiegészítő (autocomplete) keresőmező, amely szöveges címekre, utcákra és községekre is azonnal a hivatalos Swisstopo geokódolt koordinátákkal válaszol, és ráközelíti a 3D térképet a pontos épületre.
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-019-01:** Felhasználóként utcanevet és házszámot beírva szeretnék intelligens címjavaslatokat kapni a Swisstopo adatbázisából.
 - **US-019-02:** Felhasználóként kiválasztva egy javasolt címet, a rendszernek automatikusan azonosítania kell a megfelelő irányítószámot és koordinátákat.
 - **US-019-03:** Felhasználóként szeretném, hogy a 3D térkép kamerája automatikusan a kiválasztott cím fölé repüljön (fly-to animáció).
+
+- **US-019-04:** Felhasználóként szeretném, hogy üres, túl rövid vagy találat nélküli keresés esetén érthető állapotot kapjak, és a korábbi térképi állapot ne vesszen el.
 
 ## Scope
 

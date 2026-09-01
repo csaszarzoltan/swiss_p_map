@@ -20,11 +20,13 @@ Dinamikus anyag- és színváltás a 3D térképen:
 - **`ÖREB` fül:** Kataszteri zónaszínezés (Kernzone lila, Wohnzone kék, Gewerbe narancs).
 - **`Ort / Lärm` fül:** Zajterhelési izofonák.
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-015-01:** Felhasználóként a Politik fülre kattintva szeretném, ha a 3D térkép azonnal a szavazási eredmények szerinti hőtérképre váltana.
 - **US-015-02:** Felhasználóként a Sonnendach fülre kattintva szeretném látni az arany szolár potenciál térképet.
 - **US-015-03:** Felhasználóként szeretném, hogy az átmenetek sima animációval (GSAP color.lerp) menjenek végbe 60 FPS sebesség mellett.
+
+- **US-015-04:** Színlátási nehézséggel élő felhasználóként szeretném, hogy a színek mellett szöveges jelmagyarázat és megfelelő kontraszt is közvetítse az értékeket.
 
 ## Scope
 

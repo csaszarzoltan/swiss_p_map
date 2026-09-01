@@ -16,11 +16,13 @@ Ingatlanbefektetők, helyi lakóközösségek és építészek.
 
 Egy mélyreható részletező kártya és oldalsó fiók (Drawer), amely megjeleníti az építtetőt (`contractor`), az építészt (`architect`), a parcellaszámot (`parcel_number`), az építési övezetet (`zone_type`), a fellebbezési határidőig hátralévő napok számát és a jogi kockázati szintet (`low`, `medium`, `high`).
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-016-01:** Felhasználóként egy építkezésre kattintva szeretném látni a felelős építész irodát és a kivitelező céget.
 - **US-016-02:** Felhasználóként látni szeretném a projekt automatikus kockázati szintjét (pl. 🔴 Magas kockázat: tetőtér-beépítés / bontás Kernzone-ban).
 - **US-016-03:** Felhasználóként látni szeretném a pontos parcellaszámot és a közvetlen linket az Amtsblattportal hivatalos hirdetményéhez.
+
+- **US-016-04:** Felhasználóként szeretném, hogy hiányzó személyes vagy projektadatok esetén a panel „nem elérhető” állapotot mutasson, és ne következtessen nem bizonyított adatokra.
 
 ## Scope
 

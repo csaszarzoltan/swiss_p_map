@@ -16,7 +16,7 @@ A körzeti adatok és a parlamenti képviselet adatai elszigetelt kormányzati a
 
 Egyetlen API hívással lekérdezhető körzeti profil, amely élőben azonosítja a szövetségi GIS rétegeket (ARE/BAFU) és lekéri a helyi parlamenti képviselők névsorát és pártállását.
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-005-01:** Felhasználóként szeretném megtudni egy svájci irányítószámhoz (pl. 8004 Zürich) tartozó tömegközlekedési minőségi besorolást (pl. "Klasse A").
 - **US-005-02:** Felhasználóként szeretném látni a becsült nappali zajszintet (pl. "58 dB(A)"), hogy felmérjem a környék csendességét.

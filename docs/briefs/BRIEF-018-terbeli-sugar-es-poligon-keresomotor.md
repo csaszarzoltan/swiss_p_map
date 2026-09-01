@@ -18,11 +18,13 @@ Nagy sebességű (<5ms) térbeli lekérdező motor:
 - `GET /api/v1/planning/radius?lat=...&lon=...&radius_m=1000`: távolság szerint növekvő sorrendben adja vissza az építkezéseket `distance_m` mezővel.
 - `GET /api/v1/planning/bbox?min_lat=...&max_lat=...&min_lon=...&max_lon=...`: a képernyőnézetbe eső projekteket adja vissza.
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-018-01:** Felhasználóként egy kiválasztott koordináta köré 1000 méteres sugarú keresést szeretnék indítani, hogy lássam a közvetlen szomszédságomban lévő projekteket.
 - **US-018-02:** Felhasználóként a találati listában látni szeretném a projektek tőlem mért pontos távolságát méterben (pl. "240.5 m").
 - **US-018-03:** Rendszerként szeretném, ha a 22,000+ rekordon futó térbeli szűrés minimális erőforrás-igényű lenne SQLite előszűréssel és Haversine formulával.
+
+- **US-018-04:** Felhasználóként szeretném, hogy túl nagy, negatív vagy hibás sugár és bbox esetén az API egyértelmű validációs hibát adjon.
 
 ## Scope
 

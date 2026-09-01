@@ -16,7 +16,7 @@ Minden látogató asztali gépen, tableten és mobiltelefonon.
 
 Egy modern, felső elhelyezésű vízszintes lapsáv (Tabs), dinamikus számláló jelvényekkel (pl. "Planung (4)", "Politik (12)"), Quick-Pick gyorsválasztó gombokkal a kiemelt városokra (`8004`, `8001`, `8610`, `3011`, `4001`), és egy térkép alatti gazdag részletező panellel.
 
-## Jelenlegi funkciókat lefedő felhasználói történetek
+## Jelenlegi / Tervezett funkciókat lefedő felhasználói történetek
 
 - **US-010-01:** Felhasználóként szeretném a 6 fül (Übersicht, Politik, Ort, Planung, Sonnendach, ÖREB) közötti váltással azonnal szűrni a kapcsolódó listát és térképet.
 - **US-010-02:** Felhasználóként szeretnék az egyes füleken számláló jelvényeket látni (badge), hogy tudjam, hány releváns adat tartozik a körzethez.
