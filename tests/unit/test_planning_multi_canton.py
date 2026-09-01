@@ -11,7 +11,7 @@ def _seed_bsc_be_ge() -> PlanningService:
     """In-memory PlanningService seed - teszteléshez, nem a live DB-től függ."""
     repo = PlanningRepo(db_path=":memory:")
     svc = PlanningService(repo=repo)
-    today = date.today()
+    today = date.today()  # noqa: DTZ011
     svc.seed([
         Baugesuch(id="test-be-1", title="Kramgasse 45, 3011 Bern", municipality="Bern", municipality_id=351,
                   postcode="3011", canton="BE", publication_date=today - timedelta(days=4),
