@@ -1,0 +1,660 @@
+{
+  "version": "1.0",
+  "project": "swiss_p_map",
+  "generated_at": "2026-09-02T09:00:00Z",
+  "spec_count": 43,
+  "coverage": {
+    "briefs": 43,
+    "specs": 43,
+    "percent": 100
+  },
+  "specs": [
+    {
+      "id": "SPEC-001",
+      "feature": "FEAT-001",
+      "brief": "BRIEF-001",
+      "title": "Svájci Térinformatikai Architektúra és Stack",
+      "status": "SPEC_READY",
+      "risk": "low",
+      "file": "SPEC-001-svajci-terinformatikai-architektura.md",
+      "adr": [
+        "ADR-001"
+      ],
+      "research": [
+        "docs/research/2026-08-26-kickoff.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-002",
+      "feature": "FEAT-002",
+      "brief": "BRIEF-002",
+      "title": "Építési Hirdetmények Betöltése és Adatpipeline",
+      "status": "SPEC_READY",
+      "risk": "medium",
+      "file": "SPEC-002-epitesi-hirdetmenyek-betoltese-es-adatpipeline.md",
+      "adr": [
+        "ADR-002"
+      ],
+      "research": [
+        "docs/research/2026-08-26-amtsblatt-oereb-api.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-003",
+      "feature": "FEAT-003",
+      "brief": "BRIEF-003",
+      "title": "3D Sematikus Svájci Térkép és Kantonális Navigáció",
+      "status": "SPEC_READY",
+      "risk": "low",
+      "file": "SPEC-003-3d-sematikus-svajci-terkep-es-kantonalis-navigacio.md",
+      "adr": [
+        "ADR-003"
+      ],
+      "research": [
+        "docs/research/svajc_3d_terkep.html"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-004",
+      "feature": "FEAT-004",
+      "brief": "BRIEF-004",
+      "title": "Négynyelvű Nemzeti Hozzáférés és Lokalizáció",
+      "status": "SPEC_READY",
+      "risk": "low",
+      "file": "SPEC-004-negynyelvu-nemzeti-hozzaferes-es-lokalizacio.md",
+      "adr": [
+        "ADR-004"
+      ],
+      "research": [
+        "docs/research/2026-08-26-i18n-4lang.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-005",
+      "feature": "FEAT-005",
+      "brief": "BRIEF-005",
+      "title": "Élő Szövetségi Körzeti és Politikai Integráció",
+      "status": "SPEC_READY",
+      "risk": "medium",
+      "file": "SPEC-005-elo-szovetsegi-korzeti-es-politikai-integracio.md",
+      "adr": [
+        "ADR-005"
+      ],
+      "research": [
+        "docs/research/2026-08-26-politics-live-sources.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-006",
+      "feature": "FEAT-006",
+      "brief": "BRIEF-006",
+      "title": "AI-Alapú Körzeti Összefoglaló és Generatív Elemzés",
+      "status": "SPEC_READY",
+      "risk": "medium",
+      "file": "SPEC-006-ai-alapu-korzeti-osszefoglalo-es-generativ-elemzes.md",
+      "adr": [
+        "ADR-006"
+      ],
+      "research": [
+        "docs/research/2026-08-27-ai-summary-live.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-007",
+      "feature": "FEAT-007",
+      "brief": "BRIEF-007",
+      "title": "Részletes Helyi Körzetbővítés és Információs Központ",
+      "status": "SPEC_READY",
+      "risk": "low",
+      "file": "SPEC-007-reszletes-helyi-korzetbovites-es-informacios-kozpont.md",
+      "adr": [
+        "ADR-007"
+      ],
+      "research": [
+        "docs/research/2026-08-27-ort-expansion-sonnendach-oereb.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-008",
+      "feature": "FEAT-008",
+      "brief": "BRIEF-008",
+      "title": "Élő Kantonális Adókulcs Lekérdezés",
+      "status": "SPEC_READY",
+      "risk": "medium",
+      "file": "SPEC-008-elo-kantonalis-adokulcs-lekerdezes.md",
+      "adr": [
+        "ADR-008"
+      ],
+      "research": [
+        "docs/research/2026-08-27-zh-steuerfuss-live.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-009",
+      "feature": "FEAT-009",
+      "brief": "BRIEF-009",
+      "title": "Történeti és Tömeges Építési Engedély Backfill",
+      "status": "SPEC_READY",
+      "risk": "medium",
+      "file": "SPEC-009-torteneti-es-tomeges-epitesi-engedely-backfill.md",
+      "adr": [
+        "ADR-009"
+      ],
+      "research": [
+        "docs/research/2026-08-27-ogd-backfill.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-010",
+      "feature": "FEAT-010",
+      "brief": "BRIEF-010",
+      "title": "Intuitív Témaválasztó Sáv és Részletező Drawer",
+      "status": "SPEC_READY",
+      "risk": "low",
+      "file": "SPEC-010-intuitiv-temavalaszto-sav-es-reszletezo-drawer.md",
+      "adr": [
+        "ADR-010"
+      ],
+      "research": [
+        "docs/research/2026-08-27-menu-detail-panel.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-011",
+      "feature": "FEAT-011",
+      "brief": "BRIEF-011",
+      "title": "Országos Szövetségi Helyfeloldás",
+      "status": "SPEC_READY",
+      "risk": "low",
+      "file": "SPEC-011-orszagos-szovetsegi-helyfeloldas.md",
+      "adr": [
+        "ADR-011"
+      ],
+      "research": [
+        "docs/research/2026-08-27-federal-place-expansion.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-012",
+      "feature": "FEAT-012",
+      "brief": "BRIEF-012",
+      "title": "Hivatalos BFS Népszavazási Adatfolyam",
+      "status": "SPEC_READY",
+      "risk": "medium",
+      "file": "SPEC-012-hivatalos-bfs-nepszavazasi-adatfolyam.md",
+      "adr": [
+        "ADR-012"
+      ],
+      "research": [
+        "docs/research/2026-08-27-bfs-vote-data.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-013",
+      "feature": "FEAT-013",
+      "brief": "BRIEF-013",
+      "title": "3D Interaktív Építési Markerek és Fellebbezési Számláló",
+      "status": "SPEC_READY",
+      "risk": "low",
+      "file": "SPEC-013-3d-interaktiv-epitesi-markerek-es-fellebbezesi-szamlalo.md",
+      "adr": [
+        "ADR-013"
+      ],
+      "research": [
+        "docs/research/2026-08-27-3d-baugesuch-pins.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-014",
+      "feature": "FEAT-014",
+      "brief": "BRIEF-014",
+      "title": "Többkantonos Építési Engedély Federáció",
+      "status": "SPEC_READY",
+      "risk": "medium",
+      "file": "SPEC-014-tobbkantonos-epitesi-engedely-federacio.md",
+      "adr": [
+        "ADR-014"
+      ],
+      "research": [
+        "docs/research/2026-08-27-multi-canton-planning.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-015",
+      "feature": "FEAT-015",
+      "brief": "BRIEF-015",
+      "title": "Tematikus Térképi Hőtérkép és Rétegek",
+      "status": "SPEC_READY",
+      "risk": "low",
+      "file": "SPEC-015-tematikus-terkepi-hoterkep-es-retegek.md",
+      "adr": [
+        "ADR-015"
+      ],
+      "research": [
+        "docs/research/2026-08-27-thematic-map-layers.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-016",
+      "feature": "FEAT-016",
+      "brief": "BRIEF-016",
+      "title": "Építési Projektek Részletező és Kockázatelemző Panel",
+      "status": "SPEC_READY",
+      "risk": "medium",
+      "file": "SPEC-016-epitesi-projektek-reszletezo-es-kockazatelemzo-panel.md",
+      "adr": [
+        "ADR-016"
+      ],
+      "research": [
+        "docs/research/2026-08-27-baugesuch-deep-inspector.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-017",
+      "feature": "FEAT-017",
+      "brief": "BRIEF-017",
+      "title": "Interaktív Történeti Szavazási Idővonal és Referendum Választó",
+      "status": "SPEC_READY",
+      "risk": "low",
+      "file": "SPEC-017-interaktiv-torteneti-szavazasi-idovonal-es-referendum-valaszto.md",
+      "adr": [
+        "ADR-017"
+      ],
+      "research": [
+        "docs/research/2026-08-27-referendum-timeline.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-018",
+      "feature": "FEAT-018",
+      "brief": "BRIEF-018",
+      "title": "Térbeli Sugár- és Poligon Keresőmotor",
+      "status": "SPEC_READY",
+      "risk": "medium",
+      "file": "SPEC-018-terbeli-sugar-es-poligon-keresomotor.md",
+      "adr": [
+        "ADR-018"
+      ],
+      "research": [
+        "docs/research/2026-08-27-spatial-radius-engine.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-019",
+      "feature": "FEAT-019",
+      "brief": "BRIEF-019",
+      "title": "Intelligens Cím- és Geokódolási Kereső",
+      "status": "SPEC_READY",
+      "risk": "low",
+      "file": "SPEC-019-intelligens-cim-es-geokodolasi-kereso.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-020",
+      "feature": "FEAT-020",
+      "brief": "BRIEF-020",
+      "title": "Export és Ingatlanfejlesztői Audit Csomag",
+      "status": "SPEC_READY",
+      "risk": "medium",
+      "file": "SPEC-020-export-es-ingatlanfejlesztoi-audit-csomag.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-021",
+      "feature": "FEAT-021",
+      "brief": "BRIEF-021",
+      "title": "Tematikus Jelmagyarázat és Forráshivatkozás",
+      "status": "SPEC_READY",
+      "risk": "low",
+      "file": "SPEC-021-tematikus-jelmagyarazat-es-forrashivatkozas.md",
+      "adr": [
+        "ADR-019"
+      ],
+      "research": [
+        "docs/research/2026-08-28-usability-deep-dive.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-022",
+      "feature": "FEAT-022",
+      "brief": "BRIEF-022",
+      "title": "Építési Kockázatjelzés és „Miért?” Indoklás",
+      "status": "SPEC_READY",
+      "risk": "medium",
+      "file": "SPEC-022-epitesi-kockazatjelzes-es-indoklas.md",
+      "adr": [
+        "ADR-020"
+      ],
+      "research": [
+        "docs/research/2026-08-28-usability-deep-dive.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-023",
+      "feature": "FEAT-023",
+      "brief": "BRIEF-023",
+      "title": "Térképi Sugár-Figyelő és Közelben Lévő Projektek",
+      "status": "SPEC_READY",
+      "risk": "low",
+      "file": "SPEC-023-terkepi-sugar-figyelo.md",
+      "adr": [
+        "ADR-021"
+      ],
+      "research": [
+        "docs/research/2026-08-28-usability-deep-dive.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-024",
+      "feature": "FEAT-024",
+      "brief": "BRIEF-024",
+      "title": "Megosztható Mélylink és Nyelvperzisztencia",
+      "status": "SPEC_READY",
+      "risk": "low",
+      "file": "SPEC-024-megoszthato-melylink-es-allapot.md",
+      "adr": [
+        "ADR-022"
+      ],
+      "research": [
+        "docs/research/2026-08-28-usability-deep-dive.md"
+      ],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-025",
+      "feature": "FEAT-025",
+      "brief": "BRIEF-025",
+      "title": "Mentett Figyelési Zónák és Építési Értesítések",
+      "status": "SPEC_READY",
+      "risk": "high",
+      "file": "SPEC-025-mentett-figyelesek-es-ertesitesek.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-026",
+      "feature": "FEAT-026",
+      "brief": "BRIEF-026",
+      "title": "Kataszteri Rétegválasztó és Parcella-adatlekérdezés",
+      "status": "SPEC_READY",
+      "risk": "high",
+      "file": "SPEC-026-kataszteri-retegvalaszto-es-adatlekerdezes.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-027",
+      "feature": "FEAT-027",
+      "brief": "BRIEF-027",
+      "title": "Offline PWA és Gyenge Hálózati Mód",
+      "status": "SPEC_READY",
+      "risk": "high",
+      "file": "SPEC-027-offline-pwa-es-gyenge-halozati-mod.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-028",
+      "feature": "FEAT-028",
+      "brief": "BRIEF-028",
+      "title": "Körzetek Összehasonlítása és Statisztikai Elemzés",
+      "status": "SPEC_READY",
+      "risk": "medium",
+      "file": "SPEC-028-korzetek-osszehasonlitasa-es-statisztikai-elemzes.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-029",
+      "feature": "FEAT-029",
+      "brief": "BRIEF-029",
+      "title": "Adatforrás, Frissesség és Bizalmi Állapot",
+      "status": "SPEC_READY",
+      "risk": "high",
+      "file": "SPEC-029-adatforras-frissesseg-es-bizalmi-allapot.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-030",
+      "feature": "FEAT-030",
+      "brief": "BRIEF-030",
+      "title": "Mobil, Akadálymentes és Billentyűzetes Használat",
+      "status": "SPEC_READY",
+      "risk": "medium",
+      "file": "SPEC-030-mobil-akadalymentes-es-billentyuzetes-hasznalat.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-031",
+      "feature": "FEAT-031",
+      "brief": "BRIEF-031",
+      "title": "Svájci Tavak és Alpesi Domborzati Magasságok 3D-ben",
+      "status": "SPEC_READY",
+      "risk": "medium",
+      "file": "SPEC-031-svajci-tavak-es-alpesi-domborzat-3d.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-032",
+      "feature": "FEAT-032",
+      "brief": "BRIEF-032",
+      "title": "Országos Kantonális Adóverseny és Steuerfuss Hőtérkép",
+      "status": "SPEC_READY",
+      "risk": "medium",
+      "file": "SPEC-032-orszagos-kantonalis-adoverseny-es-steuerfuss-hoterkep.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-033",
+      "feature": "FEAT-033",
+      "brief": "BRIEF-033",
+      "title": "SBB Vasúti Mobilitási Főhálózat és Állomási Elérhetőség",
+      "status": "SPEC_READY",
+      "risk": "medium",
+      "file": "SPEC-033-sbb-vasuti-mobilitasi-fohalozat-es-elerhetoseg.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-034",
+      "feature": "FEAT-034",
+      "brief": "BRIEF-034",
+      "title": "Svájci Lakásingatlan-Ártrendek és Piaci Index",
+      "status": "SPEC_READY",
+      "risk": "high",
+      "file": "SPEC-034-svajci-lakasingatlan-artrendek-es-piaci-index.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-035",
+      "feature": "FEAT-035",
+      "brief": "BRIEF-035",
+      "title": "Természeti Veszélyek: Árvíz, Felszíni Lefolyás, Lavina és Földcsuszamlás",
+      "status": "SPEC_READY",
+      "risk": "high",
+      "file": "SPEC-035-termeszeti-veszelyek-arviz-lavina-es-foldcsuszamlas.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-036",
+      "feature": "FEAT-036",
+      "brief": "BRIEF-036",
+      "title": "ISOS Műemlékvédelmi és Történeti Településréteg",
+      "status": "SPEC_READY",
+      "risk": "high",
+      "file": "SPEC-036-isos-muemlekvedelmi-es-torteneti-telepulesreteg.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-037",
+      "feature": "FEAT-037",
+      "brief": "BRIEF-037",
+      "title": "Mikroklíma, Városi Hősziget és Klímajövő",
+      "status": "SPEC_READY",
+      "risk": "high",
+      "file": "SPEC-037-mikroklima-hosziget-es-klimajovo.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-038",
+      "feature": "FEAT-038",
+      "brief": "BRIEF-038",
+      "title": "Iskolák, Óvodák és Oktatási Ellátási Körzetek",
+      "status": "SPEC_READY",
+      "risk": "high",
+      "file": "SPEC-038-iskolak-ovodak-es-ellatasi-korzetek.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-039",
+      "feature": "FEAT-039",
+      "brief": "BRIEF-039",
+      "title": "Építési Észrevétel- és Fellebbezési Munkatér",
+      "status": "SPEC_READY",
+      "risk": "high",
+      "file": "SPEC-039-epitesi-eszrevetel-es-fellebbezesi-munkater.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-040",
+      "feature": "FEAT-040",
+      "brief": "BRIEF-040",
+      "title": "Levegőminőség, Pollen és Környezeti Terhelés",
+      "status": "SPEC_READY",
+      "risk": "high",
+      "file": "SPEC-040-levego-minoseg-pollen-es-kornyezeti-terheles.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-041",
+      "feature": "FEAT-041",
+      "brief": "BRIEF-041",
+      "title": "Egészségügyi és Mentési Elérhetőség",
+      "status": "SPEC_READY",
+      "risk": "high",
+      "file": "SPEC-041-egeszsegugyi-es-mentesi-elerhetoseg.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-042",
+      "feature": "FEAT-042",
+      "brief": "BRIEF-042",
+      "title": "Szélessáv, Mobilhálózat és Digitális Elérhetőség",
+      "status": "SPEC_READY",
+      "risk": "high",
+      "file": "SPEC-042-szelessav-mobilhalozat-es-digitalis-elerhetoseg.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-043",
+      "feature": "FEAT-043",
+      "brief": "BRIEF-043",
+      "title": "Épületenergetika, Felújítási Potenciál és Fűtéscsere",
+      "status": "SPEC_READY",
+      "risk": "high",
+      "file": "SPEC-043-epuletenergetika-felujitasi-potencial-es-futescsere.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    }
+  ]
+}
