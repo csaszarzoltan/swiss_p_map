@@ -1,8 +1,8 @@
 {
-  "version": "1.1",
+  "version": "1.0",
   "project": "swiss_p_map",
   "last_updated": "2026-09-01T16:54:00+02:00",
-  "brief_count": 43,
+  "brief_count": 44,
   "briefs": [
     {
       "id": "BRIEF-001",
@@ -347,6 +347,14 @@
       "adr": null,
       "feature": "FEAT-043",
       "file": "BRIEF-043-epuletenergetika-felujitasi-potencial-es-futescsere.md"
+    },
+    {
+      "id": "BRIEF-044",
+      "title": "Svájci Glassmorphism HUD és Vizuális Design Rendszer",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-010",
+      "feature": "FEAT-044",
+      "file": "BRIEF-044-svajci-glassmorphism-hud-es-design-rendszer.md"
     }
   ]
 }

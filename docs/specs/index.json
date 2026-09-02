@@ -2,10 +2,10 @@
   "version": "1.0",
   "project": "swiss_p_map",
   "generated_at": "2026-09-02T09:00:00Z",
-  "spec_count": 43,
+  "spec_count": 44,
   "coverage": {
-    "briefs": 43,
-    "specs": 43,
+    "briefs": 44,
+    "specs": 44,
     "percent": 100
   },
   "specs": [
@@ -652,6 +652,21 @@
       "risk": "high",
       "file": "SPEC-043-epuletenergetika-felujitasi-potencial-es-futescsere.md",
       "adr": [],
+      "research": [],
+      "requirement_count": 12,
+      "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-044",
+      "feature": "FEAT-044",
+      "brief": "BRIEF-044",
+      "title": "Svájci Glassmorphism HUD és Vizuális Design Rendszer",
+      "status": "SPEC_READY",
+      "risk": "low",
+      "file": "SPEC-044-svajci-glassmorphism-hud-es-design-rendszer.md",
+      "adr": [
+        "ADR-010"
+      ],
       "research": [],
       "requirement_count": 12,
       "acceptance_count": 6

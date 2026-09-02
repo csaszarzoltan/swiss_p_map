@@ -47,8 +47,9 @@ Az RVAD 1.1 szerinti, fejlesztésre kész feature-specifikációk katalógusa.
 | [SPEC-041](SPEC-041-egeszsegugyi-es-mentesi-elerhetoseg.md) | FEAT-041 | BRIEF-041 | Egészségügyi és Mentési Elérhetőség | SPEC_READY | high |
 | [SPEC-042](SPEC-042-szelessav-mobilhalozat-es-digitalis-elerhetoseg.md) | FEAT-042 | BRIEF-042 | Szélessáv, Mobilhálózat és Digitális Elérhetőség | SPEC_READY | high |
 | [SPEC-043](SPEC-043-epuletenergetika-felujitasi-potencial-es-futescsere.md) | FEAT-043 | BRIEF-043 | Épületenergetika, Felújítási Potenciál és Fűtéscsere | SPEC_READY | high |
+| [SPEC-044](SPEC-044-svajci-glassmorphism-hud-es-design-rendszer.md) | FEAT-044 | BRIEF-044 | Svájci Glassmorphism HUD és Vizuális Design Rendszer | SPEC_READY | low |
 
 ## Karbantartási szabály
-- Az `index.json`, ez a README és a fájlrendszer ugyanazt a 43 SPEC-et tartalmazza.
+- Az `index.json`, ez a README és a fájlrendszer ugyanazt a 44 SPEC-et tartalmazza.
 - Követelmény vagy AC módosításakor a tesztleképezést és a VALIDATION jelentést is frissíteni kell.
 - Fejlesztés csak SPEC_READY állapotból, RED bizonyítékkal indulhat.

@@ -4,8 +4,9 @@ root=Path(__file__).resolve().parent
 idx=json.loads((root/'index.json').read_text(encoding='utf-8'))
 errors=[]
 files=sorted(root.glob('SPEC-[0-9][0-9][0-9]-*.md'))
-if len(files)!=43: errors.append(f'spec_count={len(files)} expected=43')
-if idx.get('spec_count')!=43 or len(idx.get('specs',[]))!=43: errors.append('index count mismatch')
+expected_count = idx.get('spec_count', len(files))
+if len(files) != expected_count: errors.append(f'spec_count={len(files)} expected={expected_count}')
+if idx.get('spec_count') != len(files) or len(idx.get('specs',[])) != len(files): errors.append('index count mismatch')
 required=[f'## {i}.' for i in range(1,15)]
 for p in files:
  t=p.read_text(encoding='utf-8')

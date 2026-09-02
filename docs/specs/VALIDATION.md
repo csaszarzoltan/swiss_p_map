@@ -2,19 +2,19 @@
 
 **Dátum:** 2026-09-02  
 **Módszertan:** RVAD 1.1, `METHODOLOGY.md`  
-**Eredmény:** SPEC_READY, 43/43 brief specifikálva
+**Eredmény:** SPEC_READY, 44/44 brief specifikálva
 
 ## 1. Lefedettségi összesítés
 
-- Feature Brief-ek: **43** (`BRIEF-001`–`BRIEF-043`)
-- Feature-specifikációk: **43** (`SPEC-001`–`SPEC-043`)
+- Feature Brief-ek: **44** (`BRIEF-001`–`BRIEF-044`)
+- Feature-specifikációk: **44** (`SPEC-001`–`SPEC-044`)
 - Brief → SPEC lefedettség: **100%**
-- Funkcionális követelmények: **301**
-- Nem funkcionális követelmények: **215**
-- Acceptance scenario-k: **258**
-- Explicit REQ tesztleképezések: **301**
-- Kötelező 14 fejezettel rendelkező specifikációk: **43/43**
-- `SPEC_READY` frontmatter státusz: **43/43**
+- Funkcionális követelmények: **308**
+- Nem funkcionális követelmények: **218**
+- Acceptance scenario-k: **264**
+- Explicit REQ tesztleképezések: **308**
+- Kötelező 14 fejezettel rendelkező specifikációk: **44/44**
+- `SPEC_READY` frontmatter státusz: **44/44**
 
 ## 2. Traceability lánc
 
@@ -28,10 +28,10 @@ A `docs/specs/index.json` minden SPEC-hez rögzíti a feature-, brief-, ADR-, re
 
 - **Szerkezeti kapu:** mind a 14 kötelező fejezet jelen van.
 - **Azonosító kapu:** minden funkcionális követelmény stabil `REQ-xxx` azonosítóval és normatív jelöléssel rendelkezik.
-- **Acceptance kapu:** feature-enként 6 Given-When-Then scenario található, beleértve hibát és concurrency esetet.
+- **Acceptance kapu:** feature-enként legalább 6 Given-When-Then scenario található, beleértve hibát és concurrency esetet.
 - **Tesztleképezési kapu:** minden REQ szerepel a 12. fejezetben; az NFR-ekhez külön performance, accessibility, security, privacy és observability teszttípus tartozik.
 - **Szubjektív nyelv kapu:** mérhető időkorlátok és explicit állapotok kerültek meghatározásra; placeholder/TODO/TBD nincs.
-- **Registry kapu:** a fájlrendszer, `index.json` és `README.md` 43 tételes és szinkronizált.
+- **Registry kapu:** a fájlrendszer, `index.json` és `README.md` 44 tételes és szinkronizált.
 
 ## 4. Determinisztikus ellenőrzés
 
@@ -44,7 +44,7 @@ python docs/specs/validate_specs.py
 Eredmény:
 
 ```text
-PASS specs=43 requirements=301 acceptance=258 coverage=100%
+PASS specs=44 requirements=308 acceptance=264 coverage=100%
 ```
 
 Projekt regresszió az aktuális csomagban, a hiányzó futtatókörnyezet-függőség telepítése után:

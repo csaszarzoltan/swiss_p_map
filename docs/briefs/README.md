@@ -49,6 +49,7 @@ Ez a könyvtár a **Swiss P Map** azonosított, megvalósított és tervezett k�
 | [BRIEF-041](BRIEF-041-egeszsegugyi-es-mentesi-elerhetoseg.md) | Egészségügyi és Mentési Elérhetőség | READY_FOR_SPEC | FEAT-041 |
 | [BRIEF-042](BRIEF-042-szelessav-mobilhalozat-es-digitalis-elerhetoseg.md) | Szélessáv, Mobilhálózat és Digitális Elérhetőség | READY_FOR_SPEC | FEAT-042 |
 | [BRIEF-043](BRIEF-043-epuletenergetika-felujitasi-potencial-es-futescsere.md) | Épületenergetika, Felújítási Potenciál és Fűtéscsere | READY_FOR_SPEC | FEAT-043 |
+| [BRIEF-044](BRIEF-044-svajci-glassmorphism-hud-es-design-rendszer.md) | Svájci Glassmorphism HUD és Vizuális Design Rendszer | READY_FOR_SPEC | FEAT-044 |
 
 ## Karbantartási szabályok
 
