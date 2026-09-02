@@ -261,10 +261,13 @@ export default function Home() {
 
       <div className="mx-auto max-w-[1440px] px-4 py-5 sm:px-6">
         <LocalInformationHub postcode={result?.place?.postcode} onOpenMap={(layer) => {
-          const topic = layer === "politics" ? "politik" : layer === "planning" ? "planung" : layer === "price" || layer === "environment" || layer === "weather" || layer === "mobility" ? "ort" : "overview";
+          const topic: Topic = layer === "politics" || layer === "democracy" ? "politik" : layer === "planning" ? "planung" : layer === "solar" || layer === "energy" ? "solar" : layer === "oereb" ? "oereb" : layer === "price" || layer === "environment" || layer === "weather" || layer === "mobility" ? "ort" : "overview";
           setActiveTopic(topic);
+          const details = document.querySelector('details');
+          if (details) details.open = true;
           document.querySelector('[data-testid="map-3d"]')?.scrollIntoView({behavior:"smooth",block:"center"});
         }} />
+
       </div>
 
       <div className="mx-auto max-w-[1600px] px-2 sm:px-4">
@@ -275,9 +278,13 @@ export default function Home() {
         <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-white/10 bg-slate-950/60 shadow-2xl shadow-black/80">
           <Map3D
             selectedPostcode={result?.place?.postcode ?? null}
+            placeInfo={result?.place ?? null}
+            activeTopic={activeTopic}
+            onTopicChange={handleTopicSelect}
             baugesuche={activeTopic === "planung" && selectedBaugesuch ? [selectedBaugesuch] : (result?.baugesuche ?? [])}
             mapLocale={mapLocale}
           />
+
           <MapLegend activeTopic={activeTopic} />
         </div>
       </div>

@@ -7,8 +7,10 @@ import gsap from "gsap";
 import { SWISS_CANTONS } from "./swissCantons";
 import { SWISS_CITIES, SWISS_RIVERS, SWISS_LAKES, SWISS_ROADS } from "./mapOverlay";
 import { CITY_OUTLINES } from "./cityOutlines";
-import type { Baugesuch } from "@/lib/api";
+import type { Baugesuch, PlaceInfo } from "@/lib/api";
+import type { Topic } from "@/components/TopicSidebar";
 import { lonLatToModel } from "./projection";
+
 
 // 70°-os felülnézet + jobban bezoomolva (kameraszög ~69°, FOV 34°)
 const INITIAL_CAM = { x: 0, y: 9.0, z: 3.2 };
@@ -17,6 +19,64 @@ const INITIAL_TARGET = { x: 0, y: 0, z: -0.15 };
 const BASE_GLASS = { color: 0x1e293b, opacity: 0.42 };
 const BASE_EDGE = 0x64748b;
 const HOVER_EMISSIVE = 0x0284c7;
+
+const SOLAR_DATA: Record<string, { kwh: number; rating: string }> = {
+  VS: { kwh: 1420, rating: "Ausgezeichnet" },
+  TI: { kwh: 1380, rating: "Ausgezeichnet" },
+  GR: { kwh: 1350, rating: "Sehr gut" },
+  GE: { kwh: 1290, rating: "Sehr gut" },
+  VD: { kwh: 1270, rating: "Sehr gut" },
+  ZH: { kwh: 1208, rating: "Gut" },
+  BE: { kwh: 1190, rating: "Gut" },
+  BS: { kwh: 1150, rating: "Gut" },
+  LU: { kwh: 1180, rating: "Gut" },
+  ZG: { kwh: 1220, rating: "Sehr gut" },
+  SZ: { kwh: 1195, rating: "Gut" },
+  AG: { kwh: 1170, rating: "Gut" },
+  SG: { kwh: 1160, rating: "Gut" },
+  SO: { kwh: 1175, rating: "Gut" },
+  BL: { kwh: 1155, rating: "Gut" },
+  FR: { kwh: 1210, rating: "Sehr gut" },
+  JU: { kwh: 1140, rating: "Mäßig" },
+  NE: { kwh: 1190, rating: "Gut" },
+  SH: { kwh: 1185, rating: "Gut" },
+  TG: { kwh: 1175, rating: "Gut" },
+  UR: { kwh: 1250, rating: "Sehr gut" },
+  OW: { kwh: 1230, rating: "Sehr gut" },
+  NW: { kwh: 1240, rating: "Sehr gut" },
+  GL: { kwh: 1210, rating: "Sehr gut" },
+  AR: { kwh: 1150, rating: "Gut" },
+  AI: { kwh: 1150, rating: "Gut" },
+};
+
+const OEREB_ZONES: Record<string, { zone: string; color: string }> = {
+  ZH: { zone: "Wohnzone W3 / Kernzone", color: "#3b82f6" },
+  BE: { zone: "UNESCO Altstadt / Wohnzone", color: "#ec4899" },
+  BS: { zone: "Schonzone Altstadt / Gewerbe", color: "#f97316" },
+  GE: { zone: "Zone de développement / Résidentiel", color: "#3b82f6" },
+  VD: { zone: "Zone villa / Centre", color: "#3b82f6" },
+  ZG: { zone: "Wohn- und Arbeitszone", color: "#f97316" },
+  SZ: { zone: "Dorfzone / Landwirtschaft", color: "#22c55e" },
+  LU: { zone: "Kernzone Altstadt", color: "#ec4899" },
+  VS: { zone: "Tourismus- und Dorfzone", color: "#8b5cf6" },
+  TI: { zone: "Zona residenziale intensiva", color: "#3b82f6" },
+  GR: { zone: "Landschaftsschutzzone", color: "#22c55e" },
+};
+
+const OEV_CLASSES: Record<string, { cls: string; color: string; noise: number }> = {
+  ZH: { cls: "A (sehr dicht)", color: "#10b981", noise: 62.5 },
+  BE: { cls: "A (dicht)", color: "#10b981", noise: 59.0 },
+  BS: { cls: "A (sehr dicht)", color: "#10b981", noise: 64.0 },
+  GE: { cls: "A (sehr dicht)", color: "#10b981", noise: 63.5 },
+  VD: { cls: "B (gut)", color: "#06b6d4", noise: 60.0 },
+  LU: { cls: "A (dicht)", color: "#10b981", noise: 58.5 },
+  ZG: { cls: "B (gut)", color: "#06b6d4", noise: 57.0 },
+  SZ: { cls: "C (mittel)", color: "#8b5cf6", noise: 54.0 },
+  VS: { cls: "D (mäßig)", color: "#f59e0b", noise: 52.0 },
+  TI: { cls: "B (gut)", color: "#06b6d4", noise: 59.5 },
+  GR: { cls: "D (mäßig)", color: "#f59e0b", noise: 50.0 },
+};
+
 
 // Kantonra zoom 70°-ra hangolva — szorosabb, mint az országos nézet
 const CANTON_CAM_OFFSET = { y: 3.4, z: 1.22 };
@@ -91,13 +151,20 @@ interface MapLocale {
 export default function Map3D(
   {
     selectedPostcode = null,
+    placeInfo = null,
+    activeTopic = "overview",
+    onTopicChange,
     baugesuche = [],
     mapLocale,
   }: {
     selectedPostcode?: string | null;
+    placeInfo?: PlaceInfo | null;
+    activeTopic?: string;
+    onTopicChange?: (topic: Topic) => void;
     baugesuche?: Baugesuch[];
     mapLocale?: MapLocale;
   } = {},
+
 ) {
   const ml: MapLocale = mapLocale ?? {
     title: "Schweizerische Eidgenossenschaft",
@@ -123,7 +190,6 @@ export default function Map3D(
   const [statTarget, setStatTarget] = useState(() => ml.cantons);
   const [statPop, setStatPop] = useState(() => ml.population);
   const [voteYes, setVoteYes] = useState(58.2);
-  const [layerMode, setLayerMode] = useState<"default" | "tax" | "price">("default");
   const [showBack, setShowBack] = useState(false);
 
   useEffect(() => {
@@ -163,7 +229,7 @@ export default function Map3D(
   });
 
   const tip = (
-    d: { name: string; pop: string; yes: number; customHtml?: string } | null,
+    d: { name: string; pop: string; yes: number; code?: string; id?: string; customHtml?: string } | null,
     x?: number,
     y?: number,
   ) => {
@@ -180,10 +246,28 @@ export default function Map3D(
     }
     if (d.customHtml) {
       el.innerHTML = d.customHtml;
+      return;
+    }
+    const code = String(d.code ?? d.id ?? "");
+    if (activeTopic === "solar" || activeTopic === "sonnendach") {
+      const solar = SOLAR_DATA[code] ?? { kwh: 1208, rating: "Gut" };
+      el.innerHTML = `<strong>${d.name}</strong>${d.pop ? ` · ${d.pop}` : ""}<br/>☀ Solarpotenzial: <span style="color:#fbbf24;font-weight:700;">${solar.kwh} kWh/m²/Jahr (${solar.rating})</span>`;
+    } else if (activeTopic === "politik") {
+
+      el.innerHTML = `<strong>${d.name}</strong>${d.pop ? ` · ${d.pop}` : ""}<br/>🗳 13. AHV-Rente: <span style="color:#38bdf8;font-weight:700;">${d.yes}% ${ml.voteYes}</span>`;
+    } else if (activeTopic === "planung") {
+      el.innerHTML = `<strong>${d.name}</strong>${d.pop ? ` · ${d.pop}` : ""}<br/>🏗 Baugesuche: <span style="color:#818cf8;font-weight:700;">Amtsblatt Publikationen aktiv</span>`;
+    } else if (activeTopic === "ort") {
+      const o = OEV_CLASSES[code] ?? { cls: "A", color: "#10b981", noise: 60 };
+      el.innerHTML = `<strong>${d.name}</strong>${d.pop ? ` · ${d.pop}` : ""}<br/>📍 ÖV: <span style="color:#34d399;font-weight:700;">Klasse ${o.cls}</span> · Lärm: <span style="color:#94a3b8;font-weight:700;">${o.noise} dB</span>`;
+    } else if (activeTopic === "oereb") {
+      const z = OEREB_ZONES[code] ?? { zone: "Wohnzone / Kernzone", color: "#3b82f6" };
+      el.innerHTML = `<strong>${d.name}</strong>${d.pop ? ` · ${d.pop}` : ""}<br/>⚖ Kataster: <span style="color:#60a5fa;font-weight:700;">${z.zone}</span>`;
     } else {
-      el.innerHTML = `<strong>${d.name}</strong>${d.pop ? ` · ${d.pop}` : ""}<br/>${ml.support}: <span style="color:#38bdf8;font-weight:700;">${d.yes}% ${ml.voteYes}</span>`;
+      el.innerHTML = `<strong>${d.name}</strong>${d.pop ? ` · ${d.pop}` : ""}<br/><span style="color:#94a3b8;">${ml.cantons}</span>`;
     }
   };
+
 
   const applyHover = (mesh: THREE.Mesh) => {
     document.body.style.cursor = "pointer";
@@ -723,43 +807,93 @@ export default function Map3D(
     }
   }, [baugesuche, selectedPostcode]);
 
+  // Pins visibility based on activeTopic
+  useEffect(() => {
+    const pg = stateRef.current.pinGroup;
+    if (!pg) return;
+    pg.visible = activeTopic === "planung" || activeTopic === "overview";
+  }, [activeTopic]);
+
   useEffect(() => {
     const tax: Record<string, number> = { ZG: 54, SZ: 60, NW: 65, ZH: 119, LU: 116, BE: 154, NE: 156, GE: 155 };
     const prices: Record<string, number> = { ZG: 15300, GE: 14200, ZH: 12500, SZ: 11600, BS: 10300, VD: 9800, BE: 7600, TI: 7200 };
+
     stateRef.current.mainGroup?.children.forEach((child) => {
       const mesh = child as THREE.Mesh;
       const material = mesh.material as THREE.MeshStandardMaterial;
       const code = String(mesh.userData.code ?? mesh.userData.id ?? "");
       let color = new THREE.Color(BASE_GLASS.color);
-      if (layerMode === "tax") {
-        const value = tax[code] ?? 115;
-        color = new THREE.Color(value < 90 ? "#22c55e" : value < 135 ? "#eab308" : "#f43f5e");
-      } else if (layerMode === "price") {
-        const value = prices[code] ?? 8500;
-        color = new THREE.Color(value >= 12000 ? "#a855f7" : value >= 9500 ? "#d97706" : "#facc15");
+      let opacity = BASE_GLASS.opacity;
+
+      if (activeTopic === "solar" || activeTopic === "sonnendach") {
+        const solar = SOLAR_DATA[code] ?? { kwh: 1180, rating: "Gut" };
+        const hex = solar.kwh >= 1350 ? "#fbbf24" : solar.kwh >= 1220 ? "#f59e0b" : solar.kwh >= 1160 ? "#eab308" : "#ca8a04";
+        color = new THREE.Color(hex);
+        opacity = 0.65;
+      } else if (activeTopic === "politik") {
+        const yes = (mesh.userData.yes as number) ?? 52.0;
+        const hex = yes >= 55 ? "#38bdf8" : yes >= 50 ? "#0284c7" : yes >= 45 ? "#f43f5e" : "#be123c";
+        color = new THREE.Color(hex);
+        opacity = 0.65;
+      } else if (activeTopic === "planung") {
+        color = new THREE.Color("#4f46e5");
+        opacity = 0.55;
+      } else if (activeTopic === "ort") {
+        const oev = OEV_CLASSES[code] ?? { cls: "B", color: "#06b6d4", noise: 60 };
+        color = new THREE.Color(oev.color);
+        opacity = 0.60;
+      } else if (activeTopic === "oereb") {
+        const z = OEREB_ZONES[code] ?? { zone: "Wohnzone", color: "#3b82f6" };
+        color = new THREE.Color(z.color);
+        opacity = 0.60;
+      } else {
+        // overview
+        color = new THREE.Color(BASE_GLASS.color);
+        opacity = BASE_GLASS.opacity;
       }
+
       mesh.userData.origColor = color.getHex();
+      mesh.userData.origOpacity = opacity;
       gsap.to(material.color, { r: color.r, g: color.g, b: color.b, duration: 0.45, ease: "power2.out" });
+      gsap.to(material, { opacity, duration: 0.45, ease: "power2.out" });
     });
-  }, [layerMode]);
+  }, [activeTopic]);
 
   const noPct = (100 - voteYes).toFixed(1);
 
   return (
     <div className="relative w-full overflow-hidden rounded-xl border border-white/10" style={{ height: "62vh", minHeight: 380, background: "radial-gradient(circle at 50% 30%, #111827 0%, #030712 100%)" }} data-testid="map-3d">
       <div ref={containerRef} className="absolute inset-0" data-testid="map-3d-canvas" />
-      <div data-testid="map-layer-selector" className="absolute right-3 top-3 z-30 flex rounded-lg border border-white/15 bg-slate-950/80 p-1 backdrop-blur">
-        {(["default", "tax", "price"] as const).map((mode) => (
-          <button key={mode} onClick={() => setLayerMode(mode)} aria-pressed={layerMode === mode} className={`rounded px-2 py-1 text-[11px] font-semibold ${layerMode === mode ? "bg-sky-500 text-white" : "text-slate-300 hover:bg-white/10"}`}>
-            {mode === "default" ? "Default" : mode === "tax" ? "Tax Map" : "Price Map"}
+      
+      {/* 3D Map Thematic Layer Selector */}
+      <div data-testid="map-layer-selector" className="absolute right-3 top-3 z-30 flex flex-wrap gap-1 rounded-xl border border-white/15 bg-slate-950/85 p-1 backdrop-blur-md shadow-lg">
+        {[
+          { id: "overview" as Topic, label: "Übersicht" },
+          { id: "politik" as Topic, label: "Politik" },
+          { id: "planung" as Topic, label: "Planung" },
+          { id: "solar" as Topic, label: "Sonnendach" },
+          { id: "ort" as Topic, label: "Ort" },
+          { id: "oereb" as Topic, label: "ÖREB" },
+        ].map((t) => (
+          <button
+            key={t.id}
+            onClick={() => onTopicChange?.(t.id)}
+            aria-pressed={activeTopic === t.id || (t.id === "solar" && activeTopic === "sonnendach")}
+            className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all ${
+              activeTopic === t.id || (t.id === "solar" && activeTopic === "sonnendach")
+                ? "bg-sky-500 text-white shadow-sm"
+                : "text-slate-300 hover:bg-white/10 hover:text-white"
+            }`}
+          >
+            {t.label}
           </button>
         ))}
       </div>
 
       {/* Iránytű */}
-      <div className="pointer-events-none absolute right-4 top-4 z-10 flex h-12 w-12 flex-col items-center justify-center rounded-full border border-white/10 bg-[rgba(17,24,39,0.7)] shadow-[0_4px_20px_rgba(0,0,0,0.4)] backdrop-blur-[12px]">
+      <div className="pointer-events-none absolute right-4 top-14 z-10 flex h-11 w-11 flex-col items-center justify-center rounded-full border border-white/10 bg-[rgba(17,24,39,0.7)] shadow-[0_4px_20px_rgba(0,0,0,0.4)] backdrop-blur-[12px]">
         <div className="mb-0.5 h-0 w-0 border-x-[5px] border-b-[9px] border-x-transparent border-b-[#38bdf8]" />
-        <span className="text-[11px] font-bold text-[#38bdf8]">{ml.compass}</span>
+        <span className="text-[10px] font-bold text-[#38bdf8]">{ml.compass}</span>
       </div>
 
       {/* Glassmorphism panel */}
@@ -774,6 +908,7 @@ export default function Map3D(
         </div>
         <h2 className="mb-1 text-base sm:text-lg font-black tracking-tight text-white">{title}</h2>
         <p className="mb-3 text-[11px] sm:text-xs leading-relaxed text-slate-400">{subtitle}</p>
+        
         <div className="mb-3 rounded-xl border border-white/10 bg-white/[0.03] p-3 space-y-2">
           <div className="flex items-center justify-between text-xs">
             <span className="text-slate-400">{ml.areaLabel}:</span>
@@ -783,19 +918,116 @@ export default function Map3D(
             <span className="text-slate-400">{ml.popLabel}:</span>
             <span className="font-bold text-slate-100">{statPop}</span>
           </div>
-          <div className="pt-2 border-t border-white/5">
-            <div className="mb-1 flex items-center justify-between text-[11px]">
-              <span className="font-semibold text-slate-300">🗳 13. AHV-Rente (BFS)</span>
+
+          {/* Sonnendach Theme */}
+          {(activeTopic === "solar" || activeTopic === "sonnendach") && (
+            <div className="pt-2 border-t border-amber-500/20">
+              <div className="mb-1.5 flex items-center justify-between text-[11px]">
+                <span className="font-semibold text-amber-300">☀ BFE Sonnendach Potenzial</span>
+              </div>
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-slate-400">Mittlere Einstrahlung:</span>
+                <span className="font-bold text-amber-400">{placeInfo?.solar_kwh_m2 ?? 1208} kWh/m²/Jahr</span>
+              </div>
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-slate-400">Eignungsklasse:</span>
+                <span className="font-bold text-emerald-400">{placeInfo?.solar_class ?? "Sehr gut"}</span>
+              </div>
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-amber-950/60">
+                <div className="h-full bg-gradient-to-r from-amber-400 to-yellow-300 rounded-full" style={{ width: "88%" }} />
+              </div>
             </div>
-            <div className="mb-1 flex justify-between text-[11px] font-bold">
-              <span className="text-sky-400">{ml.voteYes}: {voteYes.toFixed(1)}%</span>
-              <span className="text-rose-400">{ml.voteNo}: {noPct}%</span>
+          )}
+
+
+
+
+          {/* Politik Theme */}
+          {activeTopic === "politik" && (
+            <div className="pt-2 border-t border-sky-500/20">
+              <div className="mb-1 flex items-center justify-between text-[11px]">
+                <span className="font-semibold text-sky-300">🗳 13. AHV-Rente (BFS)</span>
+              </div>
+              <div className="mb-1 flex justify-between text-[11px] font-bold">
+                <span className="text-sky-400">{ml.voteYes}: {voteYes.toFixed(1)}%</span>
+                <span className="text-rose-400">{ml.voteNo}: {noPct}%</span>
+              </div>
+              <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-rose-950/80">
+                <div className="h-full bg-gradient-to-r from-sky-400 to-blue-500 transition-all duration-300 rounded-full" style={{ width: `${voteYes}%` }} />
+              </div>
             </div>
-            <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-rose-950/80">
-              <div className="h-full bg-gradient-to-r from-sky-400 to-blue-500 transition-all duration-300 rounded-full" style={{ width: `${voteYes}%` }} />
+          )}
+
+          {/* Planung Theme */}
+          {activeTopic === "planung" && (
+            <div className="pt-2 border-t border-indigo-500/20">
+              <div className="mb-1.5 flex items-center justify-between text-[11px]">
+                <span className="font-semibold text-indigo-300">🏗 Amtsblatt Baugesuche</span>
+              </div>
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-slate-400">Aktive Gesuche:</span>
+                <span className="font-bold text-indigo-400">{baugesuche.length} im 20-Tage Fenster</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-400">Rechtsmittel:</span>
+                <span className="font-bold text-emerald-400">Einsprachefrist läuft</span>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Ort Theme */}
+          {activeTopic === "ort" && (
+            <div className="pt-2 border-t border-emerald-500/20">
+              <div className="mb-1.5 flex items-center justify-between text-[11px]">
+                <span className="font-semibold text-emerald-300">📍 ARE ÖV & sonBASE Lärm</span>
+              </div>
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-slate-400">ÖV-Güteklasse:</span>
+                <span className="font-bold text-emerald-400">Klasse {placeInfo?.oev_class ?? "A"}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-slate-400">Lärmbelastung Tag:</span>
+                <span className="font-bold text-slate-200">{placeInfo?.noise_db_day ?? 62.5} dB(A)</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-400">Steuerfuss:</span>
+                <span className="font-bold text-sky-400">{placeInfo?.steuerfuss_percent ?? 119}%</span>
+              </div>
+            </div>
+          )}
+
+          {/* ÖREB Theme */}
+          {activeTopic === "oereb" && (
+            <div className="pt-2 border-t border-blue-500/20">
+              <div className="mb-1.5 flex items-center justify-between text-[11px]">
+                <span className="font-semibold text-blue-300">⚖ ÖREB-Kataster (Swisstopo)</span>
+              </div>
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-slate-400">Zonierung:</span>
+                <span className="font-bold text-blue-400">{placeInfo?.oereb_zone ?? "Wohnzone W3"}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-400">Status:</span>
+                <span className="font-bold text-emerald-400">Rechtskräftig</span>
+              </div>
+            </div>
+          )}
+
+          {/* Overview Theme */}
+          {activeTopic === "overview" && (
+            <div className="pt-2 border-t border-white/10">
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-slate-400">Steuerfuss:</span>
+                <span className="font-bold text-sky-400">{placeInfo?.steuerfuss_percent ?? 119}%</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-400">ÖV-Klasse:</span>
+                <span className="font-bold text-emerald-400">Klasse {placeInfo?.oev_class ?? "A"}</span>
+              </div>
+            </div>
+          )}
         </div>
+
         {showBack && (
           <button
             onClick={handleBack}
@@ -819,3 +1051,4 @@ export default function Map3D(
     </div>
   );
 }
+
