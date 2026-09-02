@@ -190,15 +190,32 @@ export default function Map3D(
   const [statTarget, setStatTarget] = useState(() => ml.cantons);
   const [statPop, setStatPop] = useState(() => ml.population);
   const [voteYes, setVoteYes] = useState(58.2);
+  const [activeCode, setActiveCode] = useState<string | null>(null);
   const [showBack, setShowBack] = useState(false);
 
   useEffect(() => {
     setBreadcrumb(ml.breadcrumb);
     setTitle(ml.title);
-    setSubtitle(ml.subtitle);
     setStatTarget(ml.cantons);
     setStatPop(ml.population);
-  }, [ml.breadcrumb, ml.title, ml.subtitle, ml.cantons, ml.population]);
+  }, [ml.breadcrumb, ml.title, ml.cantons, ml.population]);
+
+  useEffect(() => {
+    if (activeTopic === "solar" || activeTopic === "sonnendach") {
+      setSubtitle("BFE Sonnendach Solarpotenzial & mittlere Einstrahlung (kWh/m²/Jahr)");
+    } else if (activeTopic === "politik") {
+      setSubtitle("BFS Eidgenössische Abstimmungen & kantonale Stimmbeteiligung");
+    } else if (activeTopic === "planung") {
+      setSubtitle(`Baugesuche: ${baugesuche.length} aktiv im 20-Tage Fenster — Einsprachefrist`);
+    } else if (activeTopic === "ort") {
+      setSubtitle("ARE ÖV-Güteklassen (A–D), sonBASE Lärmkataster und kantonale Steuerfüsse");
+    } else if (activeTopic === "oereb") {
+      setSubtitle("Swisstopo ÖREB-Kataster: öffentlich-rechtliche Eigentumsbeschränkungen");
+    } else {
+      setSubtitle(ml.subtitle);
+    }
+  }, [activeTopic, baugesuche.length, ml.subtitle]);
+
 
   const stateRef = useRef<{
     selectedCanton: THREE.Mesh | null;
@@ -281,11 +298,15 @@ export default function Map3D(
     _el1.color.setHex(0xe0f2fe);
     _el1.opacity = 0.95;
     tip(mesh.userData as { name: string; pop: string; yes: number });
-    const d = mesh.userData as { name: string; pop: string; yes: number };
+    const d = mesh.userData as { name: string; pop: string; yes: number; code?: string; id?: string };
     setStatTarget(d.name);
     setStatPop(d.pop);
     setVoteYes(d.yes);
+    if (d.code || d.id) {
+      setActiveCode(String(d.code ?? d.id));
+    }
   };
+
 
   const resetHover = (mesh: THREE.Mesh) => {
     document.body.style.cursor = "default";
@@ -860,6 +881,12 @@ export default function Map3D(
   }, [activeTopic]);
 
   const noPct = (100 - voteYes).toFixed(1);
+  const currentCode = activeCode ?? placeInfo?.canton ?? "ZH";
+  const currentSolar = SOLAR_DATA[currentCode] ?? { kwh: placeInfo?.solar_kwh_m2 ?? 1208, rating: placeInfo?.solar_class ?? "Sehr gut" };
+  const currentOev = OEV_CLASSES[currentCode] ?? { cls: placeInfo?.oev_class ?? "A", color: "#10b981", noise: placeInfo?.noise_db_day ?? 62.5 };
+  const currentOereb = OEREB_ZONES[currentCode] ?? { zone: placeInfo?.oereb_zone ?? "Wohnzone W3 / Kernzone", color: "#3b82f6" };
+  const cantonTax: Record<string, number> = { ZG: 54, SZ: 60, NW: 65, OW: 68, UR: 85, LU: 116, ZH: 119, AG: 112, SG: 115, BE: 154, NE: 156, GE: 155, VD: 148, BS: 130, BL: 135 };
+  const currentTax = cantonTax[currentCode] ?? placeInfo?.steuerfuss_percent ?? 119;
 
   return (
     <div className="relative w-full overflow-hidden rounded-xl border border-white/10" style={{ height: "62vh", minHeight: 380, background: "radial-gradient(circle at 50% 30%, #111827 0%, #030712 100%)" }} data-testid="map-3d">
@@ -927,20 +954,20 @@ export default function Map3D(
               </div>
               <div className="flex items-center justify-between text-xs mb-1">
                 <span className="text-slate-400">Mittlere Einstrahlung:</span>
-                <span className="font-bold text-amber-400">{placeInfo?.solar_kwh_m2 ?? 1208} kWh/m²/Jahr</span>
+                <span className="font-bold text-amber-400">{currentSolar.kwh} kWh/m²/Jahr</span>
               </div>
               <div className="flex items-center justify-between text-xs mb-1">
                 <span className="text-slate-400">Eignungsklasse:</span>
-                <span className="font-bold text-emerald-400">{placeInfo?.solar_class ?? "Sehr gut"}</span>
+                <span className="font-bold text-emerald-400">{currentSolar.rating}</span>
               </div>
               <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-amber-950/60">
-                <div className="h-full bg-gradient-to-r from-amber-400 to-yellow-300 rounded-full" style={{ width: "88%" }} />
+                <div
+                  className="h-full bg-gradient-to-r from-amber-400 to-yellow-300 rounded-full transition-all duration-300"
+                  style={{ width: `${Math.min(100, Math.max(20, Math.round((currentSolar.kwh / 1450) * 100)))}%` }}
+                />
               </div>
             </div>
           )}
-
-
-
 
           {/* Politik Theme */}
           {activeTopic === "politik" && (
@@ -983,15 +1010,15 @@ export default function Map3D(
               </div>
               <div className="flex items-center justify-between text-xs mb-1">
                 <span className="text-slate-400">ÖV-Güteklasse:</span>
-                <span className="font-bold text-emerald-400">Klasse {placeInfo?.oev_class ?? "A"}</span>
+                <span className="font-bold text-emerald-400">Klasse {currentOev.cls}</span>
               </div>
               <div className="flex items-center justify-between text-xs mb-1">
                 <span className="text-slate-400">Lärmbelastung Tag:</span>
-                <span className="font-bold text-slate-200">{placeInfo?.noise_db_day ?? 62.5} dB(A)</span>
+                <span className="font-bold text-slate-200">{currentOev.noise} dB(A)</span>
               </div>
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-400">Steuerfuss:</span>
-                <span className="font-bold text-sky-400">{placeInfo?.steuerfuss_percent ?? 119}%</span>
+                <span className="font-bold text-sky-400">{currentTax}%</span>
               </div>
             </div>
           )}
@@ -1004,7 +1031,7 @@ export default function Map3D(
               </div>
               <div className="flex items-center justify-between text-xs mb-1">
                 <span className="text-slate-400">Zonierung:</span>
-                <span className="font-bold text-blue-400">{placeInfo?.oereb_zone ?? "Wohnzone W3"}</span>
+                <span className="font-bold text-blue-400">{currentOereb.zone}</span>
               </div>
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-400">Status:</span>
@@ -1018,15 +1045,20 @@ export default function Map3D(
             <div className="pt-2 border-t border-white/10">
               <div className="flex items-center justify-between text-xs mb-1">
                 <span className="text-slate-400">Steuerfuss:</span>
-                <span className="font-bold text-sky-400">{placeInfo?.steuerfuss_percent ?? 119}%</span>
+                <span className="font-bold text-sky-400">{currentTax}%</span>
+              </div>
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-slate-400">ÖV-Klasse:</span>
+                <span className="font-bold text-emerald-400">Klasse {currentOev.cls}</span>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400">ÖV-Klasse:</span>
-                <span className="font-bold text-emerald-400">Klasse {placeInfo?.oev_class ?? "A"}</span>
+                <span className="text-slate-400">Solarertrag:</span>
+                <span className="font-bold text-amber-400">{currentSolar.kwh} kWh/m²</span>
               </div>
             </div>
           )}
         </div>
+
 
         {showBack && (
           <button

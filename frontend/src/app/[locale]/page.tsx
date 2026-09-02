@@ -42,6 +42,8 @@ export default function Home() {
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [watchRadius, setWatchRadius] = useState<number>(500);
   const [strategicP1P2, setStrategicP1P2] = useState<Record<string, Record<string, unknown>>>({});
+  const [showMap, setShowMap] = useState<boolean>(true);
+
 
   // ADR-022: deep-link state ↔ URL (plz/topic/selected/radius)
   useShareableState(
@@ -263,34 +265,44 @@ export default function Home() {
         <LocalInformationHub postcode={result?.place?.postcode} onOpenMap={(layer) => {
           const topic: Topic = layer === "politics" || layer === "democracy" ? "politik" : layer === "planning" ? "planung" : layer === "solar" || layer === "energy" ? "solar" : layer === "oereb" ? "oereb" : layer === "price" || layer === "environment" || layer === "weather" || layer === "mobility" ? "ort" : "overview";
           setActiveTopic(topic);
-          const details = document.querySelector('details');
-          if (details) details.open = true;
+          setShowMap(true);
           document.querySelector('[data-testid="map-3d"]')?.scrollIntoView({behavior:"smooth",block:"center"});
         }} />
-
       </div>
 
       <div className="mx-auto max-w-[1600px] px-2 sm:px-4">
-        <details className="rounded-2xl border border-white/10 bg-slate-950/40">
-          <summary className="cursor-pointer px-4 py-3 text-sm font-bold text-slate-300">Räumliche Analyse und Karte</summary>
-      {/* 3D Térkép Konténer */}
-      <div className="mx-auto w-full max-w-[1600px] px-2 sm:px-4 py-2 sm:py-3">
-        <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-white/10 bg-slate-950/60 shadow-2xl shadow-black/80">
-          <Map3D
-            selectedPostcode={result?.place?.postcode ?? null}
-            placeInfo={result?.place ?? null}
-            activeTopic={activeTopic}
-            onTopicChange={handleTopicSelect}
-            baugesuche={activeTopic === "planung" && selectedBaugesuch ? [selectedBaugesuch] : (result?.baugesuche ?? [])}
-            mapLocale={mapLocale}
-          />
+        <div className="rounded-2xl border border-white/10 bg-slate-950/40">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-sky-400 animate-pulse" />
+              <span className="text-sm font-bold text-slate-200">Räumliche 3D-Analyse & Themenkarte</span>
+            </div>
+            <button
+              onClick={() => setShowMap(!showMap)}
+              className="rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-sky-400 hover:bg-white/10 hover:text-sky-300 transition-all"
+            >
+              {showMap ? "Karte einklappen ▲" : "Karte ausklappen ▼"}
+            </button>
+          </div>
 
-          <MapLegend activeTopic={activeTopic} />
+          {showMap && (
+            <div className="p-2 sm:p-4">
+              <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-white/10 bg-slate-950/60 shadow-2xl shadow-black/80">
+                <Map3D
+                  selectedPostcode={result?.place?.postcode ?? null}
+                  placeInfo={result?.place ?? null}
+                  activeTopic={activeTopic}
+                  onTopicChange={handleTopicSelect}
+                  baugesuche={activeTopic === "planung" && selectedBaugesuch ? [selectedBaugesuch] : (result?.baugesuche ?? [])}
+                  mapLocale={mapLocale}
+                />
+                <MapLegend activeTopic={activeTopic} />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-        </details>
-      </div>
 
       {/* Lista + Részletező — Tiszta Swiss Card szekciók */}
       <div className="mx-auto max-w-[1440px] px-2 sm:px-4 py-3 space-y-4">
