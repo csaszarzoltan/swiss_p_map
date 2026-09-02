@@ -1,9 +1,10 @@
 {
   "version": "1.0",
   "project": "swiss_p_map",
-  "last_updated": "2026-09-02T13:30:00+02:00",
-  "brief_count": 50,
+  "last_updated": "2026-09-02T15:08:00+02:00",
+  "brief_count": 60,
   "briefs": [
+
 
     {
       "id": "BRIEF-001",
@@ -404,7 +405,88 @@
       "adr": null,
       "feature": "FEAT-050",
       "file": "BRIEF-050-svajci-onkormanyzati-ugyintezes-es-hulladeknaptar.md"
+    },
+    {
+      "id": "BRIEF-051",
+      "title": "Interaktív Szavazási és Népszavazási Vizualizációs UI Kártyák",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-051",
+      "file": "BRIEF-051-interaktiv-szavazasi-vizualizacios-ui-kartyak.md"
+    },
+    {
+      "id": "BRIEF-052",
+      "title": "Svájci Időjárási, Riasztási és Tavi Vízhőmérsékleti Widget",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-052",
+      "file": "BRIEF-052-svajci-idojarasi-riasztasi-es-vizwidget.md"
+    },
+    {
+      "id": "BRIEF-053",
+      "title": "Vizuális Svájci Hulladéknaptár és Háztartási Naptár-integráció",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-053",
+      "file": "BRIEF-053-vizualis-svajci-hulladeknaptar-es-ical.md"
+    },
+    {
+      "id": "BRIEF-054",
+      "title": "Dinamikus Svájci Megélhetési és Lakhatási Költségkalkulátor UI",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-054",
+      "file": "BRIEF-054-dinamikus-megelhetesi-koltsegkalkulator-ui.md"
+    },
+    {
+      "id": "BRIEF-055",
+      "title": "Élő MeteoSwiss OGD és Viharriasztási API Konnektor",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-014",
+      "feature": "FEAT-055",
+      "file": "BRIEF-055-elo-meteoswiss-ogd-es-riasztasi-konnektor.md"
+    },
+    {
+      "id": "BRIEF-056",
+      "title": "Élő BFS VoteInfo és Szövetségi Szavazási API Konnektor",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-015",
+      "feature": "FEAT-056",
+      "file": "BRIEF-056-elo-bfs-voteinfo-szavazasi-konnektor.md"
+    },
+    {
+      "id": "BRIEF-057",
+      "title": "Élő SBB OpenData / Transport API Menetrendi Konnektor",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-016",
+      "feature": "FEAT-057",
+      "file": "BRIEF-057-elo-sbb-opendata-menetrendi-konnektor.md"
+    },
+    {
+      "id": "BRIEF-058",
+      "title": "Kantonális E-Amtsblatt és Hivatalos Közlöny Hírfolyam Aggregátor",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-017",
+      "feature": "FEAT-058",
+      "file": "BRIEF-058-kantonalis-amtsblatt-hirfolyam-aggregator.md"
+    },
+    {
+      "id": "BRIEF-059",
+      "title": "Heti Helyi Körzeti Értesítő és E-mailes Hírlevél Generátor",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-018",
+      "feature": "FEAT-059",
+      "file": "BRIEF-059-heti-korzeti-ertesito-es-hirlevel.md"
+    },
+    {
+      "id": "BRIEF-060",
+      "title": "Böngészős Web Push és Figyelési Zóna Riasztási Rendszer",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-019",
+      "feature": "FEAT-060",
+      "file": "BRIEF-060-web-push-es-figyelesi-zona-riasztas.md"
     }
   ]
 }
+
 

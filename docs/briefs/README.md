@@ -2,7 +2,7 @@
 
 Ez a könyvtár a **Swiss P Map** azonosított, megvalósított és tervezett képességeinek Feature Brief dokumentumait tartalmazza az **RVAD 1.1** szerint.
 
-## Brief állapotleltár (50 db)
+## Brief állapotleltár (60 db)
 
 | ID | Cím | Státusz | Kapcsolódás |
 |---|---|---|---|
@@ -56,6 +56,17 @@ Ez a könyvtár a **Swiss P Map** azonosított, megvalósított és tervezett k�
 | [BRIEF-048](BRIEF-048-svajci-idojaras-riasztasok-es-klimatendenciak.md) | Svájci Időjárás, Élő Riasztások és CH2025 Klímatendenciák Központ | READY_FOR_SPEC | FEAT-048 |
 | [BRIEF-049](BRIEF-049-svajci-lakhatasi-es-megelhetesi-koltsegkalkulator.md) | Svájci Lakhatási és Megélhetési Költségkalkulátor | READY_FOR_SPEC | FEAT-049 |
 | [BRIEF-050](BRIEF-050-svajci-onkormanyzati-ugyintezes-es-hulladeknaptar.md) | Svájci Önkormányzati Ügyintézés és Hulladéknaptár | READY_FOR_SPEC | FEAT-050 |
+| [BRIEF-051](BRIEF-051-interaktiv-szavazasi-vizualizacios-ui-kartyak.md) | Interaktív Szavazási és Népszavazási Vizualizációs UI Kártyák | READY_FOR_SPEC | FEAT-051 |
+| [BRIEF-052](BRIEF-052-svajci-idojarasi-riasztasi-es-vizwidget.md) | Svájci Időjárási, Riasztási és Tavi Vízhőmérsékleti Widget | READY_FOR_SPEC | FEAT-052 |
+| [BRIEF-053](BRIEF-053-vizualis-svajci-hulladeknaptar-es-ical.md) | Vizuális Svájci Hulladéknaptár és Háztartási Naptár-integráció | READY_FOR_SPEC | FEAT-053 |
+| [BRIEF-054](BRIEF-054-dinamikus-megelhetesi-koltsegkalkulator-ui.md) | Dinamikus Svájci Megélhetési és Lakhatási Költségkalkulátor UI | READY_FOR_SPEC | FEAT-054 |
+| [BRIEF-055](BRIEF-055-elo-meteoswiss-ogd-es-riasztasi-konnektor.md) | Élő MeteoSwiss OGD és Viharriasztási API Konnektor | READY_FOR_SPEC | FEAT-055 |
+| [BRIEF-056](BRIEF-056-elo-bfs-voteinfo-szavazasi-konnektor.md) | Élő BFS VoteInfo és Szövetségi Szavazási API Konnektor | READY_FOR_SPEC | FEAT-056 |
+| [BRIEF-057](BRIEF-057-elo-sbb-opendata-menetrendi-konnektor.md) | Élő SBB OpenData / Transport API Menetrendi Konnektor | READY_FOR_SPEC | FEAT-057 |
+| [BRIEF-058](BRIEF-058-kantonalis-amtsblatt-hirfolyam-aggregator.md) | Kantonális E-Amtsblatt és Hivatalos Közlöny Hírfolyam Aggregátor | READY_FOR_SPEC | FEAT-058 |
+| [BRIEF-059](BRIEF-059-heti-korzeti-ertesito-es-hirlevel.md) | Heti Helyi Körzeti Értesítő és E-mailes Hírlevél Generátor | READY_FOR_SPEC | FEAT-059 |
+| [BRIEF-060](BRIEF-060-web-push-es-figyelesi-zona-riasztas.md) | Böngészős Web Push és Figyelési Zóna Riasztási Rendszer | READY_FOR_SPEC | FEAT-060 |
+
 
 
 ## Karbantartási szabályok
