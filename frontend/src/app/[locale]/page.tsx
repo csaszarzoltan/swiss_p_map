@@ -13,7 +13,8 @@ import RiskBadge from "@/components/RiskBadge";
 import WatchZone from "@/components/WatchZone";
 import ShareButton from "@/components/ShareButton";
 import { parseShareableState, useShareableState } from "@/hooks/useShareableState";
-import type { Baugesuch, DistrictRepresentatives, PlaceInfo } from "@/lib/api";
+import { api } from "@/lib/api";
+import type { Baugesuch, DistrictRepresentatives, HazardAssessment, IsosAssessment, PlaceInfo, PropertyPriceAssessment, TaxComparison } from "@/lib/api";
 
 const Map3D = dynamic(() => import("../Map3D"), { ssr: false });
 
@@ -23,6 +24,10 @@ interface Result {
   baugesuche?: Baugesuch[];
   error?: string;
   lngLat?: [number, number] | null;
+  propertyPrices?: PropertyPriceAssessment;
+  taxComparison?: TaxComparison;
+  hazardAssessment?: HazardAssessment;
+  isosAssessment?: IsosAssessment;
 }
 
 export default function Home() {
@@ -74,6 +79,23 @@ export default function Home() {
       if (parsed.radius) setWatchRadius(parsed.radius);
     }
   }, [didRestoreRef]);
+
+  // SPEC-032/034/035/036: load P0 strategic assessments for the active place.
+  useEffect(() => {
+    const place = result?.place;
+    if (!place) return;
+    const [lon, lat] = result?.lngLat ?? [8.54, 47.378];
+    let active = true;
+    Promise.all([
+      api.propertyPrices(place.canton, place.postcode),
+      api.taxComparison(place.canton),
+      api.hazardAssessment(place.postcode, lat, lon),
+      api.isosAssessment(place.postcode),
+    ]).then(([propertyPrices, taxComparison, hazardAssessment, isosAssessment]) => {
+      if (active) setResult((current) => current ? { ...current, propertyPrices, taxComparison, hazardAssessment, isosAssessment } : current);
+    }).catch(() => undefined);
+    return () => { active = false; };
+  }, [result?.place?.postcode, result?.place?.canton, result?.lngLat]);
 
   const mapLocale = useMemo(
     () => ({

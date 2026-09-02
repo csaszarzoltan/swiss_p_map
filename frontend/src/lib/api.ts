@@ -14,6 +14,20 @@ export interface PlaceInfo {
   risk_reason?: string | null;
 }
 
+
+export interface PropertySegment {
+  segment: "single_family_house" | "condominium";
+  average_price_chf_m2: number;
+  quarterly_index: number;
+  change_1y_percent: number;
+  change_5y_percent: number;
+}
+export interface PropertyPriceAssessment { canton: string; postcode: string; reference_period: string; source: string; quality_state: string; segments: PropertySegment[]; }
+export interface TaxEntry { canton: string; steuerfuss_percent: number; national_rank: number; band: "low" | "medium" | "high"; }
+export interface TaxComparison { canton: string; national_average_percent: number; selected: TaxEntry; ranking: TaxEntry[]; neighboring_cantons: TaxEntry[]; source: string; }
+export interface HazardAssessment { postcode: string; risk_level: "none" | "low" | "medium" | "high"; hazards: Array<{ hazard_type: string; risk_level: string }>; source: string; disclaimer: string; }
+export interface IsosAssessment { postcode: string; protected: boolean; classification: "ISOS I" | "ISOS II" | null; site_name: string | null; delay_risk: "low" | "medium" | "high"; source: string; }
+
 export interface Representative {
   id: string;
   name: string;
@@ -72,6 +86,10 @@ export const api = {
     getJson<PlaceInfo>(`/api/v1/place/${postcode}${live ? "?live=true" : ""}`),
   politics: (postcode: string, live = true) =>
     getJson<DistrictRepresentatives>(`/api/v1/politics/representatives?postcode=${postcode}${live ? "&live=true" : ""}`),
+  propertyPrices: (canton: string, postcode: string) => getJson<PropertyPriceAssessment>(`/api/v1/property/prices?canton=${canton}&postcode=${postcode}`),
+  taxComparison: (canton: string) => getJson<TaxComparison>(`/api/v1/tax/comparison?canton=${canton}`),
+  hazardAssessment: (postcode: string, lat: number, lon: number) => getJson<HazardAssessment>(`/api/v1/hazard/assessment?postcode=${postcode}&lat=${lat}&lon=${lon}`),
+  isosAssessment: (postcode: string) => getJson<IsosAssessment>(`/api/v1/heritage/isos?postcode=${postcode}`),
   planning: (postcode?: string, activeOnly = true) =>
     getJson<{ items: Baugesuch[] }>(
       `/api/v1/planning/baugesuche?${new URLSearchParams({

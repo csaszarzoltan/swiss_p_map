@@ -10,9 +10,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.models.geo import CoordinateWGS84
 from src.services.ai_summary_service import AiSummaryService
 from src.services.geo_converter import lv95_to_wgs84
+from src.services.hazard_service import HazardService
+from src.services.isos_service import IsosService
 from src.services.place_service import PlaceService
 from src.services.planning_service import PlanningService
 from src.services.politics_service import PoliticsService
+from src.services.property_price_service import PropertyPriceService
+from src.services.tax_service import TaxService
 from src.services.vote_service import VoteService
 
 _DEFAULT_CORS_ORIGINS = (
@@ -41,6 +45,10 @@ _place = PlaceService()
 _planning = PlanningService()
 _ai = AiSummaryService()
 _vote = VoteService()
+_property_prices = PropertyPriceService()
+_tax = TaxService()
+_hazard = HazardService()
+_isos = IsosService()
 # Demo seed — amíg nincs napi Amtsblatt poll, 8004-en legyen aktív Baugesuch a bemutatóhoz
 try:
     from datetime import date as _d
@@ -368,3 +376,41 @@ async def ai_summary(payload: dict[str, object]) -> dict[str, str]:
     if summary is None:
         raise HTTPException(status_code=502, detail="ai_unavailable")
     return {"summary": summary}
+
+
+@app.get("/api/v1/property/prices")
+def property_prices(
+    canton: str = Query(..., min_length=2, max_length=2, pattern=r"^[A-Za-z]{2}$"),
+    postcode: str = Query(..., min_length=4, max_length=4, pattern=r"^\d{4}$"),
+) -> dict[str, object]:
+    """SPEC-034 REQ-001..005: source-labelled BFS IMPI regional trends."""
+    return _property_prices.get_assessment(canton, postcode).model_dump()
+
+
+@app.get("/api/v1/tax/comparison")
+def tax_comparison(
+    canton: str = Query(..., min_length=2, max_length=2, pattern=r"^[A-Za-z]{2}$"),
+) -> dict[str, object]:
+    """SPEC-032 REQ-001..005: 26-canton tax ranking and neighbors."""
+    result = _tax.compare(canton)
+    if result is None:
+        raise HTTPException(status_code=404, detail=f"unknown canton {canton.upper()}")
+    return result.model_dump()
+
+
+@app.get("/api/v1/hazard/assessment")
+def hazard_assessment(
+    postcode: str = Query(..., min_length=4, max_length=4, pattern=r"^\d{4}$"),
+    lat: float = Query(..., ge=45.0, le=48.0),
+    lon: float = Query(..., ge=5.0, le=11.0),
+) -> dict[str, object]:
+    """SPEC-035 REQ-001..005: indicative BAFU hazard screening."""
+    return _hazard.assess(postcode, lat, lon).model_dump()
+
+
+@app.get("/api/v1/heritage/isos")
+def heritage_isos(
+    postcode: str = Query(..., min_length=4, max_length=4, pattern=r"^\d{4}$"),
+) -> dict[str, object]:
+    """SPEC-036 REQ-001..005: ISOS I/II federal inventory screening."""
+    return _isos.assess(postcode).model_dump()

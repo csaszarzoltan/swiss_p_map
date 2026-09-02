@@ -1,13 +1,13 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { Baugesuch, DistrictRepresentatives, PlaceInfo } from "@/lib/api";
+import type { Baugesuch, DistrictRepresentatives, HazardAssessment, IsosAssessment, PlaceInfo, PropertyPriceAssessment, TaxComparison } from "@/lib/api";
 import type { Topic } from "./TopicSidebar";
 
 interface DetailPanelProps {
   topic: Topic;
   selectedId: string | null;
-  result: { place?: PlaceInfo; politics?: DistrictRepresentatives; baugesuche?: Baugesuch[] } | null;
+  result: { place?: PlaceInfo; politics?: DistrictRepresentatives; baugesuche?: Baugesuch[]; propertyPrices?: PropertyPriceAssessment; taxComparison?: TaxComparison; hazardAssessment?: HazardAssessment; isosAssessment?: IsosAssessment } | null;
   summary: string | null;
   aiSummary: string | null;
 }
@@ -43,6 +43,48 @@ export default function DetailPanel({ topic, selectedId, result, summary, aiSumm
 
   return (
     <div data-testid="detail-panel" className="border-t border-white/10 bg-slate-950/80 p-5 backdrop-blur-xl">
+      {(topic === "overview" || topic === "ort") && (result.propertyPrices || result.taxComparison || result.hazardAssessment || result.isosAssessment) && (
+        <section data-testid="strategic-p0-panel" aria-label="Strategic location indicators" className="mb-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {result.propertyPrices && (
+            <article data-testid="property-price-card" className="rounded-xl border border-sky-500/30 bg-sky-950/20 p-4">
+              <SectionLabel>IMMOBILIENPREISINDEX · {result.propertyPrices.reference_period}</SectionLabel>
+              {result.propertyPrices.segments.map((segment) => (
+                <div key={segment.segment} className="mt-2">
+                  <div className="flex justify-between text-sm"><span>{segment.segment === "single_family_house" ? "Einfamilienhaus" : "Eigentumswohnung"}</span><strong>CHF {segment.average_price_chf_m2.toLocaleString()}/m²</strong></div>
+                  <div className="mt-1 h-1.5 rounded bg-slate-800"><div className="h-full rounded bg-sky-400" style={{ width: `${Math.min(100, segment.quarterly_index / 1.5)}%` }} /></div>
+                  <p className="mt-1 text-xs text-slate-400">Index {segment.quarterly_index} · 1J {segment.change_1y_percent}% · 5J {segment.change_5y_percent}%</p>
+                </div>
+              ))}
+              <p className="mt-2 text-[10px] text-slate-500">{result.propertyPrices.source} · regionale Schätzung</p>
+            </article>
+          )}
+          {result.taxComparison && (
+            <article data-testid="tax-comparison-card" className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-4">
+              <SectionLabel>STEUERWETTBEWERB</SectionLabel>
+              <p className="mt-2 text-2xl font-bold">#{result.taxComparison.selected.national_rank} <span className="text-sm font-normal text-slate-400">/ 26</span></p>
+              <div className="mt-2 flex h-3 overflow-hidden rounded"><span className="w-1/3 bg-emerald-500" /><span className="w-1/3 bg-amber-400" /><span className="w-1/3 bg-rose-500" /></div>
+              <p className="mt-2 text-sm">{result.taxComparison.selected.canton}: {result.taxComparison.selected.steuerfuss_percent}% · CH Ø {result.taxComparison.national_average_percent}%</p>
+              <p className="mt-1 text-xs text-slate-400">Nachbarn: {result.taxComparison.neighboring_cantons.map((x) => `${x.canton} ${x.steuerfuss_percent}%`).join(" · ") || "—"}</p>
+            </article>
+          )}
+          {result.hazardAssessment && (
+            <article data-testid="hazard-card" className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-4">
+              <SectionLabel>NATURGEFAHREN · BAFU</SectionLabel>
+              <p className={`mt-2 inline-flex rounded-full px-2 py-1 text-xs font-bold ${result.hazardAssessment.risk_level === "high" ? "bg-rose-500/30 text-rose-200" : result.hazardAssessment.risk_level === "medium" ? "bg-amber-500/30 text-amber-200" : "bg-emerald-500/30 text-emerald-200"}`}>{result.hazardAssessment.risk_level.toUpperCase()}</p>
+              <ul className="mt-2 text-sm text-slate-300">{result.hazardAssessment.hazards.map((x) => <li key={x.hazard_type}>{x.hazard_type}: {x.risk_level}</li>)}</ul>
+              <p className="mt-2 text-[10px] text-slate-500">{result.hazardAssessment.disclaimer}</p>
+            </article>
+          )}
+          {result.isosAssessment && (
+            <article data-testid="isos-card" className="rounded-xl border border-purple-500/30 bg-purple-950/20 p-4">
+              <SectionLabel>ISOS DENKMALSCHUTZ</SectionLabel>
+              <p className="mt-2 text-lg font-bold text-purple-200">{result.isosAssessment.protected ? `${result.isosAssessment.classification} · ${result.isosAssessment.site_name}` : "Kein Treffer"}</p>
+              <p className="mt-1 text-sm text-slate-400">Verzögerungsrisiko: {result.isosAssessment.delay_risk}</p>
+              <p className="mt-2 text-[10px] text-slate-500">{result.isosAssessment.source}</p>
+            </article>
+          )}
+        </section>
+      )}
       {showOverview && (
         <div className="space-y-4">
           {/* AI Executive Summary Card */}
