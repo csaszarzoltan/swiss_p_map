@@ -20,7 +20,9 @@ AMTSBLATT_XML_URL = "https://amtsblattportal.ch/api/v1/publications/xml"
 
 
 class HttpGetClient(Protocol):
-    async def get(self, url: str, params: dict[str, str | int | None] | None = None) -> httpx.Response: ...
+    async def get(
+        self, url: str, params: dict[str, str | int | None] | None = None
+    ) -> httpx.Response: ...
 
 
 def _text(el: ET.Element | None) -> str:
@@ -81,9 +83,13 @@ def _parse_publications(xml_text: str) -> list[Baugesuch]:
             if not title:
                 continue
             reg = _find_child_any(pub, "registrationOffice")
-            postcode = _text(_find_child_any(reg, "swissZipCode")) if reg is not None else ""
+            postcode = (
+                _text(_find_child_any(reg, "swissZipCode")) if reg is not None else ""
+            )
             town = _text(_find_child_any(reg, "town")) if reg is not None else ""
-            muni_id_raw = _text(_find_child_any(reg, "municipalityId")) if reg is not None else ""
+            muni_id_raw = (
+                _text(_find_child_any(reg, "municipalityId")) if reg is not None else ""
+            )
             municipality_id: int | None
             try:
                 municipality_id = int(muni_id_raw) if muni_id_raw else None

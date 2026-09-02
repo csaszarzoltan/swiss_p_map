@@ -31,7 +31,9 @@ def test_place_info_defaults() -> None:
 
 
 def test_representative_serialization() -> None:
-    r = Representative(id="1", name="Muster", party=PoliticalParty.SP, wahlkreis="Wahlkreis 4+5")
+    r = Representative(
+        id="1", name="Muster", party=PoliticalParty.SP, wahlkreis="Wahlkreis 4+5"
+    )
     assert r.model_dump()["party"] == "SP"
     assert r.proposals == []
 
@@ -42,7 +44,9 @@ def test_district_representatives_structure() -> None:
         postcode="8004",
         canton="ZH",
         representatives=[
-            Representative(id="1", name="A", party=PoliticalParty.FDP, wahlkreis="Wahlkreis 4+5"),
+            Representative(
+                id="1", name="A", party=PoliticalParty.FDP, wahlkreis="Wahlkreis 4+5"
+            ),
         ],
     )
     assert d.postcode == "8004"

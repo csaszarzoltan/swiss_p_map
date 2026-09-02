@@ -38,7 +38,9 @@ class TestMultiKantonPlace:
                         "results": [
                             {
                                 "layerBodId": "ch.are.gueteklassen_oev",
-                                "attributes": {"klasse_de": "A - sehr gute Erschliessung"},
+                                "attributes": {
+                                    "klasse_de": "A - sehr gute Erschliessung"
+                                },
                             }
                         ]
                     },

@@ -4,6 +4,8 @@ import { useTranslations } from "next-intl";
 import type { Baugesuch, DistrictRepresentatives, HazardAssessment, IsosAssessment, PlaceInfo, PropertyPriceAssessment, TaxComparison } from "@/lib/api";
 import type { Topic } from "./TopicSidebar";
 import StrategicP1P2Panel from "./StrategicP1P2Panel";
+import ParcelLookup from "./ParcelLookup";
+import ObjectionWorkspaceModal from "./ObjectionWorkspaceModal";
 
 interface DetailPanelProps {
   topic: Topic;
@@ -258,6 +260,9 @@ export default function DetailPanel({ topic, selectedId, result, summary, aiSumm
           <p className="mt-1 text-xs text-slate-400">{t("ort.oerebDesc")}</p>
         </div>
       )}
+
+      {showOerebDetail && <ParcelLookup postcode={p.postcode} />}
+      {showPlanungDetail && selectedBaugesuch && <ObjectionWorkspaceModal baugesuchId={selectedBaugesuch.id} />}
 
       {!showOverview && !showOrtDetail && !showPolitikDetail && !showPlanungDetail && !showSolarDetail && !showOerebDetail && (
         <p className="text-sm text-slate-400">{t("detail.selectHint")}</p>

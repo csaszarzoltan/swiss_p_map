@@ -14,7 +14,13 @@ from src.models.place import OeVGueteklasse, PlaceInfo
 
 
 def _mk_stub(
-    pc: str, muni: str, canton: str, steuer: float, noise: float, oev: OeVGueteklasse, gwr: int
+    pc: str,
+    muni: str,
+    canton: str,
+    steuer: float,
+    noise: float,
+    oev: OeVGueteklasse,
+    gwr: int,
 ) -> PlaceInfo:
     return PlaceInfo(
         postcode=pc,
@@ -64,7 +70,9 @@ API3_IDENTIFY = "https://api3.geo.admin.ch/rest/services/api/MapServer/identify"
 
 
 class HttpGetClient(Protocol):
-    async def get(self, url: str, params: dict[str, str | int | float] | None = None) -> httpx.Response: ...
+    async def get(
+        self, url: str, params: dict[str, str | int | float] | None = None
+    ) -> httpx.Response: ...
 
 
 def _parse_oev(results: list[dict[str, object]]) -> OeVGueteklasse:
@@ -119,7 +127,14 @@ def _parse_solar(results: list[dict[str, object]]) -> tuple[float | None, str | 
         props = props_raw if isinstance(props_raw, dict) else {}
         # BFE Sonnendach: mstrahlung (=kWh/m2) or stromertrag/flaeche derived
         kwh = None
-        for k in ("mstrahlung", "kwh_m2", "potential", "solar_potential", "strahlung", "kWh"):
+        for k in (
+            "mstrahlung",
+            "kwh_m2",
+            "potential",
+            "solar_potential",
+            "strahlung",
+            "kWh",
+        ):
             v = props.get(k)
             if isinstance(v, (int, float)):
                 kwh = float(v)
@@ -133,17 +148,29 @@ def _parse_solar(results: list[dict[str, object]]) -> tuple[float | None, str | 
         if kwh is None:
             strom = props.get("stromertrag")
             flaeche = props.get("flaeche")
-            if isinstance(strom, (int, float)) and isinstance(flaeche, (int, float)) and flaeche > 1:
-                kwh = round(float(strom) / float(flaeche) * 8.0, 1)  # ~ yield scaler; fallback to mstrahlung if present
+            if (
+                isinstance(strom, (int, float))
+                and isinstance(flaeche, (int, float))
+                and flaeche > 1
+            ):
+                kwh = round(
+                    float(strom) / float(flaeche) * 8.0, 1
+                )  # ~ yield scaler; fallback to mstrahlung if present
                 # Prefer mstrahlung if both exist
                 if isinstance(props.get("mstrahlung"), (int, float)):
                     kwh = float(props["mstrahlung"])
         if kwh is None:
             fl = props.get("flaeche_kollektoren")
             strom2 = props.get("waermeertrag")
-            if isinstance(fl, (int, float)) and fl > 1 and isinstance(strom2, (int, float)):
+            if (
+                isinstance(fl, (int, float))
+                and fl > 1
+                and isinstance(strom2, (int, float))
+            ):
                 kwh = round(float(strom2) / float(fl) * 2.5, 1)
-        label = str(props.get("label") or props.get("Label") or props.get("klasse") or "")
+        label = str(
+            props.get("label") or props.get("Label") or props.get("klasse") or ""
+        )
         # fallback: label „sehr gut (1200 kWh/m2)”
         if kwh is None:
             m2 = re.search(r"(\d{3,4})\s*kWh", label)
@@ -164,7 +191,11 @@ def _parse_solar(results: list[dict[str, object]]) -> tuple[float | None, str | 
                     klasse = kw
                     break
         # If we have mstrahlung/klasse from BFE, return even without label solar
-        has_signal = kwh is not None or klasse is not None or isinstance(props.get("mstrahlung"), (int, float))
+        has_signal = (
+            kwh is not None
+            or klasse is not None
+            or isinstance(props.get("mstrahlung"), (int, float))
+        )
         if has_signal or "solar" in label.lower() or "sonne" in label.lower():
             return kwh, klasse
     return None, None
@@ -241,7 +272,13 @@ class PlaceService:
         stub = _STUBS.get(postcode.strip())
         if stub is None:
             return None
-        lvl, reason = self._risk_for(stub, stub.steuerfuss_percent, stub.noise_db_day, stub.solar_kwh_m2, stub.oereb_zone)
+        lvl, reason = self._risk_for(
+            stub,
+            stub.steuerfuss_percent,
+            stub.noise_db_day,
+            stub.solar_kwh_m2,
+            stub.oereb_zone,
+        )
         if stub.risk_level is not None:
             return stub
         return stub.model_copy(update={"risk_level": lvl, "risk_reason": reason})
@@ -346,7 +383,7 @@ class PlaceService:
                     "VERSION": "2.0.0",
                     "REQUEST": "GetFeature",
                     "TYPENAMES": "ms:Nutzungsplanung",
-                    "BBOX": f"{easting},{northing},{easting+100},{northing+100},EPSG:2056",
+                    "BBOX": f"{easting},{northing},{easting + 100},{northing + 100},EPSG:2056",
                     "COUNT": 5,
                 },
             )
@@ -364,7 +401,9 @@ class PlaceService:
                     steuerfuss_src = parsed_src or "zh-steueramt-html"
 
         # ADR-020: risk scoring (deterministic, no upstream dependency)
-        risk_level, risk_reason = self._risk_for(base, steuerfuss, laerm, solar_kwh, oereb_zone)
+        risk_level, risk_reason = self._risk_for(
+            base, steuerfuss, laerm, solar_kwh, oereb_zone
+        )
 
         return PlaceInfo(
             postcode=code,
@@ -407,7 +446,11 @@ class PlaceService:
                 return "high", "Straßenlärm >70 dB — elevated noise exposure"
             if laerm_eff > 60:
                 return "medium", "Straßenlärm >60 dB — moderate noise exposure"
-        if solar_kwh is not None and solar_kwh >= 1200 and (laerm_eff is None or laerm_eff < 55):
+        if (
+            solar_kwh is not None
+            and solar_kwh >= 1200
+            and (laerm_eff is None or laerm_eff < 55)
+        ):
             return "low", "Sehr gut solar + quiet location"
         # Default: low when nothing elevated
         if laerm_eff is not None and laerm_eff >= 55:

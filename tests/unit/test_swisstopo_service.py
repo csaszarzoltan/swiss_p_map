@@ -64,7 +64,9 @@ async def test_swisstopo_search_skips_invalid_coords() -> None:
     mock_client = AsyncMock(spec=httpx.AsyncClient)
     mock_client.get.return_value = _mock_response(
         [
-            {"attrs": {"x": 1_000_000.0, "y": 1_200_000.0, "label": "bad"}},  # outside LV95
+            {
+                "attrs": {"x": 1_000_000.0, "y": 1_200_000.0, "label": "bad"}
+            },  # outside LV95
             {"attrs": ZH_HB_ATTRS},
         ]
     )

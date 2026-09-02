@@ -1,0 +1,3 @@
+"use client";
+import {useEffect,useState} from "react";
+export default function PwaStatus(){const [online,setOnline]=useState(true);useEffect(()=>{setOnline(navigator.onLine);const update=()=>setOnline(navigator.onLine);addEventListener("online",update);addEventListener("offline",update);if("serviceWorker" in navigator)void navigator.serviceWorker.register("/sw.js");return()=>{removeEventListener("online",update);removeEventListener("offline",update)}},[]);return <span role="status" aria-live="polite" className={`rounded px-2 py-1 text-xs ${online?"bg-emerald-500/20":"bg-amber-500/20"}`}>{online?"Online":"Offline · Cache"}</span>}

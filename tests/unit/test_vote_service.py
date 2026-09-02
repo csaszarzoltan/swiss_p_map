@@ -11,8 +11,32 @@ class TestVoteService:
         """Mind a 26 svájci kanton szerepel a BFS kód-leképezésben."""
         assert len(BFS_CANTON_MAP) == 26
         expected_cantons = {
-            "ZH", "BE", "LU", "UR", "SZ", "OW", "NW", "GL", "ZG", "FR", "SO", "BS", "BL",
-            "SH", "AR", "AI", "SG", "GR", "AG", "TG", "TI", "VD", "VS", "NE", "GE", "JU"
+            "ZH",
+            "BE",
+            "LU",
+            "UR",
+            "SZ",
+            "OW",
+            "NW",
+            "GL",
+            "ZG",
+            "FR",
+            "SO",
+            "BS",
+            "BL",
+            "SH",
+            "AR",
+            "AI",
+            "SG",
+            "GR",
+            "AG",
+            "TG",
+            "TI",
+            "VD",
+            "VS",
+            "NE",
+            "GE",
+            "JU",
         }
         assert set(BFS_CANTON_MAP.values()) == expected_cantons
 

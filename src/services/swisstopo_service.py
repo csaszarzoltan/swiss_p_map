@@ -74,7 +74,9 @@ class SwisstopoService:
                         wgs84=CoordinateWGS84(latitude=lat, longitude=lon),
                         lv95=CoordinateLV95(easting=x, northing=y),
                         canton=canton,
-                        municipality=label.split(",")[-1].strip() if "," in label else label,
+                        municipality=label.split(",")[-1].strip()
+                        if "," in label
+                        else label,
                         postcode=None,
                     )
                 )

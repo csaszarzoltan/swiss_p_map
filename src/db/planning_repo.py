@@ -167,7 +167,12 @@ class PlanningRepo:
         d_lon = (radius_m / 75_000.0) * 1.15
 
         ref = (on or date.today()).isoformat()  # noqa: DTZ011
-        where = ["lat IS NOT NULL", "lon IS NOT NULL", "lat BETWEEN ? AND ?", "lon BETWEEN ? AND ?"]
+        where = [
+            "lat IS NOT NULL",
+            "lon IS NOT NULL",
+            "lat BETWEEN ? AND ?",
+            "lon BETWEEN ? AND ?",
+        ]
         params: list[object] = [lat - d_lat, lat + d_lat, lon - d_lon, lon + d_lon]
 
         if active_only:

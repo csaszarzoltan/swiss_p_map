@@ -1,0 +1,2 @@
+"use client";
+export default function SourceTrustBadge({state,source,refreshedAt}:{state:"official_measurement"|"modeled_estimate"|"cadastral_registry";source:string;refreshedAt?:string}){const colors={official_measurement:"bg-emerald-500/20 text-emerald-200",modeled_estimate:"bg-amber-500/20 text-amber-200",cadastral_registry:"bg-purple-500/20 text-purple-200"};return <span title={`${source}${refreshedAt?` · ${refreshedAt}`:""}`} className={`inline-flex rounded-full px-2 py-1 text-[10px] font-bold ${colors[state]}`}>{state.replaceAll("_"," ")}</span>}

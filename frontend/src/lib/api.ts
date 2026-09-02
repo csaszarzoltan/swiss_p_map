@@ -81,7 +81,15 @@ async function getJson<T>(path: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+export interface DistrictComparison { postcode: string; municipality: string; steuerfuss_percent: number; price_chf_m2: number; noise_db_day: number; oev_class: string; school_count: number; solar_kwh_m2: number; }
+export interface MobilityAssessment { postcode: string; nearest_station: string; service_interval_min: number; intercity_connection: boolean; hubs: Array<{hub:string;minutes:number;zone:number}>; source: string; }
+export interface ParcelAssessment { postcode: string; parcel_nr: string; area_m2: number; zoning: string; source: string; official_url: string; trust_state: "cadastral_registry"; }
+
 export const api = {
+  districtComparison: (codes: string[]) => getJson<{items: DistrictComparison[]}>(`/api/v1/districts/compare?postcodes=${codes.join(",")}`),
+  mobility: (postcode: string) => getJson<MobilityAssessment>(`/api/v1/mobility/isochrones?postcode=${postcode}`),
+  parcel: (postcode: string, parcelNr: string) => getJson<ParcelAssessment>(`/api/v1/cadastre/parcel?postcode=${postcode}&parcel_nr=${encodeURIComponent(parcelNr)}`),
+  provenance: () => getJson<{items: Array<{id:string;source:string;trust_state:string;refreshed_at:string}>}>(`/api/v1/system/sources-provenance`),
   place: (postcode: string, live = true) =>
     getJson<PlaceInfo>(`/api/v1/place/${postcode}${live ? "?live=true" : ""}`),
   politics: (postcode: string, live = true) =>

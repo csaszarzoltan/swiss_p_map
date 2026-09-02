@@ -22,8 +22,13 @@ def test_spec_032_req_002_ac_002_tax_endpoint() -> None:
 
 
 def test_spec_035_req_003_ac_005_hazard_validation() -> None:
-    assert client.get("/api/v1/hazard/assessment?postcode=8004&lat=90&lon=8.5").status_code == 422
-    body = client.get("/api/v1/hazard/assessment?postcode=8004&lat=47.37&lon=8.52").json()
+    assert (
+        client.get("/api/v1/hazard/assessment?postcode=8004&lat=90&lon=8.5").status_code
+        == 422
+    )
+    body = client.get(
+        "/api/v1/hazard/assessment?postcode=8004&lat=47.37&lon=8.52"
+    ).json()
     assert body["quality_state"] == "indicative_model"
 
 

@@ -23,13 +23,19 @@ class PlaceInfo(BaseModel):
     postcode: str = Field(..., description="Swiss postcode (4 digits)")
     municipality: str
     canton: str
-    steuerfuss_percent: float | None = Field(None, ge=0, description="Gemeindesteuerfuss in %")
+    steuerfuss_percent: float | None = Field(
+        None, ge=0, description="Gemeindesteuerfuss in %"
+    )
     noise_db_day: float | None = Field(None, description="sonBASE day noise dB(A)")
     oev_class: OeVGueteklasse = OeVGueteklasse.NONE
     gwr_building_count: int | None = Field(None, ge=0)
-    solar_kwh_m2: float | None = Field(None, ge=0, description="Sonnendach kWh/m2 (BFE)")
+    solar_kwh_m2: float | None = Field(
+        None, ge=0, description="Sonnendach kWh/m2 (BFE)"
+    )
     solar_class: str | None = Field(None, description="Solar Eignung Klasse")
-    oereb_zone: str | None = Field(None, description="ÖREB Nutzungszone (W2, Kernzone...)")
+    oereb_zone: str | None = Field(
+        None, description="ÖREB Nutzungszone (W2, Kernzone...)"
+    )
     steuerfuss_source: str = Field("stub", description="stub|zh-ogd")
     risk_level: str | None = None
     risk_reason: str | None = None

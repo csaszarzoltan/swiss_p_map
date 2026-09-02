@@ -14,7 +14,9 @@ async def test_place_live_zh_steuerfuss_mock_returns_119_and_source() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         url = str(request.url)
         if "steuer" in url or "zh.ch" in url:
-            return httpx.Response(200, content=html.encode(), headers={"content-type": "text/html"})
+            return httpx.Response(
+                200, content=html.encode(), headers={"content-type": "text/html"}
+            )
         if "ch.are" in url or "gueteklassen" in url:
             return httpx.Response(200, json={"results": []})
         if "ch.bafu" in url:
@@ -40,6 +42,7 @@ async def test_place_live_zh_steuerfuss_mock_returns_119_and_source() -> None:
 @pytest.mark.asyncio
 async def test_place_live_zh_steuerfuss_500_fallback_stub() -> None:
     """zh.ch 500 → fallback stub 119.0 source stub."""
+
     def handler(request: httpx.Request) -> httpx.Response:
         url = str(request.url)
         if "steuer" in url or "zh.ch" in url:

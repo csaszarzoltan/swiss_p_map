@@ -11,23 +11,29 @@ from src.models.geo import CoordinateWGS84
 from src.services.ai_summary_service import AiSummaryService
 from src.services.air_quality_service import AirQualityService
 from src.services.building_energy_service import BuildingEnergyService
+from src.services.cadastral_service import CadastralService
 from src.services.connectivity_service import ConnectivityService
+from src.services.district_comparison_service import DistrictComparisonService
 from src.services.education_service import EducationService
 from src.services.geo_converter import lv95_to_wgs84
 from src.services.hazard_service import HazardService
 from src.services.healthcare_service import HealthcareService
 from src.services.isos_service import IsosService
 from src.services.microclimate_service import MicroclimateService
+from src.services.objection_workspace_service import (
+    ObjectionRequest,
+    ObjectionWorkspaceService,
+)
 from src.services.place_service import PlaceService
 from src.services.planning_service import PlanningService
 from src.services.politics_service import PoliticsService
 from src.services.property_price_service import PropertyPriceService
+from src.services.provenance_service import ProvenanceService
 from src.services.tax_service import TaxService
+from src.services.transit_mobility_service import TransitMobilityService
 from src.services.vote_service import VoteService
 
-_DEFAULT_CORS_ORIGINS = (
-    "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3310,http://127.0.0.1:3310,http://localhost:3410,http://127.0.0.1:3410"
-)
+_DEFAULT_CORS_ORIGINS = "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3310,http://127.0.0.1:3310,http://localhost:3410,http://127.0.0.1:3410"
 
 
 def _allowed_origins() -> list[str]:
@@ -56,6 +62,11 @@ _building_energy = BuildingEnergyService()
 _air_quality = AirQualityService()
 _healthcare = HealthcareService()
 _connectivity = ConnectivityService()
+_district_comparison = DistrictComparisonService()
+_transit_mobility = TransitMobilityService()
+_cadastral = CadastralService()
+_objection_workspace = ObjectionWorkspaceService()
+_provenance = ProvenanceService()
 _vote = VoteService()
 _property_prices = PropertyPriceService()
 _tax = TaxService()
@@ -260,13 +271,19 @@ def geo_convert(
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     wgs = CoordinateWGS84(latitude=lat, longitude=lon)
-    return {"wgs84": wgs.model_dump(), "lv95": {"easting": easting, "northing": northing}}
+    return {
+        "wgs84": wgs.model_dump(),
+        "lv95": {"easting": easting, "northing": northing},
+    }
 
 
 @app.get("/api/v1/politics/representatives")
 async def politics_representatives(
     postcode: str = Query(..., min_length=4, max_length=4),
-    live: bool = Query(default=False, description="Ha true, PARIS CQL élő lekérés (ADR-005); fallback stub"),
+    live: bool = Query(
+        default=False,
+        description="Ha true, PARIS CQL élő lekérés (ADR-005); fallback stub",
+    ),
 ) -> dict[str, object]:
     if live:
         data = await _politics.get_by_postcode_live(postcode)
@@ -302,7 +319,10 @@ def politics_vote_by_id(proposal_id: int) -> dict[str, object]:
 @app.get("/api/v1/place/{postcode}")
 async def place_info(
     postcode: str,
-    live: bool = Query(default=False, description="Ha true, api3 Identify élő (ARE/BAFU) + fallback stub (ADR-005)"),
+    live: bool = Query(
+        default=False,
+        description="Ha true, api3 Identify élő (ARE/BAFU) + fallback stub (ADR-005)",
+    ),
 ) -> dict[str, object]:
     if live:
         data = await _place.get_by_postcode_live(postcode)
@@ -327,11 +347,15 @@ def planning_baugesuche(
 def planning_radius(
     lat: float = Query(..., ge=45.0, le=48.0, description="WGS84 latitude"),
     lon: float = Query(..., ge=5.0, le=11.0, description="WGS84 longitude"),
-    radius_m: float = Query(default=1000.0, ge=50.0, le=50000.0, description="Search radius in meters"),
+    radius_m: float = Query(
+        default=1000.0, ge=50.0, le=50000.0, description="Search radius in meters"
+    ),
     active_only: bool = Query(default=True),
 ) -> dict[str, object]:
     """Térbeli sugárkeresés adott koordináta körül méterben (ADR-018)."""
-    items_with_dist = _planning.find_by_radius(lat=lat, lon=lon, radius_m=radius_m, active_only=active_only)
+    items_with_dist = _planning.find_by_radius(
+        lat=lat, lon=lon, radius_m=radius_m, active_only=active_only
+    )
     return {
         "count": len(items_with_dist),
         "radius_m": radius_m,
@@ -352,13 +376,19 @@ def planning_bbox(
 ) -> dict[str, object]:
     """Térképnézeti befoglaló téglalap lekérdezés (ADR-018)."""
     items = _planning.find_by_bbox(
-        min_lat=min_lat, min_lon=min_lon, max_lat=max_lat, max_lon=max_lon, active_only=active_only
+        min_lat=min_lat,
+        min_lon=min_lon,
+        max_lat=max_lat,
+        max_lon=max_lon,
+        active_only=active_only,
     )
     return {"count": len(items), "items": [b.model_dump(mode="json") for b in items]}
 
 
 @app.post("/api/v1/planning/refresh")
-async def planning_refresh(payload: dict[str, object] | None = None) -> dict[str, object]:
+async def planning_refresh(
+    payload: dict[str, object] | None = None,
+) -> dict[str, object]:
     canton = str((payload or {}).get("canton") or "ZH")
     try:
         count = await _planning.refresh(canton=canton)
@@ -368,7 +398,9 @@ async def planning_refresh(payload: dict[str, object] | None = None) -> dict[str
 
 
 @app.post("/api/v1/planning/backfill")
-async def planning_backfill(payload: dict[str, object] | None = None) -> dict[str, object]:
+async def planning_backfill(
+    payload: dict[str, object] | None = None,
+) -> dict[str, object]:
     _ = payload  # future: source filter
     try:
         count = await _planning.backfill_ogd()
@@ -382,8 +414,12 @@ async def ai_summary(payload: dict[str, object]) -> dict[str, str]:
     locale = str(payload.get("locale") or "de")
     postcode = str(payload.get("postcode") or "")
     place = payload.get("place") if isinstance(payload.get("place"), dict) else {}
-    politics = payload.get("politics") if isinstance(payload.get("politics"), dict) else {}
-    baugesuche = payload.get("baugesuche") if isinstance(payload.get("baugesuche"), list) else []
+    politics = (
+        payload.get("politics") if isinstance(payload.get("politics"), dict) else {}
+    )
+    baugesuche = (
+        payload.get("baugesuche") if isinstance(payload.get("baugesuche"), list) else []
+    )
     summary = await _ai.summarize(locale, postcode, place, politics, baugesuche)  # type: ignore[arg-type]
     if summary is None:
         raise HTTPException(status_code=502, detail="ai_unavailable")
@@ -429,36 +465,95 @@ def heritage_isos(
 
 
 @app.get("/api/v1/climate/microclimate")
-def climate_microclimate(postcode: str = Query(..., pattern=r"^\d{4}$"), canton: str = Query(..., pattern=r"^[A-Za-z]{2}$")) -> dict[str, object]:
+def climate_microclimate(
+    postcode: str = Query(..., pattern=r"^\d{4}$"),
+    canton: str = Query(..., pattern=r"^[A-Za-z]{2}$"),
+) -> dict[str, object]:
     """SPEC-037 REQ-001 AC-001."""
     return _microclimate.assess(postcode, canton).model_dump()
 
 
 @app.get("/api/v1/education/facilities")
-def education_facilities(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
+def education_facilities(
+    postcode: str = Query(..., pattern=r"^\d{4}$"),
+) -> dict[str, object]:
     """SPEC-038 REQ-001 AC-001."""
     return _education.facilities(postcode).model_dump()
 
 
 @app.get("/api/v1/energy/assessment")
-def energy_assessment(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
+def energy_assessment(
+    postcode: str = Query(..., pattern=r"^\d{4}$"),
+) -> dict[str, object]:
     """SPEC-043 REQ-001 AC-001."""
     return _building_energy.assess(postcode).model_dump()
 
 
 @app.get("/api/v1/environment/air-pollen")
-def environment_air_pollen(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
+def environment_air_pollen(
+    postcode: str = Query(..., pattern=r"^\d{4}$"),
+) -> dict[str, object]:
     """SPEC-040 REQ-001 AC-001."""
     return _air_quality.assess(postcode).model_dump()
 
 
 @app.get("/api/v1/healthcare/access")
-def healthcare_access(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
+def healthcare_access(
+    postcode: str = Query(..., pattern=r"^\d{4}$"),
+) -> dict[str, object]:
     """SPEC-041 REQ-001 AC-001."""
     return _healthcare.access(postcode).model_dump()
 
 
 @app.get("/api/v1/connectivity/status")
-def connectivity_status(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
+def connectivity_status(
+    postcode: str = Query(..., pattern=r"^\d{4}$"),
+) -> dict[str, object]:
     """SPEC-042 REQ-001 AC-001."""
     return _connectivity.status(postcode).model_dump()
+
+
+@app.get("/api/v1/districts/compare")
+def districts_compare(
+    postcodes: str = Query(..., min_length=9, max_length=24),
+) -> dict[str, object]:
+    """SPEC-028 REQ-001 AC-001 comparison matrix."""
+    codes = [item.strip() for item in postcodes.split(",") if item.strip()]
+    if not 2 <= len(codes) <= 4 or any(
+        len(code) != 4 or not code.isdigit() for code in codes
+    ):
+        raise HTTPException(
+            status_code=400, detail="postcodes must contain 2-4 Swiss postcodes"
+        )
+    items = _district_comparison.compare(codes)
+    return {"count": len(items), "items": [item.model_dump() for item in items]}
+
+
+@app.get("/api/v1/mobility/isochrones")
+def mobility_isochrones(
+    postcode: str = Query(..., pattern=r"^\d{4}$"),
+) -> dict[str, object]:
+    """SPEC-033 REQ-001 AC-001 SBB accessibility."""
+    return _transit_mobility.assess(postcode).model_dump()
+
+
+@app.get("/api/v1/cadastre/parcel")
+def cadastre_parcel(
+    postcode: str = Query(..., pattern=r"^\d{4}$"),
+    parcel_nr: str = Query(..., min_length=1, max_length=40),
+) -> dict[str, object]:
+    """SPEC-026 REQ-001 AC-001 public parcel lookup."""
+    return _cadastral.parcel(postcode, parcel_nr).model_dump()
+
+
+@app.post("/api/v1/objection/template")
+def objection_template(payload: ObjectionRequest) -> dict[str, object]:
+    """SPEC-039 REQ-001 AC-001 editable, non-legal draft."""
+    return _objection_workspace.create(payload).model_dump()
+
+
+@app.get("/api/v1/system/sources-provenance")
+def sources_provenance() -> dict[str, object]:
+    """SPEC-029 REQ-001 AC-001 trust matrix."""
+    items = _provenance.list_sources()
+    return {"count": len(items), "items": [item.model_dump() for item in items]}

@@ -4,20 +4,28 @@ from src.main import app
 
 client = TestClient(app)
 
+
 def test_health() -> None:
     r = client.get("/health")
     assert r.status_code == 200
     assert r.json()["status"] == "ok"
     assert r.json()["app"] == "swiss-p-map"
 
+
 def test_geo_convert_ok() -> None:
-    r = client.get("/api/v1/geo/convert", params={"easting": 2683100, "northing": 1248100})
+    r = client.get(
+        "/api/v1/geo/convert", params={"easting": 2683100, "northing": 1248100}
+    )
     assert r.status_code == 200
     assert abs(r.json()["wgs84"]["latitude"] - 47.378) < 0.01
 
+
 def test_geo_convert_bad_bounds() -> None:
-    r = client.get("/api/v1/geo/convert", params={"easting": 1000000, "northing": 1200000})
+    r = client.get(
+        "/api/v1/geo/convert", params={"easting": 1000000, "northing": 1200000}
+    )
     assert r.status_code == 400
+
 
 def test_politics_known_postcode() -> None:
     r = client.get("/api/v1/politics/representatives", params={"postcode": "8004"})
@@ -25,14 +33,17 @@ def test_politics_known_postcode() -> None:
     assert "Wahlkreis" in r.json()["district_name"]
     assert len(r.json()["representatives"]) > 0
 
+
 def test_politics_unknown_postcode() -> None:
     r = client.get("/api/v1/politics/representatives", params={"postcode": "9999"})
     assert r.status_code == 404
+
 
 def test_place_known_postcode() -> None:
     r = client.get("/api/v1/place/8004")
     assert r.status_code == 200
     assert r.json()["canton"] == "ZH"
+
 
 def test_place_unknown() -> None:
     r = client.get("/api/v1/place/9999")
@@ -42,7 +53,10 @@ def test_place_unknown() -> None:
 def test_cors_preflight() -> None:
     r = client.options(
         "/api/v1/place/8004",
-        headers={"Origin": "http://localhost:3000", "Access-Control-Request-Method": "GET"},
+        headers={
+            "Origin": "http://localhost:3000",
+            "Access-Control-Request-Method": "GET",
+        },
     )
     assert r.status_code in (200, 204)
     assert r.headers.get("access-control-allow-origin") == "http://localhost:3000"

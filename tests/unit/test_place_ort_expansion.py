@@ -18,24 +18,50 @@ async def test_place_live_8004_solar_and_oereb() -> None:
         if "ch.bfe.solarenergie" in layers:
             return httpx.Response(
                 200,
-                json={"results": [{"layerBodId": "ch.bfe.solarenergie-eignung-daecher",
-                                   "properties": {"kwh_m2": "1400", "klasse": "sehr gut"}}]},
+                json={
+                    "results": [
+                        {
+                            "layerBodId": "ch.bfe.solarenergie-eignung-daecher",
+                            "properties": {"kwh_m2": "1400", "klasse": "sehr gut"},
+                        }
+                    ]
+                },
             )
         if "OerebKataster" in url or "WFS" in url or "TYPENAMES" in str(params):
-            return httpx.Response(200, content=wfs_xml.encode(), headers={"content-type": "application/xml"})
+            return httpx.Response(
+                200,
+                content=wfs_xml.encode(),
+                headers={"content-type": "application/xml"},
+            )
         if "steuer" in url or "zh.ch" in url:
-            return httpx.Response(200, content=b"<html>Zuerrich 119 %</html>", headers={"content-type": "text/html"})
+            return httpx.Response(
+                200,
+                content=b"<html>Zuerrich 119 %</html>",
+                headers={"content-type": "text/html"},
+            )
         if "ch.are" in layers:
             return httpx.Response(
                 200,
-                json={"results": [{"layerBodId": "ch.are.gueteklassen_oev",
-                                   "properties": {"klasse": "A"}}]},
+                json={
+                    "results": [
+                        {
+                            "layerBodId": "ch.are.gueteklassen_oev",
+                            "properties": {"klasse": "A"},
+                        }
+                    ]
+                },
             )
         if "ch.bafu" in layers:
             return httpx.Response(
                 200,
-                json={"results": [{"layerBodId": "ch.bafu.larm-strassenlaerm_tag",
-                                   "properties": {"Lr_Tag": "65-70"}}]},
+                json={
+                    "results": [
+                        {
+                            "layerBodId": "ch.bafu.larm-strassenlaerm_tag",
+                            "properties": {"Lr_Tag": "65-70"},
+                        }
+                    ]
+                },
             )
         return httpx.Response(200, json={"results": []})
 

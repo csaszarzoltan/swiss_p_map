@@ -1,0 +1,3 @@
+"use client";
+import {useState} from "react";import SourceTrustBadge from "./SourceTrustBadge";
+export default function ParcelLookup({postcode}:{postcode:string}){const [nr,setNr]=useState("5120"),[data,setData]=useState<Record<string,unknown>|null>(null);async function load(){const b=process.env.NEXT_PUBLIC_API_URL??"http://127.0.0.1:8310";const r=await fetch(`${b}/api/v1/cadastre/parcel?postcode=${postcode}&parcel_nr=${encodeURIComponent(nr)}`);if(r.ok)setData(await r.json())}return <section><input aria-label="Parcel number" value={nr} onChange={e=>setNr(e.target.value)}/><button onClick={load}>Parzelle laden</button>{data&&<div><SourceTrustBadge state="cadastral_registry" source={String(data.source)}/><pre>{JSON.stringify(data,null,2)}</pre></div>}</section>}

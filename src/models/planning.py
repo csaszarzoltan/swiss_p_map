@@ -46,11 +46,19 @@ class Baugesuch(BaseModel):
         if self.auflage_start is None:
             object.__setattr__(self, "auflage_start", self.publication_date)
         if self.auflage_end is None:
-            object.__setattr__(self, "auflage_end", self.publication_date + timedelta(days=AUFLAGE_DAYS))
+            object.__setattr__(
+                self,
+                "auflage_end",
+                self.publication_date + timedelta(days=AUFLAGE_DAYS),
+            )
         if self.risk_level is None:
             # Rule-based automatic risk scoring (ADR-016)
             title_lower = self.title.lower()
-            if "aufstockung" in title_lower or "kernzone" in title_lower or "abbruch" in title_lower:
+            if (
+                "aufstockung" in title_lower
+                or "kernzone" in title_lower
+                or "abbruch" in title_lower
+            ):
                 object.__setattr__(self, "risk_level", "high")
             elif "neubau" in title_lower or "gewerbe" in title_lower:
                 object.__setattr__(self, "risk_level", "medium")

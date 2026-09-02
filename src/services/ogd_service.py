@@ -13,7 +13,9 @@ import httpx
 
 from src.models.planning import Baugesuch
 
-OGD_CSV_URL = "https://daten.statistik.zh.ch/ogd/daten/ressourcen/KTZH_00002982_00006183.csv"
+OGD_CSV_URL = (
+    "https://daten.statistik.zh.ch/ogd/daten/ressourcen/KTZH_00002982_00006183.csv"
+)
 
 
 def _parse_date(s: str) -> date | None:
@@ -35,13 +37,19 @@ def _row_to_bg(row: dict[str, str]) -> Baugesuch | None:
         title = (row.get("projectLocation_address_street") or "").strip().strip('"')
     if not title:
         return None
-    postcode = (row.get("projectLocation_address_swissZipCode") or "").strip().strip('"')
+    postcode = (
+        (row.get("projectLocation_address_swissZipCode") or "").strip().strip('"')
+    )
     postcode = "".join(ch for ch in postcode if ch.isdigit())[:4]
     if len(postcode) != 4:
         # fallback: bfs -> no join, skip if no PLZ
         return None
     postcode = postcode.zfill(4)
-    municipality = (row.get("municipality_name") or row.get("projectLocation_address_town") or "").strip().strip('"')
+    municipality = (
+        (row.get("municipality_name") or row.get("projectLocation_address_town") or "")
+        .strip()
+        .strip('"')
+    )
     if not municipality:
         municipality = "Zürich"
     pub = _parse_date(row.get("publicationDate") or "")
@@ -83,7 +91,9 @@ def _row_to_bg(row: dict[str, str]) -> Baugesuch | None:
 class OgdService:
     """OGD CSV fetcher — DI httpx."""
 
-    def __init__(self, client: httpx.AsyncClient | None = None, url: str = OGD_CSV_URL) -> None:
+    def __init__(
+        self, client: httpx.AsyncClient | None = None, url: str = OGD_CSV_URL
+    ) -> None:
         self._client = client
         self._url = url
 

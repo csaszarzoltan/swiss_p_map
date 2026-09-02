@@ -9,8 +9,13 @@ from src.services.tax_service import TaxService
 def test_spec_034_req_001_ac_001_property_segments_and_source() -> None:
     result = PropertyPriceService().get_assessment("ZH", "8004")
     assert result.source == "BFS/FSO IMPI (Immobilienpreisindex)"
-    assert {x.segment for x in result.segments} == {"single_family_house", "condominium"}
-    assert all(x.average_price_chf_m2 > 0 and x.quarterly_index > 0 for x in result.segments)
+    assert {x.segment for x in result.segments} == {
+        "single_family_house",
+        "condominium",
+    }
+    assert all(
+        x.average_price_chf_m2 > 0 and x.quarterly_index > 0 for x in result.segments
+    )
 
 
 def test_spec_032_req_001_ac_001_tax_all_cantons_ranked() -> None:

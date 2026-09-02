@@ -53,7 +53,10 @@ async def test_planning_service_refresh_mock() -> None:
     from src.db.planning_repo import PlanningRepo
     from src.services.planning_service import PlanningService
 
-    svc = PlanningService(fetcher=AmtsblattService(client=mock_client), repo=PlanningRepo(db_path=":memory:"))
+    svc = PlanningService(
+        fetcher=AmtsblattService(client=mock_client),
+        repo=PlanningRepo(db_path=":memory:"),
+    )
     count = await svc.refresh(canton="ZH")
     assert count >= 1
     # publication_date is tomorrow (2026-08-27 vs today 2026-08-26) — active_only=True would filter it out

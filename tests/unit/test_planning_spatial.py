@@ -17,7 +17,9 @@ class TestPlanningSpatial:
         """A /api/v1/planning/radius végpont távolság szerint növekvő listát ad."""
         client = TestClient(app)
         # Search around Zürich Aussersihl 8004 (47.388, 8.523) with 2000m radius
-        resp = client.get("/api/v1/planning/radius?lat=47.388&lon=8.523&radius_m=2000&active_only=false")
+        resp = client.get(
+            "/api/v1/planning/radius?lat=47.388&lon=8.523&radius_m=2000&active_only=false"
+        )
         assert resp.status_code == 200
         data = resp.json()
         assert data["count"] > 0
@@ -33,7 +35,9 @@ class TestPlanningSpatial:
         """A /api/v1/planning/bbox végpont Zürich régióban működik."""
         client = TestClient(app)
         # Search bounding box around Zürich Aussersihl (lat ~47.37..47.39, lon ~8.51..8.53)
-        resp = client.get("/api/v1/planning/bbox?min_lat=47.37&max_lat=47.39&min_lon=8.51&max_lon=8.53&active_only=false")
+        resp = client.get(
+            "/api/v1/planning/bbox?min_lat=47.37&max_lat=47.39&min_lon=8.51&max_lon=8.53&active_only=false"
+        )
         assert resp.status_code == 200
         data = resp.json()
         assert data["count"] > 0
@@ -45,6 +49,8 @@ class TestPlanningSpatial:
         """Távoli területen a bbox üres találatot ad."""
         client = TestClient(app)
         # Lugano (Tessin) — nincs ott adat
-        resp = client.get("/api/v1/planning/bbox?min_lat=45.99&max_lat=46.01&min_lon=8.94&max_lon=8.96&active_only=false")
+        resp = client.get(
+            "/api/v1/planning/bbox?min_lat=45.99&max_lat=46.01&min_lon=8.94&max_lon=8.96&active_only=false"
+        )
         assert resp.status_code == 200
         assert resp.json()["count"] == 0

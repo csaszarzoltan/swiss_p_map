@@ -23,8 +23,10 @@ class IsosAssessment(BaseModel):
 
 
 _SITES: dict[str, tuple[str, Literal["ISOS I", "ISOS II"]]] = {
-    "8001": ("Zürich Altstadt", "ISOS I"), "3011": ("Bern Altstadt", "ISOS I"),
-    "4001": ("Basel Altstadt", "ISOS I"), "1201": ("Genève centre", "ISOS II"),
+    "8001": ("Zürich Altstadt", "ISOS I"),
+    "3011": ("Bern Altstadt", "ISOS I"),
+    "4001": ("Basel Altstadt", "ISOS I"),
+    "1201": ("Genève centre", "ISOS II"),
     "6003": ("Luzern historische Stadt", "ISOS I"),
 }
 
@@ -35,10 +37,19 @@ class IsosService:
     def assess(self, postcode: str) -> IsosAssessment:
         site = _SITES.get(postcode)
         if site is None:
-            return IsosAssessment(postcode=postcode, protected=False, classification=None, site_name=None, delay_risk="low")
+            return IsosAssessment(
+                postcode=postcode,
+                protected=False,
+                classification=None,
+                site_name=None,
+                delay_risk="low",
+            )
         name, classification = site
         return IsosAssessment(
-            postcode=postcode, protected=True, classification=classification, site_name=name,
+            postcode=postcode,
+            protected=True,
+            classification=classification,
+            site_name=name,
             delay_risk="high" if classification == "ISOS I" else "medium",
             official_document_url=SOURCE_URL,
         )

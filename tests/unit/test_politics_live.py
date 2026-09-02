@@ -19,7 +19,9 @@ async def test_politics_paris_live_mock_8004() -> None:
 
     def handler(request: httpx.Request) -> httpx.Response:
         assert "kontakt" in str(request.url)
-        return httpx.Response(200, content=xml.encode(), headers={"content-type": "application/xml"})
+        return httpx.Response(
+            200, content=xml.encode(), headers={"content-type": "application/xml"}
+        )
 
     transport = httpx.MockTransport(handler)
     async with httpx.AsyncClient(transport=transport) as client:

@@ -20,9 +20,13 @@ def lv95_to_wgs84(easting: float, northing: float) -> tuple[float, float]:
     Raises ValueError if coordinates are outside valid Swiss bounds.
     """
     if not (EASTING_MIN <= easting <= EASTING_MAX):
-        raise ValueError(f"easting {easting} outside LV95 bounds [{EASTING_MIN}, {EASTING_MAX}]")
+        raise ValueError(
+            f"easting {easting} outside LV95 bounds [{EASTING_MIN}, {EASTING_MAX}]"
+        )
     if not (NORTHING_MIN <= northing <= NORTHING_MAX):
-        raise ValueError(f"northing {northing} outside LV95 bounds [{NORTHING_MIN}, {NORTHING_MAX}]")
+        raise ValueError(
+            f"northing {northing} outside LV95 bounds [{NORTHING_MIN}, {NORTHING_MAX}]"
+        )
 
     y_aux = (easting - 2_600_000.0) / 1_000_000.0
     x_aux = (northing - 1_200_000.0) / 1_000_000.0
@@ -49,7 +53,9 @@ def lv95_to_wgs84(easting: float, northing: float) -> tuple[float, float]:
 
 def is_valid_lv95(easting: float, northing: float) -> bool:
     """Return True if the LV95 coordinate is within valid Swiss bounds."""
-    return (EASTING_MIN <= easting <= EASTING_MAX) and (NORTHING_MIN <= northing <= NORTHING_MAX)
+    return (EASTING_MIN <= easting <= EASTING_MAX) and (
+        NORTHING_MIN <= northing <= NORTHING_MAX
+    )
 
 
 def haversine_distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:

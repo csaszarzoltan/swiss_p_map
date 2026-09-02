@@ -6,7 +6,9 @@ from src.db.planning_repo import PlanningRepo
 from src.models.planning import Baugesuch
 
 
-def _sample(id_: str = "test-1", postcode: str = "8004", pub: date = date(2026, 8, 20)) -> Baugesuch:
+def _sample(
+    id_: str = "test-1", postcode: str = "8004", pub: date = date(2026, 8, 20)
+) -> Baugesuch:
     return Baugesuch(
         id=id_,
         title="Neubau Test",

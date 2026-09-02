@@ -26,7 +26,9 @@ class HazardAssessment(BaseModel):
     source: str = SOURCE
     source_url: str = SOURCE_URL
     quality_state: Literal["indicative_model"] = "indicative_model"
-    disclaimer: str = "Indicative screening only; absence of data does not prove absence of hazard."
+    disclaimer: str = (
+        "Indicative screening only; absence of data does not prove absence of hazard."
+    )
 
 
 class HazardService:
@@ -38,9 +40,26 @@ class HazardService:
         water_corridor = 7.4 <= lon <= 8.7 and 46.9 <= lat <= 47.7
         hazards: list[HazardItem] = []
         if water_corridor:
-            hazards.extend([HazardItem(hazard_type="surface_runoff", risk_level="medium"), HazardItem(hazard_type="flood", risk_level="low")])
+            hazards.extend(
+                [
+                    HazardItem(hazard_type="surface_runoff", risk_level="medium"),
+                    HazardItem(hazard_type="flood", risk_level="low"),
+                ]
+            )
         if alpine:
-            hazards.extend([HazardItem(hazard_type="avalanche", risk_level="high"), HazardItem(hazard_type="landslide", risk_level="medium")])
+            hazards.extend(
+                [
+                    HazardItem(hazard_type="avalanche", risk_level="high"),
+                    HazardItem(hazard_type="landslide", risk_level="medium"),
+                ]
+            )
         order: dict[Risk, int] = {"none": 0, "low": 1, "medium": 2, "high": 3}
-        overall: Risk = max((h.risk_level for h in hazards), key=order.get, default="none")  # type: ignore[arg-type]
-        return HazardAssessment(postcode=postcode, lat=lat, lon=lon, risk_level=overall, hazards=hazards)
+        overall: Risk = max(
+            (h.risk_level for h in hazards),
+            key=lambda r: order.get(r, 0),
+            default="none",
+        )
+        return HazardAssessment(
+            postcode=postcode, lat=lat, lon=lon, risk_level=overall, hazards=hazards
+        )
+

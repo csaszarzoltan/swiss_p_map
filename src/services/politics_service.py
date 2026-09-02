@@ -144,7 +144,9 @@ PARIS_BASE = "https://www.gemeinderat-zuerich.ch/api"
 
 
 class HttpGetClient(Protocol):
-    async def get(self, url: str, params: dict[str, str | int] | None = None) -> httpx.Response: ...
+    async def get(
+        self, url: str, params: dict[str, str | int] | None = None
+    ) -> httpx.Response: ...
 
 
 def _parse_party(raw: str) -> PoliticalParty:
@@ -157,7 +159,9 @@ def _parse_party(raw: str) -> PoliticalParty:
 
 def _extract_block_field(block: str, key: str) -> str:
     """Toleráns: Wahlkreis=4, Wahlkreis>4, \"Wahlkreis\" : \"4\"."""
-    m = re.search(rf"{re.escape(key)}\s*[=:>]\s*\"?([^\"<\s]+)\"?", block, re.IGNORECASE)
+    m = re.search(
+        rf"{re.escape(key)}\s*[=:>]\s*\"?([^\"<\s]+)\"?", block, re.IGNORECASE
+    )
     if m:
         return m.group(1).strip().strip('">')
     # fallback: >value<
@@ -177,11 +181,17 @@ def _extract_name(block: str) -> str:
 def _parse_paris_kontakte(xml_text: str) -> list[Representative]:
     reps: list[Representative] = []
     # tolerant: find each Kontakt block (any ns)
-    blocks = re.findall(r"<[^>]*Kontakt[^>]*>(.*?)</[^>]*Kontakt[^>]*>", xml_text, re.DOTALL | re.IGNORECASE)
+    blocks = re.findall(
+        r"<[^>]*Kontakt[^>]*>(.*?)</[^>]*Kontakt[^>]*>",
+        xml_text,
+        re.DOTALL | re.IGNORECASE,
+    )
     if not blocks:
         # fallback: try ET parse for strict XML
         try:
-            root = ET.fromstring(xml_text.encode() if isinstance(xml_text, str) else xml_text)
+            root = ET.fromstring(
+                xml_text.encode() if isinstance(xml_text, str) else xml_text
+            )
             for el in root.iter():
                 tag = el.tag.split("}", 1)[-1] if "}" in el.tag else el.tag
                 if tag.lower() == "kontakt":
@@ -195,8 +205,16 @@ def _parse_paris_kontakte(xml_text: str) -> list[Representative]:
             name = _extract_name(block)
             if not name:
                 continue
-            wahl = _extract_block_field(block, "Wahlkreis") or _extract_block_field(block, "Wohnkreis") or "?"
-            party_raw = _extract_block_field(block, "Partei") or _extract_block_field(block, "Fraktion") or "Other"
+            wahl = (
+                _extract_block_field(block, "Wahlkreis")
+                or _extract_block_field(block, "Wohnkreis")
+                or "?"
+            )
+            party_raw = (
+                _extract_block_field(block, "Partei")
+                or _extract_block_field(block, "Fraktion")
+                or "Other"
+            )
             reps.append(
                 Representative(
                     id=str(rid),
@@ -232,7 +250,9 @@ class PoliticsService:
     def list_postcodes(self) -> list[str]:
         return sorted(_STUBS.keys())
 
-    async def get_by_postcode_live(self, postcode: str) -> DistrictRepresentatives | None:
+    async def get_by_postcode_live(
+        self, postcode: str
+    ) -> DistrictRepresentatives | None:
         """Live: postcode → Wahlkreis → PARIS kontakt searchdetails.
 
         Returns DistrictRepresentatives or fallback STUB; [] on hard error.

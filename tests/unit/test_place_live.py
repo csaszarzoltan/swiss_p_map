@@ -20,12 +20,26 @@ async def test_place_live_8004_ov_a_and_laerm() -> None:
         if "ch.are.gueteklassen_oev" in layers or "ch.are" in url:
             return httpx.Response(
                 200,
-                json={"results": [{"layerBodId": "ch.are.gueteklassen_oev", "properties": {"klasse": "A", "label": "A – sehr gut"}}]},
+                json={
+                    "results": [
+                        {
+                            "layerBodId": "ch.are.gueteklassen_oev",
+                            "properties": {"klasse": "A", "label": "A – sehr gut"},
+                        }
+                    ]
+                },
             )
         if "ch.bafu.larm" in layers or "ch.bafu" in url or "larm" in url.lower():
             return httpx.Response(
                 200,
-                json={"results": [{"layerBodId": "ch.bafu.larm-strassenlaerm_tag", "properties": {"Lr_Tag": "65-70", "label": "65-70 dB"}}]},
+                json={
+                    "results": [
+                        {
+                            "layerBodId": "ch.bafu.larm-strassenlaerm_tag",
+                            "properties": {"Lr_Tag": "65-70", "label": "65-70 dB"},
+                        }
+                    ]
+                },
             )
         # fallback: empty
         return httpx.Response(200, json={"results": []})

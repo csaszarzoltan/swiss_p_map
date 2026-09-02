@@ -12,6 +12,8 @@ import MapLegend from "@/components/MapLegend";
 import RiskBadge from "@/components/RiskBadge";
 import WatchZone from "@/components/WatchZone";
 import ShareButton from "@/components/ShareButton";
+import PwaStatus from "@/components/PwaStatus";
+import FinalRoadmapTools from "@/components/FinalRoadmapTools";
 import { parseShareableState, useShareableState } from "@/hooks/useShareableState";
 import { api } from "@/lib/api";
 import type { Baugesuch, DistrictRepresentatives, HazardAssessment, IsosAssessment, PlaceInfo, PropertyPriceAssessment, TaxComparison } from "@/lib/api";
@@ -213,7 +215,7 @@ export default function Home() {
   const selectedBaugesuch = selectedId ? (result?.baugesuche ?? []).find((b) => b.id === selectedId) : null;
 
   return (
-    <main className="min-h-screen bg-[#030712] text-slate-100 selection:bg-sky-500 selection:text-white">
+    <><a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:z-[100] focus:bg-white focus:p-3 focus:text-black">Skip to content</a><main id="main-content" className="min-h-screen bg-[#030712] text-slate-100 selection:bg-sky-500 selection:text-white">
       {/* Floating Glassmorphic Header */}
       <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl shadow-xl shadow-black/40">
         <div className="mx-auto flex max-w-[1440px] flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
@@ -235,7 +237,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <SearchPanel onResult={handleResult} />
             <div className="flex justify-end pt-1 sm:pt-0">
-              <LanguageSwitcher />
+              <PwaStatus /><LanguageSwitcher />
             </div>
           </div>
         </div>
@@ -297,6 +299,8 @@ export default function Home() {
             />
           </div>
 
+          {result?.place && <FinalRoadmapTools postcode={result.place.postcode} />}
+
           <DetailPanel topic={activeTopic} selectedId={selectedId} result={result} summary={summary} aiSummary={aiSummary} strategicP1P2={strategicP1P2} />
         </div>
       </div>
@@ -304,6 +308,6 @@ export default function Home() {
       <footer className="mx-auto max-w-[1440px] px-6 py-6 text-center text-xs text-slate-500">
         <p>{t("footer")}</p>
       </footer>
-    </main>
+    </main></>
   );
 }

@@ -15,8 +15,12 @@ class CoordinateWGS84(BaseModel):
 class CoordinateLV95(BaseModel):
     """Swiss LV95 coordinate (EPSG:2056)."""
 
-    easting: float = Field(..., ge=2_400_000.0, le=2_900_000.0, description="LV95 easting (E)")
-    northing: float = Field(..., ge=1_050_000.0, le=1_350_000.0, description="LV95 northing (N)")
+    easting: float = Field(
+        ..., ge=2_400_000.0, le=2_900_000.0, description="LV95 easting (E)"
+    )
+    northing: float = Field(
+        ..., ge=1_050_000.0, le=1_350_000.0, description="LV95 northing (N)"
+    )
 
 
 class AddressSearchResult(BaseModel):
