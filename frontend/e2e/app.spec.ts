@@ -119,6 +119,6 @@ test.describe("Swiss P Map — felületi E2E (ADR-003 3D + ADR-004 i18n + ADR-01
     await page.waitForTimeout(2000);
     await page.getByTestId("menu-planung").click();
     await page.waitForTimeout(1000);
-    await expect(page.getByText("Bern")).toBeVisible();
+    await expect(page.getByText("Bern").first()).toBeVisible();
   });
 });
