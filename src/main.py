@@ -19,6 +19,7 @@ from src.services.geo_converter import lv95_to_wgs84
 from src.services.hazard_service import HazardService
 from src.services.healthcare_service import HealthcareService
 from src.services.isos_service import IsosService
+from src.services.local_information_service import LocalInformationService
 from src.services.microclimate_service import MicroclimateService
 from src.services.objection_workspace_service import (
     ObjectionRequest,
@@ -72,6 +73,7 @@ _property_prices = PropertyPriceService()
 _tax = TaxService()
 _hazard = HazardService()
 _isos = IsosService()
+_local_information = LocalInformationService()
 # Demo seed — amíg nincs napi Amtsblatt poll, 8004-en legyen aktív Baugesuch a bemutatóhoz
 try:
     from datetime import date as _d
@@ -557,3 +559,9 @@ def sources_provenance() -> dict[str, object]:
     """SPEC-029 REQ-001 AC-001 trust matrix."""
     items = _provenance.list_sources()
     return {"count": len(items), "items": [item.model_dump() for item in items]}
+
+
+@app.get("/api/v1/local/briefing")
+def local_briefing(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
+    """Resident-first information hub; the map is an optional analysis layer."""
+    return _local_information.briefing(postcode).model_dump()

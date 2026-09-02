@@ -62,4 +62,3 @@ class HazardService:
         return HazardAssessment(
             postcode=postcode, lat=lat, lon=lon, risk_level=overall, hazards=hazards
         )
-

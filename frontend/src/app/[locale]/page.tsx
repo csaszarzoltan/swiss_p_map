@@ -14,6 +14,7 @@ import WatchZone from "@/components/WatchZone";
 import ShareButton from "@/components/ShareButton";
 import PwaStatus from "@/components/PwaStatus";
 import FinalRoadmapTools from "@/components/FinalRoadmapTools";
+import LocalInformationHub from "@/components/LocalInformationHub";
 import { parseShareableState, useShareableState } from "@/hooks/useShareableState";
 import { api } from "@/lib/api";
 import type { Baugesuch, DistrictRepresentatives, HazardAssessment, IsosAssessment, PlaceInfo, PropertyPriceAssessment, TaxComparison } from "@/lib/api";
@@ -258,6 +259,17 @@ export default function Home() {
         </div>
       </div>
 
+      <div className="mx-auto max-w-[1440px] px-4 py-5 sm:px-6">
+        <LocalInformationHub postcode={result?.place?.postcode} onOpenMap={(layer) => {
+          const topic = layer === "politics" ? "politik" : layer === "planning" ? "planung" : layer === "price" || layer === "environment" || layer === "weather" || layer === "mobility" ? "ort" : "overview";
+          setActiveTopic(topic);
+          document.querySelector('[data-testid="map-3d"]')?.scrollIntoView({behavior:"smooth",block:"center"});
+        }} />
+      </div>
+
+      <div className="mx-auto max-w-[1600px] px-2 sm:px-4">
+        <details className="rounded-2xl border border-white/10 bg-slate-950/40">
+          <summary className="cursor-pointer px-4 py-3 text-sm font-bold text-slate-300">Räumliche Analyse und Karte</summary>
       {/* 3D Térkép Konténer */}
       <div className="mx-auto w-full max-w-[1600px] px-2 sm:px-4 py-2 sm:py-3">
         <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-white/10 bg-slate-950/60 shadow-2xl shadow-black/80">
@@ -268,6 +280,9 @@ export default function Home() {
           />
           <MapLegend activeTopic={activeTopic} />
         </div>
+      </div>
+
+        </details>
       </div>
 
       {/* Lista + Részletező — Tiszta Swiss Card szekciók */}
