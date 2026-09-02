@@ -62,3 +62,15 @@ Az RVAD 1.1 szerinti, fejlesztésre kész feature-specifikációk katalógusa.
 - [SPEC-048](SPEC-048-svajci-idojaras-riasztasok-es-klimatendenciak.md): Svájci Időjárás, Élő Riasztások és CH2025 Klímatendenciák Központ
 - [SPEC-049](SPEC-049-svajci-lakhatasi-es-megelhetesi-koltsegkalkulator.md): Svájci Lakhatási és Megélhetési Költségkalkulátor
 - [SPEC-050](SPEC-050-svajci-onkormanyzati-ugyintezes-es-hulladeknaptar.md): Svájci Önkormányzati Ügyintézés és Hulladéknaptár
+
+## Phase 3 Civic Intelligence (SPEC-051..060)
+- [SPEC-051](SPEC-051-interaktiv-szavazasi-vizualizacios-ui-kartyak.md)
+- [SPEC-052](SPEC-052-svajci-idojarasi-riasztasi-es-vizwidget.md)
+- [SPEC-053](SPEC-053-vizualis-svajci-hulladeknaptar-es-ical.md)
+- [SPEC-054](SPEC-054-dinamikus-megelhetesi-koltsegkalkulator-ui.md)
+- [SPEC-055](SPEC-055-elo-meteoswiss-ogd-es-riasztasi-konnektor.md)
+- [SPEC-056](SPEC-056-elo-bfs-voteinfo-szavazasi-konnektor.md)
+- [SPEC-057](SPEC-057-elo-sbb-opendata-menetrendi-konnektor.md)
+- [SPEC-058](SPEC-058-kantonalis-amtsblatt-hirfolyam-aggregator.md)
+- [SPEC-059](SPEC-059-heti-korzeti-ertesito-es-hirlevel.md)
+- [SPEC-060](SPEC-060-web-push-es-figyelesi-zona-riasztas.md)

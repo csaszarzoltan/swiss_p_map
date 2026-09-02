@@ -1,0 +1,2 @@
+"use client";
+export default function WeatherVisualWidget(){return <article className="rounded-2xl border border-white/10 p-4"><h3 className="font-bold">MeteoSwiss</h3><div className="mt-3 flex gap-2">{[21,22,19,18,20,23,24].map((x,i)=><div key={i} className="rounded bg-slate-800 p-2 text-xs">{x}°</div>)}</div><div role="status" className="mt-3 rounded bg-amber-500/20 p-2">Warnstufe 2 / 5</div><p className="mt-2">Zürichsee 22.4 °C</p></article>}

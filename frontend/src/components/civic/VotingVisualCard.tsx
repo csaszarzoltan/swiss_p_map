@@ -1,0 +1,2 @@
+"use client";
+export default function VotingVisualCard(){return <article className="rounded-2xl border border-white/10 p-4"><h3 className="font-bold">Abstimmungen</h3><div aria-label="Yes 52 percent" className="mt-3 h-3 overflow-hidden rounded bg-rose-500"><div className="h-full w-[52%] bg-sky-500"/></div><details className="mt-3"><summary>Pro / Contra</summary><div className="grid grid-cols-2 gap-3 text-sm"><p>Pro: offizielle Argumente</p><p>Contra: offizielle Argumente</p></div></details><p className="mt-2 text-xs">Umfrage N=1200 · ±2.8%</p></article>}

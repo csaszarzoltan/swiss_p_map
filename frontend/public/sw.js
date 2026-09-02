@@ -1,1 +1,3 @@
 const CACHE="swiss-p-map-v1";self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(["/de","/manifest.json"]))));self.addEventListener("fetch",e=>{if(e.request.method!=="GET")return;e.respondWith(fetch(e.request).then(r=>{const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));return r}).catch(()=>caches.match(e.request).then(r=>r||caches.match("/de"))))});
+
+self.addEventListener("push",event=>{const data=event.data?event.data.json():{title:"Swiss P Map",body:"Neue Meldung"};event.waitUntil(self.registration.showNotification(data.title,{body:data.body,data:data.url||"/de"}))});self.addEventListener("notificationclick",event=>{event.notification.close();event.waitUntil(clients.openWindow(event.notification.data||"/de"))});

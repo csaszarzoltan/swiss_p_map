@@ -13,6 +13,10 @@ from src.services.air_quality_service import AirQualityService
 from src.services.building_energy_service import BuildingEnergyService
 from src.services.cadastral_service import CadastralService
 from src.services.connectivity_service import ConnectivityService
+from src.services.connectors.amtsblatt_news_pipeline import AmtsblattNewsPipeline
+from src.services.connectors.bfs_voteinfo_client import BfsVoteInfoClient
+from src.services.connectors.meteoswiss_client import MeteoSwissClient
+from src.services.connectors.sbb_transport_client import SbbTransportClient
 from src.services.cost_of_living_service import CostOfLivingService
 from src.services.district_comparison_service import DistrictComparisonService
 from src.services.education_service import EducationService
@@ -24,6 +28,7 @@ from src.services.local_information_service import LocalInformationService
 from src.services.local_news_service import LocalNewsService
 from src.services.microclimate_service import MicroclimateService
 from src.services.municipal_service import MunicipalService
+from src.services.newsletter_service import NewsletterService, SubscribeRequest
 from src.services.objection_workspace_service import (
     ObjectionRequest,
     ObjectionWorkspaceService,
@@ -38,6 +43,7 @@ from src.services.transit_mobility_service import TransitMobilityService
 from src.services.vote_analysis_service import VoteAnalysisService
 from src.services.vote_service import VoteService
 from src.services.weather_climate_service import WeatherClimateService
+from src.services.web_push_service import PushSubscription, WatchAlert, WebPushService
 
 _DEFAULT_CORS_ORIGINS = "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3310,http://127.0.0.1:3310,http://localhost:3410,http://127.0.0.1:3410"
 
@@ -84,6 +90,12 @@ _local_news = LocalNewsService()
 _weather = WeatherClimateService()
 _costs = CostOfLivingService()
 _municipal = MunicipalService()
+_meteo_connector = MeteoSwissClient()
+_voteinfo_connector = BfsVoteInfoClient()
+_sbb_connector = SbbTransportClient()
+_amtsblatt_pipeline = AmtsblattNewsPipeline()
+_newsletter = NewsletterService()
+_web_push = WebPushService()
 # Demo seed — amíg nincs napi Amtsblatt poll, 8004-en legyen aktív Baugesuch a bemutatóhoz
 try:
     from datetime import date as _d
@@ -626,3 +638,61 @@ def civic_waste(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, obj
 @app.get("/api/v1/municipal/water-quality")
 def civic_quality(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
     return _municipal.water(postcode).model_dump()
+
+
+@app.get("/api/v1/connectors/meteoswiss/current")
+def connector_meteo(station: str = Query("ZUE")) -> dict[str, object]:
+    return _meteo_connector.current(station).model_dump()
+
+
+@app.post("/api/v1/connectors/voteinfo/sync")
+def connector_voteinfo_sync() -> dict[str, object]:
+    return _voteinfo_connector.sync().model_dump()
+
+
+@app.get("/api/v1/transport/departures")
+def transport_departures(
+    station: str = Query(..., min_length=2, max_length=100),
+) -> dict[str, object]:
+    return {"items": [x.model_dump() for x in _sbb_connector.departures(station)]}
+
+
+@app.get("/api/v1/transport/hubs")
+def transport_hubs() -> dict[str, object]:
+    return {"items": ["Zürich HB", "Bern", "Basel SBB", "Genève"]}
+
+
+@app.post("/api/v1/connectors/amtsblatt/ingest")
+def amtsblatt_ingest() -> dict[str, object]:
+    return _amtsblatt_pipeline.ingest().model_dump()
+
+
+@app.post("/api/v1/newsletter/subscribe")
+def newsletter_subscribe(payload: SubscribeRequest) -> dict[str, object]:
+    try:
+        return _newsletter.subscribe(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/v1/newsletter/confirm")
+def newsletter_confirm(token: str = Query(..., min_length=16)) -> dict[str, str]:
+    result = _newsletter.confirm(token)
+    if result["status"] == "not_found":
+        raise HTTPException(status_code=404, detail="token_not_found")
+    return result
+
+
+@app.post("/api/v1/newsletter/unsubscribe")
+def newsletter_unsubscribe(email: str = Query(...)) -> dict[str, str]:
+    return _newsletter.unsubscribe(email)
+
+
+@app.post("/api/v1/push/subscribe")
+def push_subscribe(payload: PushSubscription) -> dict[str, str]:
+    return _web_push.subscribe(payload)
+
+
+@app.post("/api/v1/push/watch-alert")
+def push_watch_alert(payload: WatchAlert) -> dict[str, str]:
+    return _web_push.alert(payload)
