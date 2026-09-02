@@ -1,9 +1,10 @@
 {
   "version": "1.0",
   "project": "swiss_p_map",
-  "last_updated": "2026-09-01T16:54:00+02:00",
-  "brief_count": 44,
+  "last_updated": "2026-09-02T13:30:00+02:00",
+  "brief_count": 50,
   "briefs": [
+
     {
       "id": "BRIEF-001",
       "title": "Svájci Térinformatikai Architektúra és Stack",
@@ -355,6 +356,55 @@
       "adr": "ADR-010",
       "feature": "FEAT-044",
       "file": "BRIEF-044-svajci-glassmorphism-hud-es-design-rendszer.md"
+    },
+    {
+      "id": "BRIEF-045",
+      "title": "Resident-First Helyi Információs Központ és Életviteli Portál Architektúra",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-011",
+      "feature": "FEAT-045",
+      "file": "BRIEF-045-resident-first-helyi-informacios-kozpont.md"
+    },
+    {
+      "id": "BRIEF-046",
+      "title": "Svájci Szavazási és Választási Információs Központ",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-012",
+      "feature": "FEAT-046",
+      "file": "BRIEF-046-svajci-szavazasi-es-valasztasi-informacios-kozpont.md"
+    },
+    {
+      "id": "BRIEF-047",
+      "title": "3 Szintes Helyi Hírek és Eseményösszefoglaló Modell",
+      "status": "READY_FOR_SPEC",
+      "adr": "ADR-013",
+      "feature": "FEAT-047",
+      "file": "BRIEF-047-haromszintes-helyi-hirek-es-esemenyosszefoglalo.md"
+    },
+    {
+      "id": "BRIEF-048",
+      "title": "Svájci Időjárás, Élő Riasztások és CH2025 Klímatendenciák Központ",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-048",
+      "file": "BRIEF-048-svajci-idojaras-riasztasok-es-klimatendenciak.md"
+    },
+    {
+      "id": "BRIEF-049",
+      "title": "Svájci Lakhatási és Megélhetési Költségkalkulátor",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-049",
+      "file": "BRIEF-049-svajci-lakhatasi-es-megelhetesi-koltsegkalkulator.md"
+    },
+    {
+      "id": "BRIEF-050",
+      "title": "Svájci Önkormányzati Ügyintézés és Hulladéknaptár",
+      "status": "READY_FOR_SPEC",
+      "adr": null,
+      "feature": "FEAT-050",
+      "file": "BRIEF-050-svajci-onkormanyzati-ugyintezes-es-hulladeknaptar.md"
     }
   ]
 }
+

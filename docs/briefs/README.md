@@ -2,7 +2,7 @@
 
 Ez a könyvtár a **Swiss P Map** azonosított, megvalósított és tervezett képességeinek Feature Brief dokumentumait tartalmazza az **RVAD 1.1** szerint.
 
-## Brief állapotleltár (43 db)
+## Brief állapotleltár (50 db)
 
 | ID | Cím | Státusz | Kapcsolódás |
 |---|---|---|---|
@@ -50,6 +50,13 @@ Ez a könyvtár a **Swiss P Map** azonosított, megvalósított és tervezett k�
 | [BRIEF-042](BRIEF-042-szelessav-mobilhalozat-es-digitalis-elerhetoseg.md) | Szélessáv, Mobilhálózat és Digitális Elérhetőség | READY_FOR_SPEC | FEAT-042 |
 | [BRIEF-043](BRIEF-043-epuletenergetika-felujitasi-potencial-es-futescsere.md) | Épületenergetika, Felújítási Potenciál és Fűtéscsere | READY_FOR_SPEC | FEAT-043 |
 | [BRIEF-044](BRIEF-044-svajci-glassmorphism-hud-es-design-rendszer.md) | Svájci Glassmorphism HUD és Vizuális Design Rendszer | READY_FOR_SPEC | FEAT-044 |
+| [BRIEF-045](BRIEF-045-resident-first-helyi-informacios-kozpont.md) | Resident-First Helyi Információs Központ és Életviteli Portál Architektúra | READY_FOR_SPEC | FEAT-045 |
+| [BRIEF-046](BRIEF-046-svajci-szavazasi-es-valasztasi-informacios-kozpont.md) | Svájci Szavazási és Választási Információs Központ | READY_FOR_SPEC | FEAT-046 |
+| [BRIEF-047](BRIEF-047-haromszintes-helyi-hirek-es-esemenyosszefoglalo.md) | 3 Szintes Helyi Hírek és Eseményösszefoglaló Modell | READY_FOR_SPEC | FEAT-047 |
+| [BRIEF-048](BRIEF-048-svajci-idojaras-riasztasok-es-klimatendenciak.md) | Svájci Időjárás, Élő Riasztások és CH2025 Klímatendenciák Központ | READY_FOR_SPEC | FEAT-048 |
+| [BRIEF-049](BRIEF-049-svajci-lakhatasi-es-megelhetesi-koltsegkalkulator.md) | Svájci Lakhatási és Megélhetési Költségkalkulátor | READY_FOR_SPEC | FEAT-049 |
+| [BRIEF-050](BRIEF-050-svajci-onkormanyzati-ugyintezes-es-hulladeknaptar.md) | Svájci Önkormányzati Ügyintézés és Hulladéknaptár | READY_FOR_SPEC | FEAT-050 |
+
 
 ## Karbantartási szabályok
 
