@@ -38,6 +38,7 @@ export default function Home() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [watchRadius, setWatchRadius] = useState<number>(500);
+  const [strategicP1P2, setStrategicP1P2] = useState<Record<string, Record<string, unknown>>>({});
 
   // ADR-022: deep-link state ↔ URL (plz/topic/selected/radius)
   useShareableState(
@@ -96,6 +97,27 @@ export default function Home() {
     }).catch(() => undefined);
     return () => { active = false; };
   }, [result?.place?.postcode, result?.place?.canton, result?.lngLat]);
+
+  useEffect(() => {
+    const place = result?.place;
+    if (!place) return;
+    const base = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8310";
+    const endpoints: Record<string, string> = {
+      microclimate: `/api/v1/climate/microclimate?postcode=${place.postcode}&canton=${place.canton}`,
+      education: `/api/v1/education/facilities?postcode=${place.postcode}`,
+      energy: `/api/v1/energy/assessment?postcode=${place.postcode}`,
+      airPollen: `/api/v1/environment/air-pollen?postcode=${place.postcode}`,
+      healthcare: `/api/v1/healthcare/access?postcode=${place.postcode}`,
+      connectivity: `/api/v1/connectivity/status?postcode=${place.postcode}`,
+    };
+    let active = true;
+    Promise.all(Object.entries(endpoints).map(async ([key, path]) => {
+      const response = await fetch(`${base}${path}`);
+      if (!response.ok) throw new Error(`${key}:${response.status}`);
+      return [key, await response.json()] as const;
+    })).then((entries) => { if (active) setStrategicP1P2(Object.fromEntries(entries)); }).catch(() => { if (active) setStrategicP1P2({}); });
+    return () => { active = false; };
+  }, [result?.place?.postcode, result?.place?.canton]);
 
   const mapLocale = useMemo(
     () => ({
@@ -275,7 +297,7 @@ export default function Home() {
             />
           </div>
 
-          <DetailPanel topic={activeTopic} selectedId={selectedId} result={result} summary={summary} aiSummary={aiSummary} />
+          <DetailPanel topic={activeTopic} selectedId={selectedId} result={result} summary={summary} aiSummary={aiSummary} strategicP1P2={strategicP1P2} />
         </div>
       </div>
 

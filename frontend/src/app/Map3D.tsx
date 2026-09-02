@@ -123,6 +123,7 @@ export default function Map3D(
   const [statTarget, setStatTarget] = useState(() => ml.cantons);
   const [statPop, setStatPop] = useState(() => ml.population);
   const [voteYes, setVoteYes] = useState(58.2);
+  const [layerMode, setLayerMode] = useState<"default" | "tax" | "price">("default");
   const [showBack, setShowBack] = useState(false);
 
   useEffect(() => {
@@ -722,11 +723,38 @@ export default function Map3D(
     }
   }, [baugesuche, selectedPostcode]);
 
+  useEffect(() => {
+    const tax: Record<string, number> = { ZG: 54, SZ: 60, NW: 65, ZH: 119, LU: 116, BE: 154, NE: 156, GE: 155 };
+    const prices: Record<string, number> = { ZG: 15300, GE: 14200, ZH: 12500, SZ: 11600, BS: 10300, VD: 9800, BE: 7600, TI: 7200 };
+    stateRef.current.mainGroup?.children.forEach((child) => {
+      const mesh = child as THREE.Mesh;
+      const material = mesh.material as THREE.MeshStandardMaterial;
+      const code = String(mesh.userData.code ?? mesh.userData.id ?? "");
+      let color = new THREE.Color(BASE_GLASS.color);
+      if (layerMode === "tax") {
+        const value = tax[code] ?? 115;
+        color = new THREE.Color(value < 90 ? "#22c55e" : value < 135 ? "#eab308" : "#f43f5e");
+      } else if (layerMode === "price") {
+        const value = prices[code] ?? 8500;
+        color = new THREE.Color(value >= 12000 ? "#a855f7" : value >= 9500 ? "#d97706" : "#facc15");
+      }
+      mesh.userData.origColor = color.getHex();
+      gsap.to(material.color, { r: color.r, g: color.g, b: color.b, duration: 0.45, ease: "power2.out" });
+    });
+  }, [layerMode]);
+
   const noPct = (100 - voteYes).toFixed(1);
 
   return (
     <div className="relative w-full overflow-hidden rounded-xl border border-white/10" style={{ height: "62vh", minHeight: 380, background: "radial-gradient(circle at 50% 30%, #111827 0%, #030712 100%)" }} data-testid="map-3d">
       <div ref={containerRef} className="absolute inset-0" data-testid="map-3d-canvas" />
+      <div data-testid="map-layer-selector" className="absolute right-3 top-3 z-30 flex rounded-lg border border-white/15 bg-slate-950/80 p-1 backdrop-blur">
+        {(["default", "tax", "price"] as const).map((mode) => (
+          <button key={mode} onClick={() => setLayerMode(mode)} aria-pressed={layerMode === mode} className={`rounded px-2 py-1 text-[11px] font-semibold ${layerMode === mode ? "bg-sky-500 text-white" : "text-slate-300 hover:bg-white/10"}`}>
+            {mode === "default" ? "Default" : mode === "tax" ? "Tax Map" : "Price Map"}
+          </button>
+        ))}
+      </div>
 
       {/* Iránytű */}
       <div className="pointer-events-none absolute right-4 top-4 z-10 flex h-12 w-12 flex-col items-center justify-center rounded-full border border-white/10 bg-[rgba(17,24,39,0.7)] shadow-[0_4px_20px_rgba(0,0,0,0.4)] backdrop-blur-[12px]">

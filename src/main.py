@@ -9,9 +9,15 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.models.geo import CoordinateWGS84
 from src.services.ai_summary_service import AiSummaryService
+from src.services.air_quality_service import AirQualityService
+from src.services.building_energy_service import BuildingEnergyService
+from src.services.connectivity_service import ConnectivityService
+from src.services.education_service import EducationService
 from src.services.geo_converter import lv95_to_wgs84
 from src.services.hazard_service import HazardService
+from src.services.healthcare_service import HealthcareService
 from src.services.isos_service import IsosService
+from src.services.microclimate_service import MicroclimateService
 from src.services.place_service import PlaceService
 from src.services.planning_service import PlanningService
 from src.services.politics_service import PoliticsService
@@ -44,6 +50,12 @@ _politics = PoliticsService()
 _place = PlaceService()
 _planning = PlanningService()
 _ai = AiSummaryService()
+_microclimate = MicroclimateService()
+_education = EducationService()
+_building_energy = BuildingEnergyService()
+_air_quality = AirQualityService()
+_healthcare = HealthcareService()
+_connectivity = ConnectivityService()
 _vote = VoteService()
 _property_prices = PropertyPriceService()
 _tax = TaxService()
@@ -414,3 +426,39 @@ def heritage_isos(
 ) -> dict[str, object]:
     """SPEC-036 REQ-001..005: ISOS I/II federal inventory screening."""
     return _isos.assess(postcode).model_dump()
+
+
+@app.get("/api/v1/climate/microclimate")
+def climate_microclimate(postcode: str = Query(..., pattern=r"^\d{4}$"), canton: str = Query(..., pattern=r"^[A-Za-z]{2}$")) -> dict[str, object]:
+    """SPEC-037 REQ-001 AC-001."""
+    return _microclimate.assess(postcode, canton).model_dump()
+
+
+@app.get("/api/v1/education/facilities")
+def education_facilities(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
+    """SPEC-038 REQ-001 AC-001."""
+    return _education.facilities(postcode).model_dump()
+
+
+@app.get("/api/v1/energy/assessment")
+def energy_assessment(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
+    """SPEC-043 REQ-001 AC-001."""
+    return _building_energy.assess(postcode).model_dump()
+
+
+@app.get("/api/v1/environment/air-pollen")
+def environment_air_pollen(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
+    """SPEC-040 REQ-001 AC-001."""
+    return _air_quality.assess(postcode).model_dump()
+
+
+@app.get("/api/v1/healthcare/access")
+def healthcare_access(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
+    """SPEC-041 REQ-001 AC-001."""
+    return _healthcare.access(postcode).model_dump()
+
+
+@app.get("/api/v1/connectivity/status")
+def connectivity_status(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
+    """SPEC-042 REQ-001 AC-001."""
+    return _connectivity.status(postcode).model_dump()

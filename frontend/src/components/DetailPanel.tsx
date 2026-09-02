@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import type { Baugesuch, DistrictRepresentatives, HazardAssessment, IsosAssessment, PlaceInfo, PropertyPriceAssessment, TaxComparison } from "@/lib/api";
 import type { Topic } from "./TopicSidebar";
+import StrategicP1P2Panel from "./StrategicP1P2Panel";
 
 interface DetailPanelProps {
   topic: Topic;
@@ -10,13 +11,14 @@ interface DetailPanelProps {
   result: { place?: PlaceInfo; politics?: DistrictRepresentatives; baugesuche?: Baugesuch[]; propertyPrices?: PropertyPriceAssessment; taxComparison?: TaxComparison; hazardAssessment?: HazardAssessment; isosAssessment?: IsosAssessment } | null;
   summary: string | null;
   aiSummary: string | null;
+  strategicP1P2?: Record<string, Record<string, unknown>>;
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-500">{children}</p>;
 }
 
-export default function DetailPanel({ topic, selectedId, result, summary, aiSummary }: DetailPanelProps) {
+export default function DetailPanel({ topic, selectedId, result, summary, aiSummary, strategicP1P2 }: DetailPanelProps) {
   const t = useTranslations();
 
   if (!result?.place) {
@@ -43,6 +45,7 @@ export default function DetailPanel({ topic, selectedId, result, summary, aiSumm
 
   return (
     <div data-testid="detail-panel" className="border-t border-white/10 bg-slate-950/80 p-5 backdrop-blur-xl">
+      <StrategicP1P2Panel data={strategicP1P2} topic={topic} />
       {(topic === "overview" || topic === "ort") && (result.propertyPrices || result.taxComparison || result.hazardAssessment || result.isosAssessment) && (
         <section data-testid="strategic-p0-panel" aria-label="Strategic location indicators" className="mb-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           {result.propertyPrices && (
