@@ -68,7 +68,7 @@ export default function Home() {
       const base = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8310";
       Promise.all([
         fetch(`${base}/api/v1/place/${parsed.plz}?live=true`).then((r) => (r.ok ? r.json() : null)).catch(() => null) as Promise<PlaceInfo | null>,
-        fetch(`${base}/api/v1/politics?postcode=${parsed.plz}&live=true`).then((r) => (r.ok ? r.json() : null)).catch(() => null) as Promise<DistrictRepresentatives | null>,
+        fetch(`${base}/api/v1/politics/representatives?postcode=${parsed.plz}&live=true`).then((r) => (r.ok ? r.json() : null)).catch(() => null) as Promise<DistrictRepresentatives | null>,
         fetch(`${base}/api/v1/planning/baugesuche?postcode=${parsed.plz}&active_only=true`).then((r) => (r.ok ? r.json() : null)).catch(() => null) as Promise<{ items: Baugesuch[] } | null>,
       ]).then(([place, politics, planning]) => {
         if (!place) return;

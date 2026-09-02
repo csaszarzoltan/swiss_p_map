@@ -301,8 +301,10 @@ def geo_convert(
     }
 
 
+@app.get("/api/v1/politics")
 @app.get("/api/v1/politics/representatives")
 async def politics_representatives(
+
     postcode: str = Query(..., min_length=4, max_length=4),
     live: bool = Query(
         default=False,
