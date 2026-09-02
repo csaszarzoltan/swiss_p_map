@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ResidentCivicPanels from "./ResidentCivicPanels";
 
 type Item = {id:string;category:string;title:string;summary:string;importance:"normal"|"important"|"urgent";status:"current_data"|"source_pending";source:string;source_url:string;map_layer?:string|null};
 type Hub = {postcode:string;locality:string;generated_at:string;items:Item[];editorial_note:string};
@@ -18,6 +19,7 @@ export default function LocalInformationHub({postcode,onOpenMap}:{postcode?:stri
       <h3 className="mt-3 text-base font-bold">{item.title}</h3><p className="mt-2 flex-1 text-sm leading-6 text-slate-400">{item.summary}</p>
       <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/5 pt-3"><a href={item.source_url} target="_blank" rel="noreferrer" className="truncate text-xs text-sky-300">Quelle: {item.source}</a>{item.map_layer&&<button onClick={()=>onOpenMap?.(item.map_layer!)} className="shrink-0 rounded-lg border border-white/10 px-2 py-1 text-xs hover:bg-white/10">Auf Karte</button>}</div>
     </article>)}</div>
+    <ResidentCivicPanels postcode={hub.postcode} />
     <p className="rounded-xl border border-sky-500/20 bg-sky-500/5 p-3 text-xs leading-5 text-slate-400">{hub.editorial_note}</p>
   </section>
 }

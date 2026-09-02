@@ -86,6 +86,11 @@ export interface MobilityAssessment { postcode: string; nearest_station: string;
 export interface ParcelAssessment { postcode: string; parcel_nr: string; area_m2: number; zoning: string; source: string; official_url: string; trust_state: "cadastral_registry"; }
 
 export const api = {
+  residentBriefing: (postcode: string) => getJson<unknown>(`/api/v1/local/briefing?postcode=${postcode}`),
+  civicVoteProposals: () => getJson<unknown>(`/api/v1/votes/proposals`),
+  localNews: (postcode: string) => getJson<unknown>(`/api/v1/news/local?postcode=${postcode}`),
+  currentWeather: (postcode: string) => getJson<unknown>(`/api/v1/weather/current?postcode=${postcode}`),
+  costAssessment: (postcode: string, income: number) => getJson<unknown>(`/api/v1/costs/assessment?postcode=${postcode}&income_chf=${income}`),
   districtComparison: (codes: string[]) => getJson<{items: DistrictComparison[]}>(`/api/v1/districts/compare?postcodes=${codes.join(",")}`),
   mobility: (postcode: string) => getJson<MobilityAssessment>(`/api/v1/mobility/isochrones?postcode=${postcode}`),
   parcel: (postcode: string, parcelNr: string) => getJson<ParcelAssessment>(`/api/v1/cadastre/parcel?postcode=${postcode}&parcel_nr=${encodeURIComponent(parcelNr)}`),

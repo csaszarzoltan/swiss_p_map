@@ -53,3 +53,12 @@ Az RVAD 1.1 szerinti, fejlesztésre kész feature-specifikációk katalógusa.
 - Az `index.json`, ez a README és a fájlrendszer ugyanazt a 44 SPEC-et tartalmazza.
 - Követelmény vagy AC módosításakor a tesztleképezést és a VALIDATION jelentést is frissíteni kell.
 - Fejlesztés csak SPEC_READY állapotból, RED bizonyítékkal indulhat.
+
+## Resident-First Civic Intelligence (SPEC-045..050)
+
+- [SPEC-045](SPEC-045-resident-first-helyi-informacios-kozpont.md): Resident-First Helyi Információs Központ és Életviteli Portál Architektúra
+- [SPEC-046](SPEC-046-svajci-szavazasi-es-valasztasi-informacios-kozpont.md): Svájci Szavazási és Választási Információs Központ
+- [SPEC-047](SPEC-047-haromszintes-helyi-hirek-es-esemenyosszefoglalo.md): 3 Szintes Helyi Hírek és Eseményösszefoglaló Modell
+- [SPEC-048](SPEC-048-svajci-idojaras-riasztasok-es-klimatendenciak.md): Svájci Időjárás, Élő Riasztások és CH2025 Klímatendenciák Központ
+- [SPEC-049](SPEC-049-svajci-lakhatasi-es-megelhetesi-koltsegkalkulator.md): Svájci Lakhatási és Megélhetési Költségkalkulátor
+- [SPEC-050](SPEC-050-svajci-onkormanyzati-ugyintezes-es-hulladeknaptar.md): Svájci Önkormányzati Ügyintézés és Hulladéknaptár

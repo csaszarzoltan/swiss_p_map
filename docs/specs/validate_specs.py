@@ -13,10 +13,10 @@ for p in files:
  for h in required:
   if h not in t: errors.append(f'{p.name}: missing {h}')
  if not re.search(r'^status: SPEC_READY$',t,re.M): errors.append(f'{p.name}: status')
- req=set(re.findall(r'REQ-\d{3}',t.split('## 6.')[0]))
- mapped=set(re.findall(r'^- (REQ-\d{3}) ->',t,re.M))
+ req=set(re.findall(r'REQ-\d{3}(?:-\d{3})?',t.split('## 6.')[0]))
+ mapped=set(re.findall(r'^- (REQ-\d{3}(?:-\d{3})?) ->',t,re.M))
  if not req.issubset(mapped): errors.append(f'{p.name}: unmapped {sorted(req-mapped)}')
- ac=set(re.findall(r'^### (AC-\d{3}):',t,re.M))
+ ac=set(re.findall(r'^### (AC-\d{3}(?:-\d{3})?):',t,re.M))
  if len(ac)<2: errors.append(f'{p.name}: acceptance count')
  if any(x in t.lower() for x in ['placeholder','todo:','tbd']): errors.append(f'{p.name}: forbidden placeholder')
 indexed={x['file'] for x in idx['specs']}

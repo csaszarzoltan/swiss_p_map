@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "project": "swiss_p_map",
-  "generated_at": "2026-09-02T09:00:00Z",
-  "spec_count": 44,
+  "generated_at": "2026-09-02T12:00:00Z",
+  "spec_count": 50,
   "coverage": {
-    "briefs": 44,
-    "specs": 44,
+    "briefs": 50,
+    "specs": 50,
     "percent": 100
   },
   "specs": [
@@ -670,6 +670,90 @@
       "research": [],
       "requirement_count": 12,
       "acceptance_count": 6
+    },
+    {
+      "id": "SPEC-045",
+      "feature": "FEAT-045",
+      "brief": "BRIEF-045",
+      "title": "Resident-First Helyi Információs Központ és Életviteli Portál Architektúra",
+      "status": "SPEC_READY",
+      "implementation_status": "PENDING_DEV",
+      "risk": "medium",
+      "file": "SPEC-045-resident-first-helyi-informacios-kozpont.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 9,
+      "acceptance_count": 3
+    },
+    {
+      "id": "SPEC-046",
+      "feature": "FEAT-046",
+      "brief": "BRIEF-046",
+      "title": "Svájci Szavazási és Választási Információs Központ",
+      "status": "SPEC_READY",
+      "implementation_status": "PENDING_DEV",
+      "risk": "medium",
+      "file": "SPEC-046-svajci-szavazasi-es-valasztasi-informacios-kozpont.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 9,
+      "acceptance_count": 3
+    },
+    {
+      "id": "SPEC-047",
+      "feature": "FEAT-047",
+      "brief": "BRIEF-047",
+      "title": "3 Szintes Helyi Hírek és Eseményösszefoglaló Modell",
+      "status": "SPEC_READY",
+      "implementation_status": "PENDING_DEV",
+      "risk": "medium",
+      "file": "SPEC-047-haromszintes-helyi-hirek-es-esemenyosszefoglalo.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 9,
+      "acceptance_count": 3
+    },
+    {
+      "id": "SPEC-048",
+      "feature": "FEAT-048",
+      "brief": "BRIEF-048",
+      "title": "Svájci Időjárás, Élő Riasztások és CH2025 Klímatendenciák Központ",
+      "status": "SPEC_READY",
+      "implementation_status": "PENDING_DEV",
+      "risk": "medium",
+      "file": "SPEC-048-svajci-idojaras-riasztasok-es-klimatendenciak.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 9,
+      "acceptance_count": 3
+    },
+    {
+      "id": "SPEC-049",
+      "feature": "FEAT-049",
+      "brief": "BRIEF-049",
+      "title": "Svájci Lakhatási és Megélhetési Költségkalkulátor",
+      "status": "SPEC_READY",
+      "implementation_status": "PENDING_DEV",
+      "risk": "medium",
+      "file": "SPEC-049-svajci-lakhatasi-es-megelhetesi-koltsegkalkulator.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 9,
+      "acceptance_count": 3
+    },
+    {
+      "id": "SPEC-050",
+      "feature": "FEAT-050",
+      "brief": "BRIEF-050",
+      "title": "Svájci Önkormányzati Ügyintézés és Hulladéknaptár",
+      "status": "SPEC_READY",
+      "implementation_status": "PENDING_DEV",
+      "risk": "medium",
+      "file": "SPEC-050-svajci-onkormanyzati-ugyintezes-es-hulladeknaptar.md",
+      "adr": [],
+      "research": [],
+      "requirement_count": 9,
+      "acceptance_count": 3
     }
   ]
 }

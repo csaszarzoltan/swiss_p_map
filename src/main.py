@@ -13,6 +13,7 @@ from src.services.air_quality_service import AirQualityService
 from src.services.building_energy_service import BuildingEnergyService
 from src.services.cadastral_service import CadastralService
 from src.services.connectivity_service import ConnectivityService
+from src.services.cost_of_living_service import CostOfLivingService
 from src.services.district_comparison_service import DistrictComparisonService
 from src.services.education_service import EducationService
 from src.services.geo_converter import lv95_to_wgs84
@@ -20,7 +21,9 @@ from src.services.hazard_service import HazardService
 from src.services.healthcare_service import HealthcareService
 from src.services.isos_service import IsosService
 from src.services.local_information_service import LocalInformationService
+from src.services.local_news_service import LocalNewsService
 from src.services.microclimate_service import MicroclimateService
+from src.services.municipal_service import MunicipalService
 from src.services.objection_workspace_service import (
     ObjectionRequest,
     ObjectionWorkspaceService,
@@ -32,7 +35,9 @@ from src.services.property_price_service import PropertyPriceService
 from src.services.provenance_service import ProvenanceService
 from src.services.tax_service import TaxService
 from src.services.transit_mobility_service import TransitMobilityService
+from src.services.vote_analysis_service import VoteAnalysisService
 from src.services.vote_service import VoteService
+from src.services.weather_climate_service import WeatherClimateService
 
 _DEFAULT_CORS_ORIGINS = "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3310,http://127.0.0.1:3310,http://localhost:3410,http://127.0.0.1:3410"
 
@@ -74,6 +79,11 @@ _tax = TaxService()
 _hazard = HazardService()
 _isos = IsosService()
 _local_information = LocalInformationService()
+_votes_analysis = VoteAnalysisService()
+_local_news = LocalNewsService()
+_weather = WeatherClimateService()
+_costs = CostOfLivingService()
+_municipal = MunicipalService()
 # Demo seed — amíg nincs napi Amtsblatt poll, 8004-en legyen aktív Baugesuch a bemutatóhoz
 try:
     from datetime import date as _d
@@ -565,3 +575,54 @@ def sources_provenance() -> dict[str, object]:
 def local_briefing(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
     """Resident-first information hub; the map is an optional analysis layer."""
     return _local_information.briefing(postcode).model_dump()
+
+
+@app.get("/api/v1/votes/proposals")
+def civic_votes() -> dict[str, object]:
+    items = _votes_analysis.proposals()
+    return {"items": [x.model_dump() for x in items]}
+
+
+@app.get("/api/v1/votes/proposals/{proposal_id}/analysis")
+def civic_vote_analysis(proposal_id: int) -> dict[str, object]:
+    x = _votes_analysis.analysis(proposal_id)
+    if x is None:
+        raise HTTPException(status_code=404, detail="proposal_not_found")
+    return x.model_dump()
+
+
+@app.get("/api/v1/news/local")
+def civic_news(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
+    return _local_news.get_local(postcode).model_dump()
+
+
+@app.get("/api/v1/weather/current")
+def civic_weather(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
+    return _weather.current(postcode).model_dump()
+
+
+@app.get("/api/v1/weather/alerts")
+def civic_alerts() -> dict[str, object]:
+    return {"items": [x.model_dump() for x in _weather.alerts()]}
+
+
+@app.get("/api/v1/weather/water-temperatures")
+def civic_water() -> dict[str, object]:
+    return {"items": [x.model_dump() for x in _weather.water()]}
+
+
+@app.get("/api/v1/costs/assessment")
+def civic_costs(
+    postcode: str = Query(..., pattern=r"^\d{4}$"), income_chf: float = Query(..., gt=0)
+) -> dict[str, object]:
+    return _costs.assess(postcode, income_chf).model_dump()
+
+
+@app.get("/api/v1/municipal/waste-calendar")
+def civic_waste(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
+    return _municipal.waste(postcode).model_dump()
+
+
+@app.get("/api/v1/municipal/water-quality")
+def civic_quality(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
+    return _municipal.water(postcode).model_dump()
