@@ -60,17 +60,20 @@ export default function SearchPanel({ onResult }: { onResult: (r: Result) => voi
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap items-center gap-2">
-        <input
-          className="w-full sm:w-80 rounded-lg border border-white/15 bg-white/[0.07] px-3.5 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={t("search.placeholder")}
-          onKeyDown={(e) => e.key === "Enter" && executeSearch(query)}
-          data-testid="search-input"
-        />
+      <div className="flex items-center gap-2">
+        <div className="relative w-full sm:w-80">
+          <input
+            className="w-full rounded-xl border border-white/15 bg-slate-900/80 px-4 py-2 pl-9 text-sm text-slate-100 placeholder:text-slate-500 shadow-inner focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/30 transition-all"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t("search.placeholder")}
+            onKeyDown={(e) => e.key === "Enter" && executeSearch(query)}
+            data-testid="search-input"
+          />
+          <span className="pointer-events-none absolute left-3 top-2.5 text-xs text-slate-500">🔍</span>
+        </div>
         <button
-          className="rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-sky-500 disabled:opacity-50"
+          className="shrink-0 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-sky-500/25 transition-all hover:from-sky-400 hover:to-blue-500 active:scale-95 disabled:opacity-50"
           onClick={() => executeSearch(query)}
           disabled={loading || query.trim().length < 2}
           data-testid="search-button"
@@ -81,7 +84,7 @@ export default function SearchPanel({ onResult }: { onResult: (r: Result) => voi
 
       {/* Quick-pick shortcuts */}
       <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-400">
-        <span className="text-slate-500 text-[11px] font-medium uppercase tracking-wider">Quick:</span>
+        <span className="text-slate-500 text-[10px] font-semibold uppercase tracking-wider">Quick:</span>
         {QUICK_PICKS.map((qp) => (
           <button
             key={qp.code}
@@ -89,7 +92,7 @@ export default function SearchPanel({ onResult }: { onResult: (r: Result) => voi
               setQuery(qp.code);
               executeSearch(qp.code);
             }}
-            className="rounded-md border border-white/10 bg-white/[0.04] px-2 py-0.5 text-slate-300 transition hover:border-sky-400/50 hover:bg-sky-500/15 hover:text-sky-200"
+            className="rounded-lg border border-white/10 bg-slate-800/60 px-2.5 py-0.5 text-xs text-slate-300 transition-all hover:border-sky-400/60 hover:bg-sky-500/20 hover:text-white"
           >
             {qp.label}
           </button>

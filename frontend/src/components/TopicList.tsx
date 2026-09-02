@@ -54,22 +54,25 @@ export default function TopicList({ topic, result, selectedId, onSelect }: Topic
   }
 
   return (
-    <div data-testid="topic-list" className="flex flex-col gap-1 p-2">
-      {items.map((it) => (
-        <button
-          key={it.id}
-          data-testid={`list-item-${it.id}`}
-          onClick={() => onSelect(it.id)}
-          className={`rounded-lg border px-3 py-2 text-left transition ${
-            selectedId === it.id
-              ? "border-sky-500/50 bg-sky-500/15 text-sky-100"
-              : "border-white/10 bg-white/[0.03] text-slate-200 hover:border-white/15 hover:bg-white/[0.06]"
-          }`}
-        >
-          <p className="line-clamp-2 text-sm font-medium leading-tight">{it.label}</p>
-          {it.sublabel && <p className="mt-0.5 line-clamp-1 text-xs text-slate-400">{it.sublabel}</p>}
-        </button>
-      ))}
+    <div data-testid="topic-list" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 p-3">
+      {items.map((it) => {
+        const isSelected = selectedId === it.id;
+        return (
+          <button
+            key={it.id}
+            data-testid={`list-item-${it.id}`}
+            onClick={() => onSelect(it.id)}
+            className={`group flex flex-col justify-between rounded-xl border p-3 text-left transition-all duration-200 ${
+              isSelected
+                ? "border-sky-400 bg-sky-500/20 text-white shadow-md shadow-sky-500/20 ring-1 ring-sky-400/40"
+                : "border-white/10 bg-slate-900/60 text-slate-200 hover:border-white/20 hover:bg-slate-800/80"
+            }`}
+          >
+            <p className="line-clamp-2 text-sm font-semibold leading-snug group-hover:text-sky-300 transition-colors">{it.label}</p>
+            {it.sublabel && <p className="mt-1 line-clamp-1 text-xs text-slate-400 font-medium">{it.sublabel}</p>}
+          </button>
+        );
+      })}
     </div>
   );
 }

@@ -351,17 +351,25 @@ export default function Map3D(
       mainGroup.add(mesh);
     });
 
-    // Tavak — lapos félig áttetsző kék
+    // Tavak — csillogó, áttetsző vízkék fényű anyag (Swiss Lakes)
     SWISS_LAKES.forEach((lake) => {
       const shape = new THREE.Shape();
       shape.moveTo(lake.pts[0][0], lake.pts[0][1]);
       for (let i = 1; i < lake.pts.length; i++) shape.lineTo(lake.pts[i][0], lake.pts[i][1]);
       shape.closePath();
-      const geom = new THREE.ExtrudeGeometry(shape, { depth: 0.008, bevelEnabled: false });
-      const mat = new THREE.MeshStandardMaterial({ color: 0x1e40af, transparent: true, opacity: 0.35, roughness: 0.3, metalness: 0.1 });
+      const geom = new THREE.ExtrudeGeometry(shape, { depth: 0.015, bevelEnabled: false });
+      const mat = new THREE.MeshStandardMaterial({
+        color: 0x06b6d4,
+        emissive: 0x0284c7,
+        emissiveIntensity: 0.4,
+        transparent: true,
+        opacity: 0.72,
+        roughness: 0.1,
+        metalness: 0.6,
+      });
       const mesh = new THREE.Mesh(geom, mat);
       mesh.rotation.x = -Math.PI / 2;
-      mesh.position.y = -0.02;
+      mesh.position.y = 0.005;
       overlayGroup.add(mesh);
     });
     // Folyók — kék vonalak
@@ -727,43 +735,43 @@ export default function Map3D(
       </div>
 
       {/* Glassmorphism panel */}
-      <div className="absolute left-4 top-4 z-10 w-[calc(100%-2rem)] max-w-[320px] rounded-[14px] border border-white/10 bg-[rgba(15,23,42,0.75)] p-4 sm:p-[22px] shadow-[0_20px_40px_rgba(0,0,0,0.6)] backdrop-blur-[16px]">
-        <div className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[1px] text-[#38bdf8]">
+      <div className="absolute left-3 top-3 sm:left-5 sm:top-5 z-10 w-[calc(100%-1.5rem)] max-w-[320px] rounded-2xl border border-white/10 bg-slate-950/80 p-4 sm:p-5 shadow-2xl shadow-black/70 backdrop-blur-xl">
+        <div className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-sky-400">
           {breadcrumb.split(" / ").map((part, i, arr) => (
-            <span key={part} className={i === arr.length - 1 ? "text-[#38bdf8]" : "text-slate-500"}>
+            <span key={part} className={i === arr.length - 1 ? "text-sky-400 font-extrabold" : "text-slate-500"}>
               {part}
-              {i < arr.length - 1 ? <span className="mx-1 text-slate-500">/</span> : null}
+              {i < arr.length - 1 ? <span className="mx-1 text-slate-600">/</span> : null}
             </span>
           ))}
         </div>
-        <h2 className="mb-1.5 text-[18px] sm:text-[20px] font-bold tracking-[-0.3px] text-white">{title}</h2>
-        <p className="mb-3 text-[12px] leading-[1.4] text-slate-400">{subtitle}</p>
-        <div className="mb-3 rounded-lg border border-white/5 bg-white/[0.04] p-3">
-          <div className="mb-2 flex items-center justify-between text-[13px]">
+        <h2 className="mb-1 text-base sm:text-lg font-black tracking-tight text-white">{title}</h2>
+        <p className="mb-3 text-[11px] sm:text-xs leading-relaxed text-slate-400">{subtitle}</p>
+        <div className="mb-3 rounded-xl border border-white/10 bg-white/[0.03] p-3 space-y-2">
+          <div className="flex items-center justify-between text-xs">
             <span className="text-slate-400">{ml.areaLabel}:</span>
-            <span className="font-semibold text-slate-100">{statTarget}</span>
+            <span className="font-bold text-slate-100">{statTarget}</span>
           </div>
-          <div className="mb-2 flex items-center justify-between text-[13px]">
+          <div className="flex items-center justify-between text-xs">
             <span className="text-slate-400">{ml.popLabel}:</span>
-            <span className="font-semibold text-slate-100">{statPop}</span>
+            <span className="font-bold text-slate-100">{statPop}</span>
           </div>
-          <div className="mt-2">
+          <div className="pt-2 border-t border-white/5">
             <div className="mb-1 flex items-center justify-between text-[11px]">
               <span className="font-semibold text-slate-300">🗳 13. AHV-Rente (BFS)</span>
             </div>
-            <div className="mb-1 flex justify-between text-[11px] font-semibold">
-              <span className="text-[#38bdf8]">{ml.voteYes}: {voteYes.toFixed(1)}%</span>
-              <span className="text-[#f87171]">{ml.voteNo}: {noPct}%</span>
+            <div className="mb-1 flex justify-between text-[11px] font-bold">
+              <span className="text-sky-400">{ml.voteYes}: {voteYes.toFixed(1)}%</span>
+              <span className="text-rose-400">{ml.voteNo}: {noPct}%</span>
             </div>
-            <div className="flex h-1.5 w-full overflow-hidden rounded bg-[rgba(239,68,68,0.5)]">
-              <div className="h-full bg-[#38bdf8] transition-[width] duration-300" style={{ width: `${voteYes}%` }} />
+            <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-rose-950/80">
+              <div className="h-full bg-gradient-to-r from-sky-400 to-blue-500 transition-all duration-300 rounded-full" style={{ width: `${voteYes}%` }} />
             </div>
           </div>
         </div>
         {showBack && (
           <button
             onClick={handleBack}
-            className="w-full rounded-lg border border-[#38bdf8]/40 bg-[#38bdf8]/15 px-3 py-2.5 text-[13px] font-semibold text-[#38bdf8] transition hover:bg-[#38bdf8]/30 hover:text-white"
+            className="w-full rounded-xl border border-sky-500/40 bg-sky-500/15 px-3 py-2 text-xs font-bold text-sky-300 transition-all hover:bg-sky-500/30 hover:text-white active:scale-95"
           >
             ← {ml.breadcrumb}
           </button>
@@ -773,11 +781,11 @@ export default function Map3D(
       <div
         ref={tooltipRef}
         data-testid="map-tooltip"
-        className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-[120%] rounded-md border border-[#38bdf8]/30 bg-[rgba(15,23,42,0.88)] px-3 py-2 text-xs shadow-[0_8px_24px_rgba(0,0,0,0.5)] backdrop-blur-[8px]"
+        className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-[120%] rounded-xl border border-sky-400/40 bg-slate-950/90 px-3.5 py-2 text-xs font-medium text-slate-100 shadow-2xl shadow-black/80 backdrop-blur-md"
         style={{ display: "none" }}
       />
 
-      <div className="pointer-events-none absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full border border-white/5 bg-[rgba(15,23,42,0.6)] px-4 py-1.5 text-xs tracking-[0.5px] text-slate-500 backdrop-blur-[8px]">
+      <div className="pointer-events-none absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full border border-white/10 bg-slate-950/70 px-4 py-1 text-[11px] font-medium tracking-wide text-slate-400 backdrop-blur-md shadow-md">
         {ml.hint}
       </div>
     </div>

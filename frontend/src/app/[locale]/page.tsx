@@ -169,21 +169,21 @@ export default function Home() {
   const selectedBaugesuch = selectedId ? (result?.baugesuche ?? []).find((b) => b.id === selectedId) : null;
 
   return (
-    <main className="min-h-screen bg-[#030712] text-gray-100">
-      {/* Fejléc Branding + Search + Nyelvválasztó */}
-      <header className="border-b border-white/10 bg-[#0b1220]/90 backdrop-blur sticky top-0 z-30 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
-        <div className="mx-auto flex max-w-[1280px] flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+    <main className="min-h-screen bg-[#030712] text-slate-100 selection:bg-sky-500 selection:text-white">
+      {/* Floating Glassmorphic Header */}
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl shadow-xl shadow-black/40">
+        <div className="mx-auto flex max-w-[1440px] flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           {/* Logo & Brand */}
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-600 font-bold text-white shadow-md shadow-red-900/40">
-              <span className="text-xl leading-none">✚</span>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-red-700 font-bold text-white shadow-lg shadow-red-600/30 ring-1 ring-white/20">
+              <span className="text-2xl leading-none">✚</span>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-base font-bold tracking-tight text-white">{t("header.title")}</span>
-                <span className="rounded bg-sky-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-sky-400 border border-sky-500/30">v0.2.1</span>
+                <span className="text-base sm:text-lg font-extrabold tracking-tight text-white">{t("header.title")}</span>
+                <span className="rounded-md bg-sky-500/20 px-2 py-0.5 text-[10px] font-bold text-sky-300 border border-sky-500/30 uppercase tracking-wider">v0.3 Swiss</span>
               </div>
-              <p className="text-[11px] text-slate-400 hidden sm:block">{t("header.subtitle")}</p>
+              <p className="text-xs text-slate-400 hidden sm:block">{t("header.subtitle")}</p>
             </div>
           </div>
 
@@ -196,54 +196,70 @@ export default function Home() {
           </div>
         </div>
         {result?.error && (
-          <div className="mx-auto max-w-[1280px] px-4 pb-3 sm:px-6">
-            <p className="text-xs font-medium text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-md px-3 py-1.5 inline-block">
-              {result.error}
+          <div className="mx-auto max-w-[1440px] px-4 pb-3 sm:px-6">
+            <p className="text-xs font-semibold text-amber-300 bg-amber-500/15 border border-amber-500/30 rounded-xl px-3.5 py-2 inline-flex items-center gap-2">
+              <span>⚠️</span>
+              <span>{result.error}</span>
             </p>
           </div>
         )}
       </header>
 
-      {/* Menü fölül — teljes szélesség */}
-      <div className="mx-auto max-w-[1280px]">
-        <TopicSidebar activeTopic={activeTopic} onSelect={handleTopicSelect} counts={counts} />
+      {/* Menü sáv — Glassmorphic Pill Bar */}
+      <div className="sticky top-[65px] z-30 border-b border-white/5 bg-slate-950/70 backdrop-blur-lg">
+        <div className="mx-auto max-w-[1440px]">
+          <TopicSidebar activeTopic={activeTopic} onSelect={handleTopicSelect} counts={counts} />
+        </div>
       </div>
 
-      {/* Térkép — teljes szélesség, a lehető legszélesebb */}
-      <div className="mx-auto w-full max-w-[1600px]">
-        <div className="relative"><Map3D
-          selectedPostcode={result?.place?.postcode ?? null}
-          baugesuche={activeTopic === "planung" && selectedBaugesuch ? [selectedBaugesuch] : (result?.baugesuche ?? [])}
-          mapLocale={mapLocale}
-        /><MapLegend activeTopic={activeTopic} /></div>
+      {/* 3D Térkép Konténer */}
+      <div className="mx-auto w-full max-w-[1600px] px-2 sm:px-4 py-2 sm:py-3">
+        <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-white/10 bg-slate-950/60 shadow-2xl shadow-black/80">
+          <Map3D
+            selectedPostcode={result?.place?.postcode ?? null}
+            baugesuche={activeTopic === "planung" && selectedBaugesuch ? [selectedBaugesuch] : (result?.baugesuche ?? [])}
+            mapLocale={mapLocale}
+          />
+          <MapLegend activeTopic={activeTopic} />
+        </div>
       </div>
 
-      {/* Lista + Részletező — a térkép alatt */}
-      <div className="mx-auto max-w-[1280px] border-t border-white/10 bg-[#080c18]">
+      {/* Lista + Részletező — Tiszta Swiss Card szekciók */}
+      <div className="mx-auto max-w-[1440px] px-2 sm:px-4 py-3 space-y-4">
         {result?.place && (result.place.risk_level || result.place.risk_reason) && (
-          <div className="px-4 py-3">
+          <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-3 backdrop-blur-md">
             <RiskBadge
               level={result.place.risk_level as "low" | "medium" | "high" | null}
               reason={result.place.risk_reason}
             />
           </div>
         )}
-        <TopicList topic={activeTopic} result={result} selectedId={selectedId} onSelect={setSelectedId} />
-        <WatchZone center={result?.lngLat} radius={watchRadius} onRadiusChange={setWatchRadius} />
-        <ShareButton
-          getUrl={() => {
-            const u = new URL(window.location.href);
-            if (result?.place?.postcode) u.searchParams.set("plz", result.place.postcode);
-            u.searchParams.set("topic", activeTopic);
-            if (selectedId) u.searchParams.set("selected", selectedId);
-            if (watchRadius !== 500) u.searchParams.set("radius", String(watchRadius));
-            return u.toString();
-          }}
-        />
-        <DetailPanel topic={activeTopic} selectedId={selectedId} result={result} summary={summary} aiSummary={aiSummary} />
+
+        {/* Fő információs kártya doboz */}
+        <div className="overflow-hidden rounded-2xl sm:rounded-3xl border border-white/10 bg-slate-900/70 backdrop-blur-xl shadow-xl">
+          <TopicList topic={activeTopic} result={result} selectedId={selectedId} onSelect={setSelectedId} />
+          
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-slate-950/50 p-3 sm:px-5">
+            <WatchZone center={result?.lngLat} radius={watchRadius} onRadiusChange={setWatchRadius} />
+            <ShareButton
+              getUrl={() => {
+                const u = new URL(window.location.href);
+                if (result?.place?.postcode) u.searchParams.set("plz", result.place.postcode);
+                u.searchParams.set("topic", activeTopic);
+                if (selectedId) u.searchParams.set("selected", selectedId);
+                if (watchRadius !== 500) u.searchParams.set("radius", String(watchRadius));
+                return u.toString();
+              }}
+            />
+          </div>
+
+          <DetailPanel topic={activeTopic} selectedId={selectedId} result={result} summary={summary} aiSummary={aiSummary} />
+        </div>
       </div>
 
-      <p className="mx-auto max-w-[1280px] px-6 py-4 text-xs text-slate-600">{t("footer")}</p>
+      <footer className="mx-auto max-w-[1440px] px-6 py-6 text-center text-xs text-slate-500">
+        <p>{t("footer")}</p>
+      </footer>
     </main>
   );
 }
