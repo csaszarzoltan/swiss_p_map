@@ -89,14 +89,14 @@ _hazard = HazardService()
 _isos = IsosService()
 _local_information = LocalInformationService()
 _votes_analysis = VoteAnalysisService()
-_local_news = LocalNewsService()
+_local_news = LocalNewsService(repo=_planning._repo)
 _weather = WeatherClimateService()
 _costs = CostOfLivingService()
 _municipal = MunicipalService()
 _meteo_connector = MeteoSwissClient()
 _voteinfo_connector = BfsVoteInfoClient()
 _sbb_connector = SbbTransportClient()
-_amtsblatt_pipeline = AmtsblattNewsPipeline()
+_amtsblatt_pipeline = AmtsblattNewsPipeline(repo=_planning._repo)
 _newsletter = NewsletterService()
 _web_push = WebPushService()
 # Demo seed — amíg nincs napi Amtsblatt poll, 8004-en legyen aktív Baugesuch a bemutatóhoz
@@ -709,8 +709,8 @@ def transport_hubs() -> dict[str, object]:
 
 
 @app.post("/api/v1/connectors/amtsblatt/ingest")
-def amtsblatt_ingest() -> dict[str, object]:
-    return _amtsblatt_pipeline.ingest().model_dump()
+async def amtsblatt_ingest(canton: str = Query(default="ZH")) -> dict[str, object]:
+    return (await _amtsblatt_pipeline.ingest(canton=canton)).model_dump()
 
 
 @app.post("/api/v1/newsletter/subscribe")

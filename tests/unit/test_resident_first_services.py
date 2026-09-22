@@ -16,7 +16,12 @@ def test_spec_046_req_046_001_ac_046_001_voting_analysis_pro_contra() -> None:
 
 
 def test_spec_047_req_047_004_ac_047_002_news_pending() -> None:
-    assert LocalNewsService().get_local("8004").status == "source_pending"
+    from src.db.planning_repo import PlanningRepo
+
+    assert (
+        LocalNewsService(repo=PlanningRepo(":memory:")).get_local("8004").status
+        == "source_pending"
+    )
 
 
 def test_spec_048_req_048_001_ac_048_001_weather() -> None:

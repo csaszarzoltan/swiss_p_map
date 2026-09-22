@@ -18,8 +18,25 @@ def test_spec_057_req_057_001_ac_057_001_departures() -> None:
     assert SbbTransportClient().departures("Zürich HB")[0].category == "IC"
 
 
-def test_spec_058_req_058_001_ac_058_001_amtsblatt_ingest() -> None:
-    assert AmtsblattNewsPipeline().ingest().ingested == 1
+async def test_spec_058_req_058_001_ac_058_001_amtsblatt_ingest() -> None:
+    from unittest.mock import AsyncMock, MagicMock
+
+    import httpx
+
+    from src.db.planning_repo import PlanningRepo
+    from src.services.amtsblatt_service import AmtsblattService
+
+    resp = MagicMock(spec=httpx.Response)
+    resp.status_code = 200
+    resp.text = "<result><total>0</total><publications/></result>"
+    resp.raise_for_status.return_value = None
+    mock_client = AsyncMock(spec=httpx.AsyncClient)
+    mock_client.get.return_value = resp
+    pipe = AmtsblattNewsPipeline(
+        fetcher=AmtsblattService(client=mock_client),
+        repo=PlanningRepo(":memory:"),
+    )
+    assert (await pipe.ingest()).trust_state == "source_pending"
 
 
 def test_spec_059_req_059_001_ac_059_001_newsletter_subscription_double_optin() -> None:
