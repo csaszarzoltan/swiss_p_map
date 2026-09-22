@@ -89,9 +89,36 @@ export interface DistrictComparison { postcode: string; municipality: string; st
 export interface MobilityAssessment { postcode: string; nearest_station: string; service_interval_min: number; intercity_connection: boolean; hubs: Array<{hub:string;minutes:number;zone:number}>; source: string; }
 export interface ParcelAssessment { postcode: string; parcel_nr: string; area_m2: number; zoning: string; source: string; official_url: string; trust_state: "cadastral_registry"; }
 
+export interface VoteProposalItem {
+  id: number;
+  title: string;
+  vote_date: string;
+  status: string;
+  source: string;
+}
+
+export interface VotePoll {
+  institute: string;
+  sample_size: number;
+  margin_percent: number;
+  yes_percent: number;
+  fieldwork_date: string;
+}
+
+export interface VoteAnalysis {
+  proposal: VoteProposalItem;
+  pro_arguments: string[];
+  contra_arguments: string[];
+  polls: VotePoll[];
+  local_yes_percent: number | null;
+  cantonal_yes_percent: number | null;
+  national_yes_percent: number | null;
+}
+
 export const api = {
   residentBriefing: (postcode: string) => getJson<unknown>(`/api/v1/local/briefing?postcode=${postcode}`),
-  civicVoteProposals: () => getJson<unknown>(`/api/v1/votes/proposals`),
+  civicVoteProposals: () => getJson<{ items: VoteProposalItem[] }>(`/api/v1/votes/proposals`),
+  civicVoteAnalysis: (id: number) => getJson<VoteAnalysis>(`/api/v1/votes/proposals/${id}/analysis`),
   localNews: (postcode: string) => getJson<unknown>(`/api/v1/news/local?postcode=${postcode}`),
   currentWeather: (postcode: string) => getJson<unknown>(`/api/v1/weather/current?postcode=${postcode}`),
   weatherForecast: (postcode: string) => getJson<WeatherForecast>(`/api/v1/weather/forecast?postcode=${postcode}`),

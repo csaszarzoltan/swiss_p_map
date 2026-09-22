@@ -157,6 +157,22 @@
         "thunderstorm": "Thunderstorm",
         "unknown": "—"
       }
+    },
+    "feature051": {
+      "title": "Votes",
+      "loading": "Loading votes…",
+      "loadingDetail": "Loading analysis…",
+      "empty": "No vote proposals available.",
+      "error": "Could not load votes.",
+      "errorDetail": "Could not load analysis.",
+      "proposalLabel": "Proposal",
+      "proContra": "Pro / Contra",
+      "pro": "Pro",
+      "contra": "Contra",
+      "yesShare": "Yes: {pct}%",
+      "noPollData": "No poll data yet.",
+      "pollMeta": "{institute} · N={n} · ±{margin}%",
+      "resultMeta": "National {nat}% · Cantonal {cant}% · Local {loc}%"
     }
   }
 }

@@ -157,6 +157,22 @@
         "thunderstorm": "Orage",
         "unknown": "—"
       }
+    },
+    "feature051": {
+      "title": "Votations",
+      "loading": "Chargement des votations…",
+      "loadingDetail": "Chargement de l’analyse…",
+      "empty": "Aucun objet de vote disponible.",
+      "error": "Impossible de charger les votations.",
+      "errorDetail": "Impossible de charger l’analyse.",
+      "proposalLabel": "Objet",
+      "proContra": "Pour / Contre",
+      "pro": "Pour",
+      "contra": "Contre",
+      "yesShare": "Oui : {pct} %",
+      "noPollData": "Pas encore de données de sondage.",
+      "pollMeta": "{institute} · N={n} · ±{margin} %",
+      "resultMeta": "National {nat} % · Cantonal {cant} % · Local {loc} %"
     }
   }
 }

@@ -157,6 +157,22 @@
         "thunderstorm": "Gewitter",
         "unknown": "—"
       }
+    },
+    "feature051": {
+      "title": "Abstimmungen",
+      "loading": "Abstimmungen werden geladen…",
+      "loadingDetail": "Analyse wird geladen…",
+      "empty": "Keine Abstimmungsvorlagen verfügbar.",
+      "error": "Abstimmungen konnten nicht geladen werden.",
+      "errorDetail": "Analyse konnte nicht geladen werden.",
+      "proposalLabel": "Vorlage",
+      "proContra": "Pro / Contra",
+      "pro": "Pro",
+      "contra": "Contra",
+      "yesShare": "Ja: {pct} %",
+      "noPollData": "Noch keine Umfragedaten.",
+      "pollMeta": "{institute} · N={n} · ±{margin} %",
+      "resultMeta": "National {nat} % · Kantonal {cant} % · Lokal {loc} %"
     }
   }
 }
