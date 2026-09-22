@@ -173,6 +173,34 @@
       "noPollData": "No poll data yet.",
       "pollMeta": "{institute} · N={n} · ±{margin}%",
       "resultMeta": "National {nat}% · Cantonal {cant}% · Local {loc}%"
+    },
+    "feature053": {
+      "title": "Waste calendar",
+      "loading": "Loading waste calendar…",
+      "empty": "No collection dates available.",
+      "error": "Waste calendar could not be loaded.",
+      "listLabel": "Upcoming collections",
+      "today": "today",
+      "tomorrow": "tomorrow",
+      "inDays": "in {n} days",
+      "exportIcs": "Export .ics"
+    },
+    "feature054": {
+      "title": "Cost of living",
+      "loading": "Calculating costs…",
+      "empty": "No cost estimate available.",
+      "error": "Costs could not be calculated.",
+      "errorHint": "Try again later — no stale values are shown as live.",
+      "income": "Income",
+      "size": "Dwelling size",
+      "calculate": "Calculate",
+      "housing": "Rent",
+      "tax": "Income tax",
+      "health": "Health insurance",
+      "commute": "Transit pass",
+      "remaining": "Remaining",
+      "total": "Total / month",
+      "disclaimer": "Indicative modeled estimate, not financial or tax advice."
     }
   }
 }

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.models.geo import CoordinateWGS84
@@ -660,14 +660,25 @@ def civic_water(live: bool = Query(False)) -> dict[str, object]:
 
 @app.get("/api/v1/costs/assessment")
 def civic_costs(
-    postcode: str = Query(..., pattern=r"^\d{4}$"), income_chf: float = Query(..., gt=0)
+    postcode: str = Query(..., pattern=r"^\d{4}$"),
+    income_chf: float = Query(..., gt=0),
+    size_m2: float = Query(default=80.0, gt=0, le=1000),
 ) -> dict[str, object]:
-    return _costs.assess(postcode, income_chf).model_dump()
+    return _costs.assess(postcode, income_chf, size_m2).model_dump()
 
 
 @app.get("/api/v1/municipal/waste-calendar")
 def civic_waste(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
     return _municipal.waste(postcode).model_dump()
+
+
+@app.get("/api/v1/municipal/waste-calendar.ics")
+def civic_waste_ics(postcode: str = Query(..., pattern=r"^\d{4}$")) -> Response:
+    return Response(
+        content=_municipal.waste_ics(postcode),
+        media_type="text/calendar",
+        headers={"Content-Disposition": f'attachment; filename="abfall-{postcode}.ics"'},
+    )
 
 
 @app.get("/api/v1/municipal/water-quality")

@@ -173,6 +173,34 @@
       "noPollData": "Noch keine Umfragedaten.",
       "pollMeta": "{institute} · N={n} · ±{margin} %",
       "resultMeta": "National {nat} % · Kantonal {cant} % · Lokal {loc} %"
+    },
+    "feature053": {
+      "title": "Abfallkalender",
+      "loading": "Abfallkalender wird geladen…",
+      "empty": "Keine Abfuhrtermine verfügbar.",
+      "error": "Abfallkalender konnte nicht geladen werden.",
+      "listLabel": "Nächste Abfuhrtermine",
+      "today": "heute",
+      "tomorrow": "morgen",
+      "inDays": "in {n} Tagen",
+      "exportIcs": ".ics exportieren"
+    },
+    "feature054": {
+      "title": "Lebenskosten",
+      "loading": "Kosten werden berechnet…",
+      "empty": "Keine Kostenschätzung verfügbar.",
+      "error": "Kosten konnten nicht berechnet werden.",
+      "errorHint": "Später erneut versuchen — keine veralteten Werte werden als live angezeigt.",
+      "income": "Einkommen",
+      "size": "Wohnfläche",
+      "calculate": "Berechnen",
+      "housing": "Miete",
+      "tax": "Einkommenssteuer",
+      "health": "Krankenkasse",
+      "commute": "ÖV-Abo",
+      "remaining": "Verfügbar",
+      "total": "Total / Monat",
+      "disclaimer": "Unverbindliche Modellschätzung, keine Finanz- oder Steuerberatung."
     }
   }
 }

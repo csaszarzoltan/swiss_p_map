@@ -173,6 +173,34 @@
       "noPollData": "Pas encore de données de sondage.",
       "pollMeta": "{institute} · N={n} · ±{margin} %",
       "resultMeta": "National {nat} % · Cantonal {cant} % · Local {loc} %"
+    },
+    "feature053": {
+      "title": "Calendrier des déchets",
+      "loading": "Chargement du calendrier…",
+      "empty": "Aucune date de collecte disponible.",
+      "error": "Calendrier indisponible.",
+      "listLabel": "Prochaines collectes",
+      "today": "aujourd'hui",
+      "tomorrow": "demain",
+      "inDays": "dans {n} jours",
+      "exportIcs": "Exporter .ics"
+    },
+    "feature054": {
+      "title": "Coût de la vie",
+      "loading": "Calcul des coûts…",
+      "empty": "Aucune estimation disponible.",
+      "error": "Coûts indisponibles.",
+      "errorHint": "Réessayez plus tard — aucune valeur obsolète affichée comme en direct.",
+      "income": "Revenu",
+      "size": "Surface du logement",
+      "calculate": "Calculer",
+      "housing": "Loyer",
+      "tax": "Impôt sur le revenu",
+      "health": "Assurance maladie",
+      "commute": "Abonnement TP",
+      "remaining": "Disponible",
+      "total": "Total / mois",
+      "disclaimer": "Estimation indicative modélisée, sans valeur de conseil financier ou fiscal."
     }
   }
 }
