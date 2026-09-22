@@ -42,7 +42,10 @@ from src.services.tax_service import TaxService
 from src.services.transit_mobility_service import TransitMobilityService
 from src.services.vote_analysis_service import VoteAnalysisService
 from src.services.vote_service import VoteService
-from src.services.weather_climate_service import WeatherClimateService
+from src.services.weather_climate_service import (
+    WeatherClimateService,
+    WeatherProviderError,
+)
 from src.services.web_push_service import PushSubscription, WatchAlert, WebPushService
 
 _DEFAULT_CORS_ORIGINS = "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3310,http://127.0.0.1:3310,http://localhost:3410,http://127.0.0.1:3410"
@@ -611,17 +614,47 @@ def civic_news(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, obje
 
 
 @app.get("/api/v1/weather/current")
-def civic_weather(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
+def civic_weather(
+    postcode: str = Query(..., pattern=r"^\d{4}$"),
+    live: bool = Query(False),
+) -> dict[str, object]:
+    if live:
+        try:
+            return _weather.current_live(postcode).model_dump()
+        except WeatherProviderError as e:
+            raise HTTPException(
+                status_code=503,
+                detail={"error": "weather_provider_unavailable",
+                        "trust_state": "source_pending",
+                        "message": str(e)},
+            ) from e
     return _weather.current(postcode).model_dump()
 
 
+@app.get("/api/v1/weather/forecast")
+def civic_forecast(postcode: str = Query(..., pattern=r"^\d{4}$")) -> dict[str, object]:
+    try:
+        return _weather.forecast_live(postcode).model_dump()
+    except WeatherProviderError as e:
+        raise HTTPException(
+            status_code=503,
+            detail={"error": "weather_provider_unavailable",
+                    "trust_state": "source_pending",
+                    "message": str(e)},
+        ) from e
+
+
 @app.get("/api/v1/weather/alerts")
-def civic_alerts() -> dict[str, object]:
+def civic_alerts(live: bool = Query(False)) -> dict[str, object]:
+    if live:
+        return _weather.alerts_live("8000").model_dump()
     return {"items": [x.model_dump() for x in _weather.alerts()]}
 
 
 @app.get("/api/v1/weather/water-temperatures")
-def civic_water() -> dict[str, object]:
+def civic_water(live: bool = Query(False)) -> dict[str, object]:
+    if live:
+        return _weather.water_live("8000").model_dump()
     return {"items": [x.model_dump() for x in _weather.water()]}
 
 

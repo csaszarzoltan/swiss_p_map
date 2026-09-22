@@ -73,6 +73,10 @@ export interface VoteProposalOverview {
   national_turnout_percent: number;
 }
 
+export interface WeatherDay { date: string; temp_min_c: number; temp_max_c: number; precip_prob_pct: number; condition: string; }
+export interface WeatherForecast { postcode: string; current_temp_c: number; current_condition: string; observed_at: string; days: WeatherDay[]; source: string; trust_state: string; fetched_at: string; cache_ttl_seconds: number; }
+export interface WeatherLiveList { status: string; items: unknown[]; source: string; official_url: string; fetched_at: string; note: string; }
+
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8310";
 
 async function getJson<T>(path: string): Promise<T> {
@@ -90,6 +94,9 @@ export const api = {
   civicVoteProposals: () => getJson<unknown>(`/api/v1/votes/proposals`),
   localNews: (postcode: string) => getJson<unknown>(`/api/v1/news/local?postcode=${postcode}`),
   currentWeather: (postcode: string) => getJson<unknown>(`/api/v1/weather/current?postcode=${postcode}`),
+  weatherForecast: (postcode: string) => getJson<WeatherForecast>(`/api/v1/weather/forecast?postcode=${postcode}`),
+  weatherAlertsLive: () => getJson<WeatherLiveList>(`/api/v1/weather/alerts?live=true`),
+  weatherWaterLive: () => getJson<WeatherLiveList>(`/api/v1/weather/water-temperatures?live=true`),
   costAssessment: (postcode: string, income: number) => getJson<unknown>(`/api/v1/costs/assessment?postcode=${postcode}&income_chf=${income}`),
   districtComparison: (codes: string[]) => getJson<{items: DistrictComparison[]}>(`/api/v1/districts/compare?postcodes=${codes.join(",")}`),
   mobility: (postcode: string) => getJson<MobilityAssessment>(`/api/v1/mobility/isochrones?postcode=${postcode}`),

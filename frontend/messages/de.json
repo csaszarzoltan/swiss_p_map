@@ -130,5 +130,33 @@
     "button": "Copy link",
     "copied": "Link copied",
     "error": "Copy failed"
+  },
+  "phase3": {
+    "feature052": {
+      "title": "Wetter",
+      "loading": "Wetter wird geladen…",
+      "empty": "Keine Wetterdaten verfügbar.",
+      "error": "Wetterdaten konnten nicht geladen werden.",
+      "errorHint": "Später erneut versuchen — es werden keine veralteten Werte als live angezeigt.",
+      "source": "Open-Meteo / MeteoSwiss ICON",
+      "weekTrend": "7-Tage-Trend",
+      "currentTemp": "Aktuell {v} Grad",
+      "precip": "Niederschlagswahrscheinlichkeit {v} Prozent",
+      "alertsPending": "Offizielle Warnstufen nur auf der MeteoSchweiz-Karte:",
+      "officialMap": "Offizielle Karte",
+      "waterHint": "Wassertemperaturen nur auf Hydrodaten:",
+      "cond": {
+        "clear": "Klar",
+        "mostly_clear": "Meist klar",
+        "partly_cloudy": "Wechselhaft",
+        "overcast": "Bedeckt",
+        "fog": "Nebel",
+        "drizzle": "Nieselregen",
+        "rain": "Regen",
+        "snow": "Schnee",
+        "thunderstorm": "Gewitter",
+        "unknown": "—"
+      }
+    }
   }
 }

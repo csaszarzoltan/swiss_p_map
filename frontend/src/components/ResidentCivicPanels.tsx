@@ -9,7 +9,7 @@ export default function ResidentCivicPanels({ postcode }: { postcode: string }) 
   return (
     <section aria-label="Civic intelligence" className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
       <VotingVisualCard />
-      <WeatherVisualWidget />
+      <WeatherVisualWidget postcode={postcode} />
       <WasteCalendarVisual />
       <CostOfLivingCalculator postcode={postcode} />
     </section>
