@@ -38,6 +38,16 @@ CREATE INDEX IF NOT EXISTS idx_baugesuche_postcode ON baugesuche(postcode);
 CREATE INDEX IF NOT EXISTS idx_baugesuche_auflage_end ON baugesuche(auflage_end);
 """
 
+# Opcionális oszlopok, amelyek korábbi DB-verziókban nem léteztek.
+# A CREATE TABLE IF NOT EXISTS nem migrál meglévő táblát, ezért induláskor pótoljuk.
+_COLUMN_MIGRATIONS: tuple[tuple[str, str], ...] = (
+    ("contractor", "TEXT"),
+    ("architect", "TEXT"),
+    ("parcel_number", "TEXT"),
+    ("zone_type", "TEXT"),
+    ("risk_level", "TEXT"),
+)
+
 
 def _row_to_bg(row: sqlite3.Row) -> Baugesuch:
     keys = row.keys()
@@ -75,7 +85,15 @@ class PlanningRepo:
         self._conn = sqlite3.connect(db_path, check_same_thread=False)
         self._conn.row_factory = sqlite3.Row
         self._conn.executescript(_DDL)
+        self._migrate_schema()
         self._conn.commit()
+
+    def _migrate_schema(self) -> None:
+        """Hiányzó oszlopok pótlása régi DB-n (CREATE TABLE IF NOT EXISTS nem migrál)."""
+        existing = {row["name"] for row in self._conn.execute("PRAGMA table_info(baugesuche)")}
+        for column, column_type in _COLUMN_MIGRATIONS:
+            if column not in existing:
+                self._conn.execute(f"ALTER TABLE baugesuche ADD COLUMN {column} {column_type}")
 
     def upsert_many(self, items: list[Baugesuch]) -> int:
         if not items:

@@ -836,9 +836,6 @@ export default function Map3D(
   }, [activeTopic]);
 
   useEffect(() => {
-    const tax: Record<string, number> = { ZG: 54, SZ: 60, NW: 65, ZH: 119, LU: 116, BE: 154, NE: 156, GE: 155 };
-    const prices: Record<string, number> = { ZG: 15300, GE: 14200, ZH: 12500, SZ: 11600, BS: 10300, VD: 9800, BE: 7600, TI: 7200 };
-
     stateRef.current.mainGroup?.children.forEach((child) => {
       const mesh = child as THREE.Mesh;
       const material = mesh.material as THREE.MeshStandardMaterial;
@@ -969,8 +966,8 @@ export default function Map3D(
             </div>
           )}
 
-          {/* Politik Theme */}
-          {activeTopic === "politik" && (
+          {/* Politik Theme — ADR-012: a szavazás címe a statisztikai kártyán (overview + politik) */}
+          {(activeTopic === "politik" || activeTopic === "overview") && (
             <div className="pt-2 border-t border-sky-500/20">
               <div className="mb-1 flex items-center justify-between text-[11px]">
                 <span className="font-semibold text-sky-300">🗳 13. AHV-Rente (BFS)</span>
