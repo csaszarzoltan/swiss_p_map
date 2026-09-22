@@ -15,6 +15,7 @@ from fastapi.testclient import TestClient
 
 from src.main import app
 from src.services.weather_climate_service import (
+    Forecast,
     WeatherClimateService,
     WeatherProviderError,
 )
@@ -141,9 +142,7 @@ def test_spec_052_req_052_005_ac_052_002_fallback_never_official(
     import src.main as main_mod
 
     class _Failing(WeatherClimateService):
-        def forecast_live(
-            self, postcode: str
-        ) -> object:  # type: ignore[override]
+        def forecast_live(self, postcode: str) -> Forecast:
             raise WeatherProviderError("down")
 
     monkeypatch.setattr(main_mod, "_weather", _Failing())
