@@ -131,6 +131,27 @@
     "copied": "Link copied",
     "error": "Copy failed"
   },
+  "resident": {
+    "feature045": {
+          "title": "Local briefing",
+          "eyebrow": "Your place. Clearly explained.",
+          "introTitle": "What matters in your municipality today",
+          "introBody": "Search for a postcode. You will then see votes, environment, weather, housing, mobility and planning projects as separate topics. The map only opens where spatial context helps.",
+          "loading": "Loading local overview…",
+          "empty": "No local information available.",
+          "error": "Local overview could not be loaded.",
+          "errorHint": "Try again later — no stale values are shown as live.",
+          "todayIn": "Important today in {locality}",
+          "briefingFor": "Local briefing · {postcode}",
+          "verifiedNote": "Source-checked data · news adapter prepared",
+          "source": "Source: {name}",
+          "openMap": "On map",
+          "close": "Close",
+          "topicsLabel": "Local topics",
+          "chartFallback": "Topic overview as a list: {count} topics with source and status.",
+          "pendingBadge": "Source pending"
+    }
+  },
   "phase3": {
     "feature052": {
       "title": "Weather",

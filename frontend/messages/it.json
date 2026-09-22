@@ -131,6 +131,27 @@
     "copied": "Link copied",
     "error": "Copy failed"
   },
+  "resident": {
+    "feature045": {
+          "title": "Bollettino locale",
+          "eyebrow": "Il tuo luogo. Spiegato chiaramente.",
+          "introTitle": "Cosa conta oggi nel tuo comune",
+          "introBody": "Cerca un codice postale. Vedrai poi votazioni, ambiente, meteo, abitazione, mobilità e progetti edilizi come temi separati. La mappa si apre solo dove il contesto spaziale aiuta.",
+          "loading": "Caricamento panoramica locale…",
+          "empty": "Nessuna informazione locale disponibile.",
+          "error": "Panoramica locale non disponibile.",
+          "errorHint": "Riprova più tardi — nessun valore obsoleto mostrato come live.",
+          "todayIn": "Importante oggi a {locality}",
+          "briefingFor": "Bollettino locale · {postcode}",
+          "verifiedNote": "Dati verificati · adattatore notizie preparato",
+          "source": "Fonte: {name}",
+          "openMap": "Sulla mappa",
+          "close": "Chiudi",
+          "topicsLabel": "Temi locali",
+          "chartFallback": "Panoramica dei temi come elenco: {count} temi con fonte e stato.",
+          "pendingBadge": "Fonte in attesa"
+    }
+  },
   "phase3": {
     "feature052": {
       "title": "Meteo",

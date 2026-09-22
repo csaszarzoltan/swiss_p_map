@@ -131,6 +131,27 @@
     "copied": "Link copied",
     "error": "Copy failed"
   },
+  "resident": {
+    "feature045": {
+          "title": "Bulletin local",
+          "eyebrow": "Votre lieu. Expliqué clairement.",
+          "introTitle": "Ce qui compte aujourd'hui dans votre commune",
+          "introBody": "Recherchez un code postal. Vous verrez ensuite votations, environnement, météo, logement, mobilité et projets d'aménagement comme thèmes séparés. La carte ne s'ouvre que là où le contexte spatial aide.",
+          "loading": "Chargement de l'aperçu local…",
+          "empty": "Aucune information locale disponible.",
+          "error": "Aperçu local indisponible.",
+          "errorHint": "Réessayez plus tard — aucune valeur obsolète affichée comme en direct.",
+          "todayIn": "Important aujourd'hui à {locality}",
+          "briefingFor": "Bulletin local · {postcode}",
+          "verifiedNote": "Données vérifiées · adaptateur d'actualités préparé",
+          "source": "Source : {name}",
+          "openMap": "Sur la carte",
+          "close": "Fermer",
+          "topicsLabel": "Thèmes locaux",
+          "chartFallback": "Aperçu des thèmes sous forme de liste : {count} thèmes avec source et statut.",
+          "pendingBadge": "Source en attente"
+    }
+  },
   "phase3": {
     "feature052": {
       "title": "Météo",

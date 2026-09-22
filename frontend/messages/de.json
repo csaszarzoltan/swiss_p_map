@@ -131,6 +131,27 @@
     "copied": "Link copied",
     "error": "Copy failed"
   },
+  "resident": {
+    "feature045": {
+          "title": "Lokales Briefing",
+          "eyebrow": "Ihr Ort. Verständlich erklärt.",
+          "introTitle": "Was heute in Ihrer Gemeinde wichtig ist",
+          "introBody": "Suchen Sie eine Postleitzahl. Danach sehen Sie Abstimmungen, Umwelt, Wetter, Wohnen, Mobilität und Bauvorhaben als getrennte Themen. Die Karte öffnet sich nur dort, wo räumlicher Kontext hilft.",
+          "loading": "Lokale Übersicht wird geladen…",
+          "empty": "Keine lokalen Informationen verfügbar.",
+          "error": "Lokale Übersicht konnte nicht geladen werden.",
+          "errorHint": "Später erneut versuchen — keine veralteten Werte werden als live angezeigt.",
+          "todayIn": "Heute wichtig in {locality}",
+          "briefingFor": "Lokales Briefing · {postcode}",
+          "verifiedNote": "Quellengeprüfte Daten · Nachrichtenadapter vorbereitet",
+          "source": "Quelle: {name}",
+          "openMap": "Auf Karte",
+          "close": "Schließen",
+          "topicsLabel": "Lokale Themen",
+          "chartFallback": "Themenübersicht als Liste: {count} Themen mit Quelle und Status.",
+          "pendingBadge": "Quelle ausstehend"
+    }
+  },
   "phase3": {
     "feature052": {
       "title": "Wetter",
