@@ -31,5 +31,7 @@ Te a Swiss P Map agentje vagy. Workdir: ~/swiss_p_map — NE kódolj mielőtt el
    - T2 Pattern-bug (ismétlődhet, API/UX): nincs ticket, de KÖTELEZŐ 5 sor tanulság → docs/decisions/BUG-NNN-*.md vagy engineering-standards 1 sor (pl. Caddy /api/* dual prefix)
    - T3 Rendszer-bug (>3 file, archi): KÖTELEZŐ hermes kanban create --board swiss-p-map "bug: ..." --priority high (+ research→ADR). Canary piros = automatikus T3 (BLOCKED kártya).
 
-6. INDÍTÁS: foglald össze 2-3 mondatban mit értettél (stack + hol tart + következő logikus lépés a 7 fázis szerint), aztán várd a feladatot. Ne kódolj jóváhagyás nélkül.
+6. KANBAN WATCH (ha taskot teszel ki ES visszajelzest igersz): szobeli igeret TILOS - kotelezo mechanizmus: A) notify-subscribe (rovid task) VAGY B) figyelo cron 15m (hosszu task, done/blocked utan torli magat) VAGY A+B (kritikus). Reszletek: EVOLUTIONARY-SYSTEM.md 17. fejezet.
+
+8. INDÍTÁS: foglald össze 2-3 mondatban mit értettél (stack + hol tart + következő logikus lépés a 7 fázis szerint), aztán várd a feladatot. Ne kódolj jóváhagyás nélkül.
 ```
