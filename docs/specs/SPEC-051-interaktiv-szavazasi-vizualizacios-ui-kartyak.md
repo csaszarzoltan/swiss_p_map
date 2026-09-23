@@ -13,7 +13,7 @@ brief: BRIEF-051
 ---
 # SPEC-051: Interaktív Szavazási és Népszavazási Vizualizációs UI Kártyák
 ## 1. Cím és metaadatok
-`SPEC-051`, `BRIEF-051`, verzió 1, SPEC_READY, implementáció PENDING_DEV.
+`SPEC-051`, `BRIEF-051`, verzió 1, SPEC_READY, implementáció IMPLEMENTED.
 ## 2. Cél és kontextus
 Resident-first civic UX, élő OGD integráció vagy hozzájárulás-alapú értesítés biztosítása ellenőrizhető forrással.
 ## 3. Funkcionális követelmények

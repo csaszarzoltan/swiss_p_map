@@ -16,7 +16,7 @@ brief: BRIEF-047
 
 ## 1. Cím és metaadatok
 - Specifikáció: `SPEC-047`; kapcsolódó brief: `BRIEF-047`.
-- Implementációs státusz: `PENDING_DEV`; specifikációs kapu: `SPEC_READY`.
+- Implementációs státusz: `IMPLEMENTED`; specifikációs kapu: `SPEC_READY`.
 
 ## 2. Cél és kontextus
 Resident-first, forrásolt helyi információ biztosítása úgy, hogy a térkép opcionális elemzőeszköz maradjon.

@@ -5,6 +5,13 @@ Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Ch
 ## [Unreleased]
 
 ### Added
+- **SPEC-051: VotingVisualCard élő adatokkal**: `GET /api/v1/votes/proposals` + `/{id}/analysis` proposal-választóval, last-request-wins, loading/empty/error állapotok, `SourceTrustBadge` (`frontend/src/components/civic/VotingVisualCard.tsx` + `test_spec051_voting_contract.py`)
+- **SPEC-052: WeatherVisualWidget élő MeteoSwiss/Open-Meteo adatokkal**: live forecast + alerts/water `source_pending` (soha nem hamis official adat), `Forecast` típus (`WeatherVisualWidget.tsx` + `test_spec052_weather_contract.py` 14 teszt)
+- **SPEC-053: WasteCalendarVisual élő adatokkal + valós .ics**: `GET /api/v1/municipal/waste-calendar` relatív nap-visszaszámlálással, valós `.ics` export (`MunicipalService.waste_ics`, `text/calendar`), relatív schedule tesztek (`test_spec053_waste_calendar.py`)
+- **SPEC-054: CostOfLivingCalculator teljes lebontás + disclaimer**: housing/tax/health/commute/remaining sorok összegzése totalra, `size_m2` paraméter (default 80), `modeled_estimate` trust (`test_spec054_cost_of_living.py`)
+- **SPEC-045: LocalInformationHub i18n + traceability + a11y**: `resident.feature045` szótárak (de/en/fr/it), SPEC-045/REQ-045/AC-045 traceability ID-k, tablist arrow-key/Home/End navigáció + Escape-zárás, last-request-wins, E2E (`test_local_information_hub.py`)
+- **SPEC-047/058: Amtsblatt hír-pipeline élőre kötése**: valós XML fetch `AmtsblattService`-en át, idempotens SQLite upsert (ingested/skipped számlálók, canton paraméter), postcode-szűrt `GET /api/v1/news/local` (`AmtsblattNewsPipeline`, `test_spec047_058_news_pipeline.py` 12 teszt)
+- **SPEC státuszszinkron**: SPEC-045/047/051/052/053/054/058 `implementationStatus: IMPLEMENTED` (frontmatter + 1. fejezet törzsszöveg), kód+teszt evidenciával validálva
 - **ADR-012: Valós Szövetségi Szavazási Adatok (BFS/FSO)**: Hivatalos népszavazási eredmények (`13. AHV-Rente`) mind a 26 kantonra valós Igen/Nem százalékkal és 4-nyelvű címekkel (`GET /api/v1/politics/votes/latest`)
 - **ADR-013: 3D Interaktív Építési Markerek**: Borostyánsárga lüktető 3D Three.js pin jelölők, fellebbezési időablak visszaszámláló és raycasting alapú projekt-kattintás
 - **ADR-014: Többkantonos Építési Engedély Federáció**: Bern (`3011`), Basel (`4001`), Genf (`1201`), és Zürich (`8004`, `8001`, `8610`) aktív építési projektjeinek integrációja
@@ -21,9 +28,10 @@ Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Ch
 - Mobilos reszponzivitás: a lebegő nyelvválasztó és 3D panel képernyőmérethez igazítása
 
 ### Verified
-- `pytest tests/`: **54 passed in 1.85s** (100% green)
-- `mypy src`: **20 source files clean (0 errors)**
+- `pytest tests/unit`: **129 passed** (100% green)
+- `mypy src`: **47 source files clean (0 errors)**
 - `ruff check src tests`: **All checks passed**
+- `tsc --noEmit` + `npm run build`: **clean (SSG)**
 - `npx playwright test`: **8/8 passed (43.3s)** — Hero, 3D Canvas, N Iránytű, Témák, PLZ 8004 keresés, Quick-Pick 8001, 4 locale (DE/EN/FR/IT), Valós BFS szavazás & Többkantonos Planung (3011 Bern & 4001 Basel)
 
 

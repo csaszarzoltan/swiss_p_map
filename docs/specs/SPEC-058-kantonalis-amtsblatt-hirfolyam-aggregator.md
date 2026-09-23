@@ -13,7 +13,7 @@ brief: BRIEF-058
 ---
 # SPEC-058: Kantonális E-Amtsblatt és Hivatalos Közlöny Hírfolyam Aggregátor
 ## 1. Cím és metaadatok
-`SPEC-058`, `BRIEF-058`, verzió 1, SPEC_READY, implementáció PENDING_DEV.
+`SPEC-058`, `BRIEF-058`, verzió 1, SPEC_READY, implementáció IMPLEMENTED.
 ## 2. Cél és kontextus
 Resident-first civic UX, élő OGD integráció vagy hozzájárulás-alapú értesítés biztosítása ellenőrizhető forrással.
 ## 3. Funkcionális követelmények

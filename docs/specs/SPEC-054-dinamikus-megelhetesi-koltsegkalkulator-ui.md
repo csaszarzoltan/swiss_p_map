@@ -13,7 +13,7 @@ brief: BRIEF-054
 ---
 # SPEC-054: Dinamikus Svájci Megélhetési és Lakhatási Költségkalkulátor UI
 ## 1. Cím és metaadatok
-`SPEC-054`, `BRIEF-054`, verzió 1, SPEC_READY, implementáció PENDING_DEV.
+`SPEC-054`, `BRIEF-054`, verzió 1, SPEC_READY, implementáció IMPLEMENTED.
 ## 2. Cél és kontextus
 Resident-first civic UX, élő OGD integráció vagy hozzájárulás-alapú értesítés biztosítása ellenőrizhető forrással.
 ## 3. Funkcionális követelmények

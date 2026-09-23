@@ -13,7 +13,7 @@ brief: BRIEF-053
 ---
 # SPEC-053: Vizuális Svájci Hulladéknaptár és Háztartási Naptár-integráció
 ## 1. Cím és metaadatok
-`SPEC-053`, `BRIEF-053`, verzió 1, SPEC_READY, implementáció PENDING_DEV.
+`SPEC-053`, `BRIEF-053`, verzió 1, SPEC_READY, implementáció IMPLEMENTED.
 ## 2. Cél és kontextus
 Resident-first civic UX, élő OGD integráció vagy hozzájárulás-alapú értesítés biztosítása ellenőrizhető forrással.
 ## 3. Funkcionális követelmények
