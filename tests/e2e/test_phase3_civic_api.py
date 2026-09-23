@@ -18,7 +18,9 @@ def test_spec_057_req_057_001_ac_057_001_transport_api() -> None:
 
 
 def test_spec_058_req_058_001_ac_058_001_amtsblatt_api() -> None:
-    assert c.post("/api/v1/connectors/amtsblatt/ingest").json()["ingested"] == 1
+    # Idempotens upsert: első futás ingested>=1, ismétlés skipped>=1 — összeg stabil.
+    body = c.post("/api/v1/connectors/amtsblatt/ingest").json()
+    assert body["ingested"] + body["skipped"] >= 1
 
 
 def test_spec_059_req_059_004_ac_059_003_newsletter_requires_consent() -> None:

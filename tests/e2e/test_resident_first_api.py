@@ -23,8 +23,11 @@ def test_spec_046_req_046_003_ac_046_003_vote_404() -> None:
 
 
 def test_spec_047_req_047_004_ac_047_002_news_api() -> None:
-    assert (
-        c.get("/api/v1/news/local?postcode=8004").json()["status"] == "source_pending"
+    # Viselkedés SPEC-047/058 után: ha van tárolt hír → success, ha üres → honest source_pending.
+    # Mindkettő becsületes állapot (REQ-047-004: nincs fabrikált adat).
+    assert c.get("/api/v1/news/local?postcode=8004").json()["status"] in (
+        "success",
+        "source_pending",
     )
 
 

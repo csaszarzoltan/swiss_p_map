@@ -48,7 +48,6 @@ def test_spec_045_req_045_004_ac_045_002_pending_live_source_not_presented_as_cu
         if x.category == "weather"
     )
     assert weather.status == "source_pending"
-    assert weather.status != "current_data"
 
 
 def test_spec_045_req_045_006_ac_045_002_responses_are_request_scoped_no_crosstalk() -> None:

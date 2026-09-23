@@ -173,7 +173,12 @@ def _seeded_service() -> LocalNewsService:
     pipe = AmtsblattNewsPipeline(fetcher=_fake_fetcher(SAMPLE_XML_TWO), repo=repo)
     import asyncio
 
-    asyncio.get_event_loop().run_until_complete(pipe.ingest())
+    # Suite-biztos: saját loop (get_event_loop suite-ban RuntimeError-t dobhat).
+    loop = asyncio.new_event_loop()
+    try:
+        loop.run_until_complete(pipe.ingest())
+    finally:
+        loop.close()
     return svc
 
 
