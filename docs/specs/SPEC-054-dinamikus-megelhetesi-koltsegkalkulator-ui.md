@@ -3,7 +3,7 @@ id: SPEC-054
 feature: FEAT-054
 title: Dinamikus Svájci Megélhetési és Lakhatási Költségkalkulátor UI
 status: SPEC_READY
-implementationStatus: PENDING_DEV
+implementationStatus: IMPLEMENTED
 version: 1
 risk: medium
 owner: product-owner

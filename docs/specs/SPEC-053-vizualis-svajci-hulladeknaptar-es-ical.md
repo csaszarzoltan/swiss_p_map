@@ -3,7 +3,7 @@ id: SPEC-053
 feature: FEAT-053
 title: Vizuális Svájci Hulladéknaptár és Háztartási Naptár-integráció
 status: SPEC_READY
-implementationStatus: PENDING_DEV
+implementationStatus: IMPLEMENTED
 version: 1
 risk: medium
 owner: product-owner

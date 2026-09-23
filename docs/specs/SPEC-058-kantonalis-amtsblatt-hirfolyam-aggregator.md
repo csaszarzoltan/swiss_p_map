@@ -3,7 +3,7 @@ id: SPEC-058
 feature: FEAT-058
 title: Kantonális E-Amtsblatt és Hivatalos Közlöny Hírfolyam Aggregátor
 status: SPEC_READY
-implementationStatus: PENDING_DEV
+implementationStatus: IMPLEMENTED
 version: 1
 risk: medium
 owner: product-owner

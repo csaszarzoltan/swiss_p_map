@@ -3,7 +3,7 @@ id: SPEC-051
 feature: FEAT-051
 title: Interaktív Szavazási és Népszavazási Vizualizációs UI Kártyák
 status: SPEC_READY
-implementationStatus: PENDING_DEV
+implementationStatus: IMPLEMENTED
 version: 1
 risk: medium
 owner: product-owner

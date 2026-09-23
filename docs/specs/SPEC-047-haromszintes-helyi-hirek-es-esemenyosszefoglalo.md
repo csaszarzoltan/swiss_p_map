@@ -2,7 +2,7 @@
 id: FEAT-047
 title: 3 Szintes Helyi Hírek és Eseményösszefoglaló Modell
 status: SPEC_READY
-implementationStatus: PENDING_DEV
+implementationStatus: IMPLEMENTED
 version: 1
 risk: medium
 owner: product-owner

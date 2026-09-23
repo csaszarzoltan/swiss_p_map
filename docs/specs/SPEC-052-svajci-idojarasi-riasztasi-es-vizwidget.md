@@ -3,7 +3,7 @@ id: SPEC-052
 feature: FEAT-052
 title: Svájci Időjárási, Riasztási és Tavi Vízhőmérsékleti Widget
 status: SPEC_READY
-implementationStatus: PENDING_DEV
+implementationStatus: IMPLEMENTED
 version: 1
 risk: medium
 owner: product-owner

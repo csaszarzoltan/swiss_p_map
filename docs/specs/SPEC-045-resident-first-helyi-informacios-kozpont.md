@@ -2,7 +2,7 @@
 id: FEAT-045
 title: Resident-First Helyi Információs Központ és Életviteli Portál Architektúra
 status: SPEC_READY
-implementationStatus: PENDING_DEV
+implementationStatus: IMPLEMENTED
 version: 1
 risk: medium
 owner: product-owner
