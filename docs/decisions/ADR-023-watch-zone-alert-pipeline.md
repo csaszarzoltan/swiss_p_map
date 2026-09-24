@@ -1,6 +1,6 @@
 # ADR-023: Watch-zone értesítési lánc és Einsprachefrist-menedzser
 
-- **Státusz:** proposed
+- **Státusz:** accepted (2026-09-24, implementálva: A `3edb777` + B `3370820`)
 - **Dátum:** 2026-09-23
 - **Kontextus:** research `docs/research/2026-09-23-proactive-civic-features.md`
 - **Kapcsolódó:** ADR-002 (ingest), ADR-013 (3D pin), ADR-021 (radius watcher), SPEC-059/060
