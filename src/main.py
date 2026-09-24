@@ -34,6 +34,7 @@ from src.services.objection_workspace_service import (
     ObjectionRequest,
     ObjectionWorkspaceService,
 )
+from src.services.oereb_service import OerebProviderError, OerebService
 from src.services.place_service import PlaceService
 from src.services.planning_service import PlanningService
 from src.services.politics_service import PoliticsService
@@ -107,6 +108,8 @@ _newsletter = NewsletterService()
 _web_push = WebPushService()
 # ADR-023: watch-zone értesítési lánc a meglévő ingest-store-on (additív wiring)
 _watch = WatchService(repo=_planning._repo, web_push=_web_push, newsletter=_newsletter)
+# ADR-023/C: ÖREB Nutzungsplanung élő zóna-lekérdezés (kanton-tudatos)
+_oereb = OerebService()
 # Demo seed — amíg nincs napi Amtsblatt poll, 8004-en legyen aktív Baugesuch a bemutatóhoz
 try:
     from datetime import date as _d
@@ -581,6 +584,30 @@ def cadastre_parcel(
 ) -> dict[str, object]:
     """SPEC-026 REQ-001 AC-001 public parcel lookup."""
     return _cadastral.parcel(postcode, parcel_nr).model_dump()
+
+
+@app.get("/api/v1/cadastre/zone")
+async def cadastre_zone(
+    lat: float = Query(..., ge=45.7, le=47.9),
+    lon: float = Query(..., ge=5.8, le=10.6),
+) -> dict[str, object]:
+    """ADR-023/C: OEREB Nutzungsplanung zóna lat/lon-ra (kanton-tudatos).
+
+    Üres feed (pl. ZH/BE lefedettség-hiány) -> honest source_pending +
+    hivatalos-link; ZH-ra a meglévő WFS Nutzungsplanung marad (place_service).
+    Provider-hiba -> kontrollált 503.
+    """
+    try:
+        return (await _oereb.zone(lat, lon)).model_dump()
+    except OerebProviderError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "error": "oereb_provider_unavailable",
+                "trust_state": "source_pending",
+                "message": str(exc),
+            },
+        ) from exc
 
 
 @app.post("/api/v1/objection/template")
