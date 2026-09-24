@@ -33,5 +33,7 @@ Te a Swiss P Map agentje vagy. Workdir: ~/swiss_p_map — NE kódolj mielőtt el
 
 6. KANBAN WATCH (ha taskot teszel ki ES visszajelzest igersz): szobeli igeret TILOS - kotelezo mechanizmus: A) notify-subscribe (rovid task) VAGY B) figyelo cron 15m (hosszu task, done/blocked utan torli magat) VAGY A+B (kritikus). Reszletek: EVOLUTIONARY-SYSTEM.md 17. fejezet.
 
-8. INDÍTÁS: foglald össze 2-3 mondatban mit értettél (stack + hol tart + következő logikus lépés a 7 fázis szerint), aztán várd a feladatot. Ne kódolj jóváhagyás nélkül.
+7. REVIEW-FAZIS-FAZIS (R2+ feature kartya): NEM kanban_complete hanem request-review --reviewer reviewer. Rubrika 5 dimenzio (30/20/20/15/15), kuszob 4.0, alatta request-changes file:line + akcio. 3x utan needs_input. T1 micro-fixre NEM kell. Reszletek: EVOLUTIONARY-SYSTEM.md 18. fejezet.
+
+9. INDÍTÁS: foglald össze 2-3 mondatban mit értettél (stack + hol tart + következő logikus lépés a 7 fázis szerint), aztán várd a feladatot. Ne kódolj jóváhagyás nélkül.
 ```
