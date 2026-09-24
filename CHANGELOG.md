@@ -2,13 +2,17 @@
 
 Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Changelog + SemVer.
 
-## [Unreleased]
+## [0.3.0] - 2026-09-24
 
 ### Added
 - **SPEC-051: VotingVisualCard élő adatokkal**: `GET /api/v1/votes/proposals` + `/{id}/analysis` proposal-választóval, last-request-wins, loading/empty/error állapotok, `SourceTrustBadge` (`frontend/src/components/civic/VotingVisualCard.tsx` + `test_spec051_voting_contract.py`)
 - **SPEC-052: WeatherVisualWidget élő MeteoSwiss/Open-Meteo adatokkal**: live forecast + alerts/water `source_pending` (soha nem hamis official adat), `Forecast` típus (`WeatherVisualWidget.tsx` + `test_spec052_weather_contract.py` 14 teszt)
 - **SPEC-053: WasteCalendarVisual élő adatokkal + valós .ics**: `GET /api/v1/municipal/waste-calendar` relatív nap-visszaszámlálással, valós `.ics` export (`MunicipalService.waste_ics`, `text/calendar`), relatív schedule tesztek (`test_spec053_waste_calendar.py`)
 - **SPEC-054: CostOfLivingCalculator teljes lebontás + disclaimer**: housing/tax/health/commute/remaining sorok összegzése totalra, `size_m2` paraméter (default 80), `modeled_estimate` trust (`test_spec054_cost_of_living.py`)
+- **ADR-023: watch-zone értesítési lánc + Einsprachefrist-menedzser**: `WatchZone` CRUD consent-kapuval, `WatchStore` SQLite dedup `(zone_id,baugesuch_id,kind)`, `WatchMatcher` determinisztikus távolság-szűrés, események `source/fetched_at/trust_state`-tel, push → `WebPushService` + e-mail → `NewsletterService` double opt-in (queued, soha nem hamis `sent`), `publication_date + 20 nap` → `deadline/days_left` (`open`/`due_soon ≤3 nap`/`expired`), REQ-B3 disclaimer (`src/services/watch_service.py` 594 sor + 5 endpoint: `POST/GET /api/v1/watch/zones`, `GET /api/v1/watch/events|deadlines`, `POST /api/v1/watch/run`, `test_adr023_watch_zone.py` 33 teszt)
+- **ADR-023/B: watch-zone notification UI + Einsprachefrist countdown**: `WatchEventsCard` event-lista + határidő-visszaszámláló + consent-gated channel-választó (`push|email`), `resident.feature023` szótárak 43 kulccsal × 4 nyelv, `frontend/tests/unit/adr023-watch-ui.test.mjs` 11 zöld + e2e `watch-events-card.spec.ts` 10 teszt
+- **ADR-023/C: kanton-tudatos ÖREB Nutzungsplanung zóna-lekérdezés**: `GET /api/v1/cadastre/zone` lat/lon-ra (OGC API LV95, honest `source_pending`, 24h cache; ZH-ra a meglévő WFS Nutzungsplanung marad), provider-hiba → kontrollált 503 (`src/services/oereb_service.py` + `test_oereb_zone.py`)
+- **SPEC-coverage audit (mind a 60 SPEC)**: `docs/audits/SPEC-coverage-2026-09-23.md` SPEC→testfile mátrix, contract-mélység SPEC-046/055/056/057/059/060 (`test_spec046_055_060_contract.py` 24 contract-teszt REQ/AC traceability-vel, mutation-checked: 3 mutáció → 5 failure)
 - **SPEC-045: LocalInformationHub i18n + traceability + a11y**: `resident.feature045` szótárak (de/en/fr/it), SPEC-045/REQ-045/AC-045 traceability ID-k, tablist arrow-key/Home/End navigáció + Escape-zárás, last-request-wins, E2E (`test_local_information_hub.py`)
 - **SPEC-047/058: Amtsblatt hír-pipeline élőre kötése**: valós XML fetch `AmtsblattService`-en át, idempotens SQLite upsert (ingested/skipped számlálók, canton paraméter), postcode-szűrt `GET /api/v1/news/local` (`AmtsblattNewsPipeline`, `test_spec047_058_news_pipeline.py` 12 teszt)
 - **SPEC státuszszinkron**: SPEC-045/047/051/052/053/054/058 `implementationStatus: IMPLEMENTED` (frontmatter + 1. fejezet törzsszöveg), kód+teszt evidenciával validálva
@@ -33,6 +37,17 @@ Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Ch
 - `ruff check src tests`: **All checks passed**
 - `tsc --noEmit` + `npm run build`: **clean (SSG)**
 - `npx playwright test`: **8/8 passed (43.3s)** — Hero, 3D Canvas, N Iránytű, Témák, PLZ 8004 keresés, Quick-Pick 8001, 4 locale (DE/EN/FR/IT), Valós BFS szavazás & Többkantonos Planung (3011 Bern & 4001 Basel)
+- **ADR-019…022 usability package**: tematikus `MapLegend` (Politics/Solar/ÖREB paletták + forrás-hivatkozások), `RiskBadge` (`low/medium/high` + „Miért?" tooltip, visszafelé kompatibilis `risk_level`/`risk_reason` Place-mezők), radius-watcher (`WatchZone` 300/500/1000 m, `AbortController`, meglévő `/api/v1/planning/radius` újrahasznosítva), megosztható locale-aware mélylink (`useShareableState` + `ShareButton` + vágólap-visszajelzés, 4 lokalizáció)
+
+### Verified
+- `pytest`: **238 passed, 1 skipped** (unit 195 + E2E/API 43)
+- `mypy src tests`: **91 source files clean (0 errors)**
+- `ruff check src tests`: **All checks passed**
+- `tsc --noEmit` + `npm run build`: **clean (SSG)**
+- Frontend unit: **11/11 passed** (`adr023-watch-ui.test.mjs`)
+- Backend útvonalak: **57 route** (`src/main.py`), API endpointok: **56 egyedi path** (+ `/health`)
+
+## [0.2.1] - 2026-08-27
 
 
 ### Added
@@ -75,9 +90,7 @@ Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Ch
 - ADR-001: Next.js + MapLibre + FastAPI + PostGIS, accepted
 - Kickoff research + W35 competitor scan + scaffold + CI + Phase 1 backend+frontend — 20 passed
 
-[Unreleased]: https://github.com/csaszarzoltan/swiss_p_map/compare/v0.2.1...HEAD
+[0.3.0]: https://github.com/csaszarzoltan/swiss_p_map/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/csaszarzoltan/swiss_p_map/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/csaszarzoltan/swiss_p_map/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/csaszarzoltan/swiss_p_map/releases/tag/v0.1.0
-
-- Added ADR-019..022 usability package: legend, risk badge, radius watcher, and share links.

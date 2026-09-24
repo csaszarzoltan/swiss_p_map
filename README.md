@@ -1,5 +1,7 @@
 # Swiss P Map
 
+**Version:** v0.3.0 · **Backend:** 57 route · **Tesztek:** 238 passed · **mypy:** 91 clean
+
 > **„A svájci környék egyetlen térképén”** — Integrált interaktív döntéstámogató térkép a helyi politika, életminőség és épített környezet metszetében. 4 nyelven: **de / en / fr / it**.
 
 ## Áttekintés
@@ -14,9 +16,9 @@ A **Swiss P Map** online scrapeli a svájci nyílt kormányzati adatokat (**OGD*
 - **Geo:** LV95 ↔ WGS84 (`GET /api/v1/geo/convert`), Swisstopo Search geokódolás
 - **i18n:** `next-intl 3.26.5`, `localePrefix: always`, `de` default, hreflang/sitemap
 
-## Architektúra & Stack (ADR-001…022)
+## Architektúra & Stack (ADR-001…023)
 
-- **Backend:** Python 3.11+ (FastAPI, Pydantic, httpx) — `src/main.py` **51 route**, `src/services/*` (civic: `local_information`, `local_news`, `weather_climate`, `cost_of_living`, `municipal`, `vote_analysis`, connectorok: `meteoswiss`, `bfs_voteinfo`, `sbb_transport`, `amtsblatt_news_pipeline` + `newsletter`, `web_push`)
+- **Backend:** Python 3.11+ (FastAPI, Pydantic, httpx) — `src/main.py` **57 route**, `src/services/*` (civic: `local_information`, `local_news`, `weather_climate`, `cost_of_living`, `municipal`, `vote_analysis`, connectorok: `meteoswiss`, `bfs_voteinfo`, `sbb_transport`, `amtsblatt_news_pipeline` + `newsletter`, `web_push`)
 - **Frontend:** Next.js 14 App Router (TS strict) + next-intl + Tailwind + Three.js 0.160 + MapLibre Light + swiss-maps TopoJSON + gsap
 - **Adattár:** SQLite WAL (`data/swisspm.db` — 22k Baugesuche + daily poll), PostGIS később külön ADR
 - **AI:** llm-budget-gateway `8013` (cooldown `502 ai_unavailable` → sablon)
@@ -47,7 +49,7 @@ CORS: `SWISSPM_CORS_ORIGINS=http://localhost:3310,http://127.0.0.1:3310`
 ```
 swiss_p_map/
 ├── src/
-│   ├── main.py                 # FastAPI 51 route (geo/politics/place/planning/ai + civic/connectors)
+│   ├── main.py                 # FastAPI 57 route (geo/politics/place/planning/ai + civic/connectors/watch/oereb)
 │   ├── models/{geo,place,politics,planning}.py
 │   ├── services/{geo_converter,place,politics,planning,amtsblatt,ogd_service,ai_summary}.py
 │   ├── services/{local_information,local_news,weather_climate,cost_of_living,municipal,vote_analysis,newsletter,web_push}.py
@@ -70,8 +72,8 @@ swiss_p_map/
 
 ```bash
 # Backend
-.venv/bin/python -m pytest tests/unit -q  # 129 passed
-.venv/bin/python -m mypy src  # 47 clean
+.venv/bin/python -m pytest -q  # 238 passed, 1 skipped
+.venv/bin/python -m mypy src tests  # 91 clean
 .venv/bin/python -m ruff check src tests
 
 # Backend lokálisan (DBUS-clean)
