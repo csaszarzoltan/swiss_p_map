@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from typing import Annotated
 
 from fastapi import FastAPI, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -42,6 +43,11 @@ from src.services.tax_service import TaxService
 from src.services.transit_mobility_service import TransitMobilityService
 from src.services.vote_analysis_service import VoteAnalysisService
 from src.services.vote_service import VoteService
+from src.services.watch_service import (
+    EventKind,
+    WatchService,
+    WatchZoneRequest,
+)
 from src.services.weather_climate_service import (
     WeatherClimateService,
     WeatherProviderError,
@@ -99,6 +105,8 @@ _sbb_connector = SbbTransportClient()
 _amtsblatt_pipeline = AmtsblattNewsPipeline(repo=_planning._repo)
 _newsletter = NewsletterService()
 _web_push = WebPushService()
+# ADR-023: watch-zone értesítési lánc a meglévő ingest-store-on (additív wiring)
+_watch = WatchService(repo=_planning._repo, web_push=_web_push, newsletter=_newsletter)
 # Demo seed — amíg nincs napi Amtsblatt poll, 8004-en legyen aktív Baugesuch a bemutatóhoz
 try:
     from datetime import date as _d
@@ -742,3 +750,46 @@ def push_subscribe(payload: PushSubscription) -> dict[str, str]:
 @app.post("/api/v1/push/watch-alert")
 def push_watch_alert(payload: WatchAlert) -> dict[str, str]:
     return _web_push.alert(payload)
+
+
+@app.post("/api/v1/watch/zones")
+def watch_create_zone(payload: WatchZoneRequest) -> dict[str, object]:
+    """ADR-023 REQ-A1: figyelési zóna regisztrálása consent mellett."""
+    try:
+        zone = _watch.create_zone(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return zone.model_dump()
+
+
+@app.get("/api/v1/watch/zones")
+def watch_list_zones() -> dict[str, object]:
+    return _watch.list_zones().model_dump()
+
+
+@app.get("/api/v1/watch/events")
+def watch_events(
+    kind: Annotated[EventKind | None, Query(description="new_permit | deadline_soon")] = None,
+    limit: Annotated[int, Query(ge=1, le=500)] = 50,
+) -> dict[str, object]:
+    """ADR-023 REQ-A3: forrásolt események (source/fetched_at/trust_state)."""
+    return _watch.events(kind=kind, limit=limit).model_dump()
+
+
+@app.get("/api/v1/watch/deadlines")
+def watch_deadlines(
+    postcode: str | None = Query(default=None, pattern=r"^\d{4}$"),
+    zone_id: str | None = Query(default=None, min_length=1, max_length=64),
+) -> dict[str, object]:
+    """ADR-023 REQ-B1/B2/B3: Einsprachefrist + állapot + disclaimer."""
+    try:
+        return _watch.deadlines(postcode=postcode, zone_id=zone_id).model_dump()
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.post("/api/v1/watch/run")
+def watch_run(payload: dict[str, object] | None = None) -> dict[str, object]:
+    """ADR-023: ingest-elt Baugesuch-ok matchelése a zónákra, dedup kulccsal."""
+    zone_id = (payload or {}).get("zone_id")
+    return _watch.run(zone_id=str(zone_id) if zone_id else None).model_dump()
