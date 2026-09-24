@@ -179,3 +179,152 @@ export async function fetchVoteProposal(id: number): Promise<unknown | null> {
   if (!res.ok) return null;
   return res.json();
 }
+
+// --------------------------------------------------------------------------
+// ADR-023: watch-zone alert pipeline + Einsprachefrist (REQ-A1..A3, B1..B3).
+// Additive block — existing helpers above stay untouched.
+// --------------------------------------------------------------------------
+
+export type WatchTrustState =
+  | "official_measurement"
+  | "official_publication"
+  | "modeled_estimate"
+  | "cadastral_registry"
+  | "stale"
+  | "source_pending";
+export type WatchEventKind = "new_permit" | "deadline_soon";
+export type WatchDeadlineState = "open" | "due_soon" | "expired";
+export type WatchChannel = "push" | "email";
+
+export interface WatchDeliveryResult {
+  channel: WatchChannel;
+  status: string;
+  detail: string;
+}
+
+export interface WatchEventItem {
+  event_id: string;
+  zone_id: string;
+  baugesuch_id: string;
+  kind: WatchEventKind;
+  distance_m: number | null;
+  title: string;
+  postcode: string;
+  canton: string;
+  publication_date: string;
+  deadline: string;
+  days_left: number;
+  state: WatchDeadlineState;
+  source_url: string;
+  source: string;
+  trust_state: WatchTrustState;
+  fetched_at: string;
+  delivery: WatchDeliveryResult[];
+}
+
+export interface WatchDeadlineItem {
+  baugesuch_id: string;
+  zone_id: string;
+  postcode: string;
+  municipality: string;
+  title: string;
+  publication_date: string;
+  deadline: string;
+  days_left: number;
+  state: WatchDeadlineState;
+  source_url: string;
+  source: string;
+  trust_state: WatchTrustState;
+  disclaimer: string;
+  rule: string;
+}
+
+export interface WatchEventsResponse {
+  count: number;
+  items: WatchEventItem[];
+  status: string;
+  source: string;
+  trust_state: WatchTrustState;
+  fetched_at: string;
+}
+
+export interface WatchDeadlinesResponse {
+  count: number;
+  items: WatchDeadlineItem[];
+  status: string;
+  rule: string;
+  disclaimer: string;
+  source: string;
+  trust_state: WatchTrustState;
+  fetched_at: string;
+  zone_id?: string | null;
+  postcode?: string | null;
+}
+
+export interface WatchZoneRequest {
+  zone_id: string;
+  postcode?: string;
+  lat?: number;
+  lon?: number;
+  radius_m: number;
+  channels: WatchChannel[];
+  consent: boolean;
+  subscription_endpoint?: string;
+  email?: string;
+}
+
+export interface WatchZone extends WatchZoneRequest {
+  created_at: string;
+  center_source: string;
+}
+
+export interface WatchRunResult {
+  status: string;
+  zones_processed: number;
+  skipped_no_consent: number;
+  events_created: number;
+  deduplicated: number;
+  items: WatchEventItem[];
+  source: string;
+  trust_state: WatchTrustState;
+  fetched_at: string;
+  disclaimer: string;
+}
+
+async function postJson<T>(path: string, body: unknown): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`API ${res.status}: ${path}`);
+  return res.json() as Promise<T>;
+}
+
+/** ADR-023 REQ-A3: stored, source-labelled watch events for the active zone. */
+export function fetchWatchEvents(limit = 50, signal?: AbortSignal): Promise<WatchEventsResponse> {
+  const qs = new URLSearchParams({ limit: String(limit) });
+  return getJsonWithSignal<WatchEventsResponse>(`/api/v1/watch/events?${qs.toString()}`, signal);
+}
+
+/** ADR-023 REQ-B1/B2/B3: Einsprachefrist list with state + mandatory disclaimer. */
+export function fetchWatchDeadlines(postcode: string, signal?: AbortSignal): Promise<WatchDeadlinesResponse> {
+  const qs = new URLSearchParams({ postcode });
+  return getJsonWithSignal<WatchDeadlinesResponse>(`/api/v1/watch/deadlines?${qs.toString()}`, signal);
+}
+
+/** ADR-023 REQ-A1: zone registration is consent-gated on the server too. */
+export function createWatchZone(request: WatchZoneRequest): Promise<WatchZone> {
+  return postJson<WatchZone>("/api/v1/watch/zones", request);
+}
+
+/** ADR-023: run the matcher/dedup chain for stored zones. */
+export function runWatchZones(zoneId?: string): Promise<WatchRunResult> {
+  return postJson<WatchRunResult>("/api/v1/watch/run", zoneId ? { zone_id: zoneId } : {});
+}
+
+async function getJsonWithSignal<T>(path: string, signal?: AbortSignal): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, signal ? { signal } : undefined);
+  if (!res.ok) throw new Error(`API ${res.status}: ${path}`);
+  return res.json() as Promise<T>;
+}

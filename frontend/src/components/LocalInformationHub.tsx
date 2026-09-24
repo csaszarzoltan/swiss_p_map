@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import ResidentCivicPanels from "./ResidentCivicPanels";
 import SourceTrustBadge from "./SourceTrustBadge";
+import WatchEventsCard from "./WatchEventsCard";
 
 type Item = {id:string;category:string;title:string;summary:string;importance:"normal"|"important"|"urgent";status:"current_data"|"source_pending";source:string;source_url:string;map_layer?:string|null};
 type Hub = {postcode:string;locality:string;generated_at:string;items:Item[];editorial_note:string};
@@ -106,6 +107,7 @@ export default function LocalInformationHub({postcode,onOpenMap}:{postcode?:stri
       <div className="mt-3 flex items-center gap-2"><SourceTrustBadge state={trustOf(detail)} source={detail.source} refreshedAt={hub.generated_at}/><a href={detail.source_url} target="_blank" rel="noreferrer" className="truncate text-xs text-sky-300">{t("source",{name:detail.source})}</a></div>
     </div></div>}
     <ResidentCivicPanels postcode={hub.postcode} />
+    <WatchEventsCard postcode={hub.postcode} />
     <p className="rounded-xl border border-sky-500/20 bg-sky-500/5 p-3 text-xs leading-5 text-slate-400">{hub.editorial_note}</p>
   </section>;
 }
