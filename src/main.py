@@ -21,6 +21,7 @@ from src.services.connectors.sbb_transport_client import SbbTransportClient
 from src.services.cost_of_living_service import CostOfLivingService
 from src.services.district_comparison_service import DistrictComparisonService
 from src.services.education_service import EducationService
+from src.services.export_service import ExportService
 from src.services.geo_converter import lv95_to_wgs84
 from src.services.hazard_service import HazardService
 from src.services.healthcare_service import HealthcareService
@@ -34,7 +35,6 @@ from src.services.objection_workspace_service import (
     ObjectionRequest,
     ObjectionWorkspaceService,
 )
-from src.services.export_service import ExportService
 from src.services.oereb_service import OerebProviderError, OerebService
 from src.services.place_service import PlaceService
 from src.services.planning_service import PlanningService

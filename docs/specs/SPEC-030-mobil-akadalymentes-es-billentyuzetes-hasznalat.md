@@ -2,6 +2,7 @@
 id: FEAT-030
 title: Mobil, Akadálymentes és Billentyűzetes Használat
 status: SPEC_READY
+implementationStatus: IMPLEMENTED
 version: 1
 risk: medium
 owner: product-owner
@@ -14,6 +15,8 @@ brief: BRIEF-030
 # FEAT-030: Mobil, Akadálymentes és Billentyűzetes Használat
 
 ## 1. Cél és felhasználói eredmény
+
+- Implementációs státusz: `IMPLEMENTED`; specifikációs kapu: `SPEC_READY`.
 
 
 Siker akkor áll fenn, ha a brief négy felhasználói útja determinisztikusan végrehajtható, a hibaállapot megfigyelhető, és a forrás, frissesség vagy becslési státusz nem vész el.

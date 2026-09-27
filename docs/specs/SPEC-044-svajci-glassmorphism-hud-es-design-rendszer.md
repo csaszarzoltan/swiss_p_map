@@ -2,6 +2,7 @@
 id: FEAT-044
 title: Svájci Glassmorphism HUD és Vizuális Design Rendszer
 status: SPEC_READY
+implementationStatus: IMPLEMENTED
 version: 1
 risk: low
 owner: product-owner
@@ -14,6 +15,8 @@ brief: BRIEF-044
 # FEAT-044: Svájci Glassmorphism HUD és Vizuális Design Rendszer
 
 ## 1. Cél és felhasználói eredmény
+
+- Implementációs státusz: `IMPLEMENTED`; specifikációs kapu: `SPEC_READY`.
 
 A felhasználó egy tágas, lebegő üveghatású (Glassmorphism HUD) felhasználói felületen böngészheti Svájc 3D térképét és adatait. A kulcsfontosságú mutatók (Steuerfuss, zaj, tömegközlekedés, napenergia, építkezések) nagyméretű, elegáns statisztikai kártyákon, azonnal átlátható tipográfiai hierarchiával jelennek meg.
 

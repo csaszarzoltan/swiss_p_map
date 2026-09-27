@@ -2,6 +2,7 @@
 id: FEAT-020
 title: Export és Ingatlanfejlesztői Audit Csomag
 status: SPEC_READY
+implementationStatus: IMPLEMENTED
 version: 1
 risk: medium
 owner: product-owner
@@ -14,6 +15,8 @@ brief: BRIEF-020
 # FEAT-020: Export és Ingatlanfejlesztői Audit Csomag
 
 ## 1. Cél és felhasználói eredmény
+
+- Implementációs státusz: `IMPLEMENTED`; specifikációs kapu: `SPEC_READY`.
 
 
 Siker akkor áll fenn, ha a brief négy felhasználói útja determinisztikusan végrehajtható, a hibaállapot megfigyelhető, és a forrás, frissesség vagy becslési státusz nem vész el.

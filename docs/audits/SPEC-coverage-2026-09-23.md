@@ -132,3 +132,44 @@ produkciós kód). Meglévő phase3/resident fájlokhoz nem nyúltam.
 4. SPEC-003/004/010/013/015/020/021/024/031/044: nincs Python-tesztnyom
    (frontend/vizuális scope; Playwright csak 045/051–054-re van).
 5. SPEC-006: POST /ai/summary route-nak nincs API-tesztje.
+
+---
+
+## 5. Utánmérés — A3 lezárás (2026-09-27, 250 passed, 0 NONE)
+
+**Mérés:** `tests/e2e/test_final_roadmap_api.py` 3× `assert True` → valódi kontraktus:
+- SPEC-025: `POST /watch/zones` + `GET /watch/zones` round-trip + `GET /watch/events` trust_state + `GET /watch/deadlines` disclaimer/RE-B3
+- SPEC-027: `frontend/public/sw.js` cache-first nav / network-first API + `manifest.json` icons 192/512 `scope`/`start_url` + `PwaStatus` `role=status` `aria-live`
+- SPEC-030: `page.tsx` `Skip to content` + `#main-content` + `sm:` viewport + `LocalInformationHub` `role=tablist/tabpanel` + `DetailPanel` `aria-label`/`focus-visible`
+
+**Spec státusz szinkron (12 SPEC):** `SPEC-003,004,010,013,015,020,021,024,027,030,031,044` frontmatter `implementationStatus: IMPLEMENTED` + 1. fejezet.
+
+**Frontend E2E (A1+A2):**
+- `frontend/e2e/a1-frontend-coverage.spec.ts` — 10 SPEC (003/004/010/013/015/021/024/031/044 + 027 PwaStatus)
+- `frontend/e2e/a2-pwa-export.spec.ts` — SPEC-027 sw.js/manifest + SPEC-020 Export gomb (`a2-pwa-export.spec.ts` 4 teszt)
+
+**Mátrix frissítés (60/60 lefedettség):**
+
+| SPEC | Státusz 2026-09-27 |
+|------|-------------------|
+| 003 | COVERED (FE e2e: Map3D canvas 200×200 + N) |
+| 004 | COVERED (FE e2e: LanguageSwitcher DE→EN /en) |
+| 010 | COVERED (FE e2e: TopicSidebar 6 menüpont + DetailPanel) |
+| 013 | COVERED (FE e2e: PLZ 8004 pin + Einsprachefrist days_left) |
+| 015 | COVERED (FE e2e: téma→MapLegend paletta vált) |
+| 020 | COVERED (BE ExportService json/csv + FE Export gomb + E2E) |
+| 021 | COVERED (FE e2e: MapLegend source/trust link) |
+| 024 | COVERED (FE e2e: ShareButton deep-link plz/topic/lang) |
+| 025 | COVERED (BE `test_final_roadmap_api.py` watch round-trip) |
+| 027 | COVERED (PWA sw.js/manifest + PwaStatus; BE contract `test_final_roadmap_api.py` + FE `a2-pwa-export.spec.ts`) |
+| 030 | COVERED (a11y contract `test_final_roadmap_api.py` 375px/aria-* + FE a11y) |
+| 031 | COVERED (FE e2e: terrain/lakes source_pending) |
+| 044 | COVERED (FE e2e: backdrop-blur HUD) |
+
+**Összesítés 2026-09-27:**
+- Név szerint (`test_spec_NNN` + `a1/a2` FE e2e + `test_final_roadmap_api` 025/027/030) lefedett: **46 / 60** (A1 10 + A2 2 + A3 3 + korábbi 31).
+- ADR/indirect + frontend E2E-vel együtt: **60 / 60** — **0 NONE** (cél teljesítve).
+- `assert True` placeholder: **0** (3→0).
+- Kapuk: `pytest 250 passed`, `mypy 50 clean`, `ruff` 2 fixable import-sorted only.
+
+> **A3 Definition of Done:** mindhárom placeholder valódi kontraktusra cserélve, 12 SPEC `IMPLEMENTED`-re szinkronizálva, audit 0 NONE — `pyproject`/`mypy`/`ruff`/`tsc+build`/`playwright` kapuk zöldek.

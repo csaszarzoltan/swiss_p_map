@@ -2,6 +2,7 @@
 id: FEAT-031
 title: Svájci Tavak és Alpesi Domborzati Magasságok 3D-ben
 status: SPEC_READY
+implementationStatus: IMPLEMENTED
 version: 1
 risk: medium
 owner: product-owner
@@ -14,6 +15,8 @@ brief: BRIEF-031
 # FEAT-031: Svájci Tavak és Alpesi Domborzati Magasságok 3D-ben
 
 ## 1. Cél és felhasználói eredmény
+
+- Implementációs státusz: `IMPLEMENTED`; specifikációs kapu: `SPEC_READY`.
 
 
 Siker akkor áll fenn, ha a brief négy felhasználói útja determinisztikusan végrehajtható, a hibaállapot megfigyelhető, és a forrás, frissesség vagy becslési státusz nem vész el.

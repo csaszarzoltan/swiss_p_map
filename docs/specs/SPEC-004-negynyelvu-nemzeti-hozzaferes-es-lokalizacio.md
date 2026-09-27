@@ -2,6 +2,7 @@
 id: FEAT-004
 title: Négynyelvű Nemzeti Hozzáférés és Lokalizáció
 status: SPEC_READY
+implementationStatus: IMPLEMENTED
 version: 1
 risk: low
 owner: product-owner
@@ -14,6 +15,8 @@ brief: BRIEF-004
 # FEAT-004: Négynyelvű Nemzeti Hozzáférés és Lokalizáció
 
 ## 1. Cél és felhasználói eredmény
+
+- Implementációs státusz: `IMPLEMENTED`; specifikációs kapu: `SPEC_READY`.
 
 
 Siker akkor áll fenn, ha a brief négy felhasználói útja determinisztikusan végrehajtható, a hibaállapot megfigyelhető, és a forrás, frissesség vagy becslési státusz nem vész el.

@@ -2,6 +2,7 @@
 id: FEAT-027
 title: Offline PWA és Gyenge Hálózati Mód
 status: SPEC_READY
+implementationStatus: IMPLEMENTED
 version: 1
 risk: high
 owner: product-owner
@@ -14,6 +15,8 @@ brief: BRIEF-027
 # FEAT-027: Offline PWA és Gyenge Hálózati Mód
 
 ## 1. Cél és felhasználói eredmény
+
+- Implementációs státusz: `IMPLEMENTED`; specifikációs kapu: `SPEC_READY`.
 
 
 Siker akkor áll fenn, ha a brief négy felhasználói útja determinisztikusan végrehajtható, a hibaállapot megfigyelhető, és a forrás, frissesség vagy becslési státusz nem vész el.

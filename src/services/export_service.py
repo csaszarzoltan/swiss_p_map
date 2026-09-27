@@ -16,7 +16,6 @@ from src.models.place import PlaceInfo
 from src.services.place_service import PlaceService
 from src.services.planning_service import PlanningService
 
-
 _TRUST_BY_SOURCE: dict[str, str] = {
     "place": "official_measurement",
     "solar": "official_measurement",

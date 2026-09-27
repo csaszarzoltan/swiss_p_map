@@ -2,6 +2,18 @@
 
 Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Changelog + SemVer.
 
+## [Unreleased]
+
+### Added
+- **A3: Placeholder-csere + SPEC-státusz szinkron + audit (025/027/030):** `tests/e2e/test_final_roadmap_api.py` 3× `assert True` → valódi kontraktus — 025 `POST+GET /watch/zones` round-trip + `GET /watch/events` trust_state + `GET /watch/deadlines` REQ-B3 disclaimer, 027 `frontend/public/sw.js` (cache-first nav / network-first API) + `manifest.json` 192/512 `scope`/`start_url` + `PwaStatus` `role=status` `aria-live`, 030 `page.tsx` skip-link + `LocalInformationHub` `role=tablist/tabbpanel` + `DetailPanel` `aria-label/focus-visible` + `sm:` viewport (A3 definition of done).
+- **SPEC-státusz szinkron (12 SPEC):** `SPEC-003,004,010,013,015,020,021,024,027,030,031,044` frontmatter `implementationStatus: IMPLEMENTED` + 1. fejezet.
+- **Audit frissítés:** `docs/audits/SPEC-coverage-2026-09-23.md` §5 — **0 NONE** (60/60 lefedettség: név szerint 46 + indirect 14; `assert True` 3→0), 250 passed, 50 mypy clean.
+- **A1: Frontend E2E (10 NONE SPEC):** `frontend/e2e/a1-frontend-coverage.spec.ts` — Map3D 200×200+N, LanguageSwitcher DE→EN, TopicSidebar 6, PLZ 8004 pin+days_left, MapLegend palette, MapLegend source, ShareButton deep-link, lakes/terrain, backdrop-blur HUD + PwaStatus.
+- **A2: PWA + Export:** `public/sw.js` + `public/manifest.json` + `GET /api/v1/place/{postcode}/export?format=json|csv` + `ExportService` + `DetailPanel` export gomb (`export-button`, `export-format-select`, `aria-label`, `focus-visible`).
+
+### Verified
+- `pytest: 250 passed, 1 skipped` · `mypy 50 clean` · `ruff` import-sorted · `frontend tsc+build` SSG · `playwright 8/8 + A1/A2` green
+
 ## [0.3.0] - 2026-09-24
 
 ### Added

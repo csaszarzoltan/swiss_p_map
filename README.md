@@ -1,6 +1,6 @@
 # Swiss P Map
 
-**Version:** v0.3.0 · **Backend:** 57 route · **Tesztek:** 238 passed · **mypy:** 91 clean
+**Version:** v0.3.0 · **Backend:** 57 route · **Tesztek:** 250 passed · **mypy:** 50 clean
 
 > **„A svájci környék egyetlen térképén”** — Integrált interaktív döntéstámogató térkép a helyi politika, életminőség és épített környezet metszetében. 4 nyelven: **de / en / fr / it**.
 
@@ -12,7 +12,7 @@ A **Swiss P Map** online scrapeli a svájci nyílt kormányzati adatokat (**OGD*
 - **Ort / Place (6 csempe):** Steuerfuss (zh.ch HTML 119%), Lärm sonBASE, ÖV-Güteklasse ARE, GWR Gebäudezahl, **Sonnendach** BFE WGS84 (`1208 kWh/m² sehr gut`), **ÖREB** ZH WFS Nutzungsplanung (`Kernzone`) — `GET /api/v1/place/{postcode}?live=true`
 - **Planung:** 20 napos Baugesuche (Amtsblattportal XML 1.24/1.26 + SQLite WAL), `GET /api/v1/planning/baugesuche?postcode=8004` + `POST /api/v1/planning/refresh`
 - **KI-Zusammenfassung:** 2 mondat, 4 nyelven, llm-budget-gateway `8013` → fallback sablon (`POST /api/v1/ai/summary`)
-- **Resident-first civic (SPEC-045/047/051…054/058 — IMPLEMENTED):** `LocalInformationHub` i18n + a11y tablist (`GET /api/v1/local/briefing`), `VotingVisualCard` (`GET /api/v1/votes/proposals` + `/{id}/analysis`), `WeatherVisualWidget` live Open-Meteo (`GET /api/v1/weather/current|forecast|alerts|water-temperatures`), `WasteCalendarVisual` + valós `.ics` (`GET /api/v1/municipal/waste-calendar[.ics]`), `CostOfLivingCalculator` breakdown + `size_m2` (`GET /api/v1/costs/assessment`), Amtsblatt hír-pipeline (`POST /api/v1/connectors/amtsblatt/ingest`, `GET /api/v1/news/local`)
+- **Resident-first civic (SPEC-003/004/010/013/015/020/021/024/027/030/031/044/045/047/051…054/058 — IMPLEMENTED):** `LocalInformationHub` i18n + a11y tablist (`GET /api/v1/local/briefing`), `VotingVisualCard` (`GET /api/v1/votes/proposals` + `/{id}/analysis`), `WeatherVisualWidget` live Open-Meteo (`GET /api/v1/weather/current|forecast|alerts|water-temperatures`), `WasteCalendarVisual` + valós `.ics` (`GET /api/v1/municipal/waste-calendar[.ics]`), `CostOfLivingCalculator` breakdown + `size_m2` (`GET /api/v1/costs/assessment`), Amtsblatt hír-pipeline (`POST /api/v1/connectors/amtsblatt/ingest`, `GET /api/v1/news/local`)
 - **Geo:** LV95 ↔ WGS84 (`GET /api/v1/geo/convert`), Swisstopo Search geokódolás
 - **i18n:** `next-intl 3.26.5`, `localePrefix: always`, `de` default, hreflang/sitemap
 
@@ -41,6 +41,10 @@ A **Swiss P Map** online scrapeli a svájci nyílt kormányzati adatokat (**OGD*
 | GET | `/api/v1/weather/current|forecast|alerts|water-temperatures` | Open-Meteo live (052) |
 | GET | `/api/v1/costs/assessment?postcode=&income_chf=&size_m2=` | CostOfLiving (054) |
 | GET | `/api/v1/municipal/waste-calendar[.ics]` | Municipal (053) |
+| GET | `/api/v1/place/{postcode}/export?format=json|csv` | Export audit (020) — `attachment` JSON/CSV `;` |
+| POST | `/api/v1/watch/zones` + `GET /watch/zones|events|deadlines` + `POST /watch/run` | Watch + Einsprachefrist (025/ADR-023) |
+| GET | `/api/v1/cadastre/zone?lat=&lon=` | OEREB Nutzungsplanung OGC API (ADR-023/C) |
+| GET | `/sw.js` + `/manifest.json` | PWA shell cache (027) |
 
 CORS: `SWISSPM_CORS_ORIGINS=http://localhost:3310,http://127.0.0.1:3310`
 
@@ -72,8 +76,8 @@ swiss_p_map/
 
 ```bash
 # Backend
-.venv/bin/python -m pytest -q  # 238 passed, 1 skipped
-.venv/bin/python -m mypy src tests  # 91 clean
+.venv/bin/python -m pytest -q  # 250 passed, 1 skipped
+.venv/bin/python -m mypy src tests  # 50 clean
 .venv/bin/python -m ruff check src tests
 
 # Backend lokálisan (DBUS-clean)
@@ -89,7 +93,7 @@ cd frontend && npm run build && npx next start -p 3310
 
 ## Kanban & Docs
 
-Board: `swiss-p-map`. Docs: 22 ADR (001…022) + SPEC-001…060 (`docs/specs/`, 7 IMPLEMENTED: 045/047/051/052/053/054/058). Master roadmap: `docs/plans/2026-08-26-master-roadmap.md`.
+Board: `swiss-p-map`. Docs: 23 ADR (001…023) + SPEC-001…060 (`docs/specs/`, 19 IMPLEMENTED: 003/004/010/013/015/020/021/024/027/030/031/044/045/047/051/052/053/054/058). Audit `docs/audits/SPEC-coverage-2026-09-23.md` — 0 NONE. Master roadmap: `docs/plans/2026-08-26-master-roadmap.md`.
 
 ## Usability package
 ADR-019..022 adds a thematic legend, explainable risk metadata, radius controls, and shareable locale-aware state.
