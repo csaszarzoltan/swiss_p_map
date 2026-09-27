@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { Baugesuch, DistrictRepresentatives, HazardAssessment, IsosAssessment, PlaceInfo, PropertyPriceAssessment, TaxComparison } from "@/lib/api";
 import type { Topic } from "./TopicSidebar";
@@ -22,6 +23,8 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 export default function DetailPanel({ topic, selectedId, result, summary, aiSummary, strategicP1P2 }: DetailPanelProps) {
   const t = useTranslations();
+  const [exportFormat, setExportFormat] = useState<"json" | "csv">("json");
+  const [exportToast, setExportToast] = useState<string | null>(null);
 
   if (!result?.place) {
     return (
@@ -47,6 +50,43 @@ export default function DetailPanel({ topic, selectedId, result, summary, aiSumm
 
   return (
     <div data-testid="detail-panel" className="border-t border-white/10 bg-slate-950/80 p-5 backdrop-blur-xl">
+      {/* SPEC-020 Export audit-csomag — place+solar+oereb+steuerfuss+planning + provenance */}
+      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-slate-900/60 p-3">
+        <label htmlFor="export-format" className="text-xs font-semibold text-slate-400">{t("export.formatLabel")}</label>
+        <select
+          id="export-format"
+          data-testid="export-format-select"
+          aria-label={t("export.formatLabel")}
+          value={exportFormat}
+          onChange={(e) => setExportFormat(e.target.value as "json" | "csv")}
+          className="rounded-lg border border-white/10 bg-slate-950 px-2 py-1.5 text-xs text-slate-200"
+        >
+          <option value="json">{t("export.formatJson")}</option>
+          <option value="csv">{t("export.formatCsv")}</option>
+        </select>
+        <button
+          type="button"
+          data-testid="export-button"
+          aria-label={t("export.button")}
+          onClick={() => {
+            const base = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8310";
+            const url = `${base}/api/v1/place/${p.postcode}/export?format=${exportFormat}`;
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `swiss-p-map-${p.postcode}.${exportFormat}`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setExportToast(t("export.toastSuccess"));
+            window.setTimeout(() => setExportToast(null), 3000);
+          }}
+          className="rounded-lg bg-sky-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-400 focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+        >
+          {t("export.button")}
+        </button>
+        <span className="text-[11px] text-slate-500">{t("export.hint")}</span>
+        {exportToast && <span role="status" aria-live="polite" className="text-xs text-emerald-300">{exportToast}</span>}
+      </div>
       <StrategicP1P2Panel data={strategicP1P2} topic={topic} />
       {(topic === "overview" || topic === "ort") && (result.propertyPrices || result.taxComparison || result.hazardAssessment || result.isosAssessment) && (
         <section data-testid="strategic-p0-panel" aria-label="Strategic location indicators" className="mb-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">

@@ -34,6 +34,7 @@ from src.services.objection_workspace_service import (
     ObjectionRequest,
     ObjectionWorkspaceService,
 )
+from src.services.export_service import ExportService
 from src.services.oereb_service import OerebProviderError, OerebService
 from src.services.place_service import PlaceService
 from src.services.planning_service import PlanningService
@@ -110,6 +111,8 @@ _web_push = WebPushService()
 _watch = WatchService(repo=_planning._repo, web_push=_web_push, newsletter=_newsletter)
 # ADR-023/C: ÖREB Nutzungsplanung élő zóna-lekérdezés (kanton-tudatos)
 _oereb = OerebService()
+# SPEC-020: Export audit-csomag
+_export = ExportService(place=_place, planning=_planning)
 # Demo seed — amíg nincs napi Amtsblatt poll, 8004-en legyen aktív Baugesuch a bemutatóhoz
 try:
     from datetime import date as _d
@@ -820,3 +823,30 @@ def watch_run(payload: dict[str, object] | None = None) -> dict[str, object]:
     """ADR-023: ingest-elt Baugesuch-ok matchelése a zónákra, dedup kulccsal."""
     zone_id = (payload or {}).get("zone_id")
     return _watch.run(zone_id=str(zone_id) if zone_id else None).model_dump()
+
+@app.get("/api/v1/place/{postcode}/export")
+def place_export(
+    postcode: str,
+    format: str = Query(default="json", pattern="^(json|csv)$", description="json|csv"),
+) -> Response:
+    """SPEC-020: audit-csomag (place+solar+oereb+steuerfuss+planning + provenance)."""
+    if format not in ("json", "csv"):
+        raise HTTPException(status_code=422, detail="format must be json or csv")
+    if format == "json":
+        body = _export.to_json(postcode)
+        if body is None:
+            raise HTTPException(status_code=404, detail=f"no data for postcode {postcode}")
+        return Response(
+            content=body,
+            media_type="application/json; charset=utf-8",
+            headers={"Content-Disposition": f'attachment; filename="swiss-p-map-{postcode}.json"'},
+        )
+    body_csv = _export.to_csv(postcode)
+    if body_csv is None:
+        raise HTTPException(status_code=404, detail=f"no data for postcode {postcode}")
+    return Response(
+        content=body_csv,
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="swiss-p-map-{postcode}.csv"'},
+    )
+

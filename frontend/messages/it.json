@@ -133,23 +133,23 @@
   },
   "resident": {
     "feature045": {
-          "title": "Bollettino locale",
-          "eyebrow": "Il tuo luogo. Spiegato chiaramente.",
-          "introTitle": "Cosa conta oggi nel tuo comune",
-          "introBody": "Cerca un codice postale. Vedrai poi votazioni, ambiente, meteo, abitazione, mobilità e progetti edilizi come temi separati. La mappa si apre solo dove il contesto spaziale aiuta.",
-          "loading": "Caricamento panoramica locale…",
-          "empty": "Nessuna informazione locale disponibile.",
-          "error": "Panoramica locale non disponibile.",
-          "errorHint": "Riprova più tardi — nessun valore obsoleto mostrato come live.",
-          "todayIn": "Importante oggi a {locality}",
-          "briefingFor": "Bollettino locale · {postcode}",
-          "verifiedNote": "Dati verificati · adattatore notizie preparato",
-          "source": "Fonte: {name}",
-          "openMap": "Sulla mappa",
-          "close": "Chiudi",
-          "topicsLabel": "Temi locali",
-          "chartFallback": "Panoramica dei temi come elenco: {count} temi con fonte e stato.",
-          "pendingBadge": "Fonte in attesa"
+      "title": "Bollettino locale",
+      "eyebrow": "Il tuo luogo. Spiegato chiaramente.",
+      "introTitle": "Cosa conta oggi nel tuo comune",
+      "introBody": "Cerca un codice postale. Vedrai poi votazioni, ambiente, meteo, abitazione, mobilità e progetti edilizi come temi separati. La mappa si apre solo dove il contesto spaziale aiuta.",
+      "loading": "Caricamento panoramica locale…",
+      "empty": "Nessuna informazione locale disponibile.",
+      "error": "Panoramica locale non disponibile.",
+      "errorHint": "Riprova più tardi — nessun valore obsoleto mostrato come live.",
+      "todayIn": "Importante oggi a {locality}",
+      "briefingFor": "Bollettino locale · {postcode}",
+      "verifiedNote": "Dati verificati · adattatore notizie preparato",
+      "source": "Fonte: {name}",
+      "openMap": "Sulla mappa",
+      "close": "Chiudi",
+      "topicsLabel": "Temi locali",
+      "chartFallback": "Panoramica dei temi come elenco: {count} temi con fonte e stato.",
+      "pendingBadge": "Fonte in attesa"
     },
     "feature023": {
       "title": "Notifiche zona",
@@ -267,6 +267,21 @@
       "remaining": "Disponibile",
       "total": "Totale / mese",
       "disclaimer": "Stima indicativa modellata, non è consulenza finanziaria o fiscale."
+    }
+  },
+  "export": {
+    "button": "Esporta audit",
+    "formatJson": "JSON",
+    "formatCsv": "CSV (Excel ;)",
+    "formatLabel": "Formato",
+    "toastSuccess": "Export avviato — download in corso.",
+    "toastError": "Export fallito.",
+    "hint": "Profilo NPA + permessi + provenienza come file."
+  },
+  "pwa": {
+    "status": {
+      "online": "Online",
+      "offline": "Offline · Cache"
     }
   }
 }
