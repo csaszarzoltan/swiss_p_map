@@ -47,7 +47,7 @@ machine-readable endpoint. **There is no `voteinfo.bfs.admin.ch`** — that host
 | # | Source / operator | Shape | Granularity | Lat/lon or stable key | Access | Licence | Cadence | Verified |
 |---|---|---|---|---|---|---|---|---|
 | 1 | **BFS STAT-TAB / PXWeb** | statistical tables | varies, often municipality | `GEO_NAME` dimension | **REST/OGD, live** | not stated per table | per-table `updated` | ✅ |
-| 2 | **BFS VoteInfo** (BK/BFS/AZ Zürich) | federal vote outcomes | **municipality + canton + CH** | app only | **app only — no API found** | n/a | quasi-live vote day | ✅ (as app) |
+| 2 | **BFS VoteInfo OGD** (BK/BFS/AZ Zürich) | federal vote outcomes, **per municipality** | **municipality + canton + CH** | BFS `geoLevelnummer`; 161 gemeinden for canton ZH | **REST JSON, live — HTTP 200, 1.98 MB** | not stated | per vote Sunday | ✅ REFUTED 2026-10-05 (was "app only — no API found") |
 | 3 | **Federal vote dashboard** `abstimmungen.admin.ch` | federal + cantonal vote outcomes | municipality → canton → CH | canton/municipality keys in page | Next.js SPA, **no data endpoints found** | n/a | live on vote day | ✅ (negative) |
 | 4 | **Federal elections** `wahlen.admin.ch` | seats + party shares | **canton** | canton code | HTML result tables | not stated | per election | ✅ |
 | 5 | **Canton ZH vote archive** (Amt f. Statistik ZH) | vote outcomes | **municipality + Bezirk**, since 1831 | `STAT_GEMEINDE_ID` | **CSV, live** | not stated | per vote day | ✅ |
@@ -188,11 +188,25 @@ city-level event calendars on individual OGD portals — which is again per-cant
 
 ## 3. Explicitly NOT available or not verified
 
-- **(a) Federal per-municipality results, programmatic → NOT AVAILABLE as an API.** Data exists and
+- **(a) Federal per-municipality results → REFUTED ON 2026-10-05; the endpoint DOES exist.** ~~Data exists and
   is documented (VoteInfo serves Gemeinde+Kanton+CH live), but the channel is a **mobile app**.
   BFS's own page exposes no CSV/JSON/interface; `voteinfo.bfs.admin.ch` does not resolve. Question (a)
   is answered *no* for a documented endpoint. What VoteInfo "exposes" beyond a proposal list: nothing
-  reachable — there is nothing to call.
+  reachable — there is nothing to call.~~ **The negative above was drawn from the wrong hosts.**
+  `voteinfo.bfs.admin.ch` and `abstimmungen.bfs.admin.ch` do not resolve, but they are not the
+  machine-readable channel. The canonical VoteInfo OGD publication, documented in this repo since
+  2026-08-27 at `docs/research/2026-08-27-bfs-vote-data.md:13`, is live and was measured on
+  2026-10-05:
+  `https://ogd-static.voteinfo-app.ch/v1/ogd/sd-t-17-02-20240922-eidgAbstimmung.json`
+  → **HTTP 200, 1 977 268 bytes, 0.25 s**. Its shape is `abstimmtag` / `timestamp` /
+  `spatial_reference` / `schweiz`, with `schweiz.vorlagen[0].kantone` = **26** and
+  `kantone[0].gemeinden` = **161** municipalities, each keyed by the BFS `geoLevelnummer` and
+  carrying `resultat.jaStimmenInProzent`, `jaStimmenAbsolut`, `stimmbeteiligungInProzent`. So
+  per-municipality federal results ARE programmatically available, at municipality granularity, with
+  a stable BFS key — which also means they can be drawn on a municipality choropleth.
+  This repo's own parser already consumed the payload correctly (fed live it returned
+  `proposal 6710 | cantons 26 | national_yes 36.96`); it simply had no caller until commit `33aab13`
+  wired it (see `docs/specs/SPEC-056b-live-voteinfo-ogd-wiring.md`).
 - **(b) Federal elections per municipality → NOT VERIFIED.** Official published granularity is
   **canton** (seats + party shares). No per-municipality federal election machine-readable source found.
 - **(c) National aggregator for cantonal/kommunal votes → REFUTED.** Verified by exhaustive CKAN query.
