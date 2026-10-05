@@ -1,13 +1,49 @@
 """Vote service — Swiss Federal votes (BFS / VoteInfo OGD) (ADR-012).
 
 Serves official referendum results for all 26 cantons with multilingual titles.
+
+SPEC-056b live path: :class:`~src.services.connectors.bfs_voteinfo_client.BfsVoteInfoClient`
+fetches the real publication at
+``https://ogd-static.voteinfo-app.ch/v1/ogd/sd-t-17-02-{YYYYMMDD}-eidgAbstimmung.json``
+and hands it unchanged to :meth:`VoteService.parse_voteinfo_payload` (line 311,
+parser logic itself is NOT altered in this slice). The only new service method
+is :meth:`VoteService.refresh_from_live`, wired in ``src/main.py``. Fixtures
+remain as honest seed data and are never labelled as live.
+
+Honest-state behaviour (SPEC-056b FR-03/FR-04):
+
+* On a successful live parse, the served proposals are replaced and the
+  envelope carries ``source="BFS VoteInfo OGD"``, ``trust_state="official_publication"``
+  and ISO-UTC ``fetched_at``.
+* On any failure (transport, non-200, parse drift) the fixtures keep being
+  served but under ``trust_state="stale"``.
+* When the store is empty (not the case in this tree, but honoured for the
+  specified 500-avoidance edge), ``source_pending`` would apply.
+
+Single attempt per refresh call; no retry/backoff in this slice (SPEC-056b R-1).
 """
 
 from __future__ import annotations
 
+import logging
+import re
+from datetime import UTC, datetime
+
 import httpx
 
 from src.models.vote import CantonVoteResult, FederalVoteProposal
+
+# The BFS VoteInfo OGD publication is a constant host; the only user-supplied
+# fragment is the vote Sunday (YYYYMMDD), validated strictly as ^\\d{8}$.
+# The host itself is never user-controlled.
+LATEST_VOTE_DATE: str = "20260927"  # newest known OGD publication at time of writing
+# TODO(SPEC-056b-R3): replace this constant with a catalogue-index lookup
+# when a catalogue endpoint becomes known.
+VOTE_DATE_RE = re.compile(r"^\d{8}$")
+
+# Same redaction discipline as the OGD connector: the date is validated before
+# any network touch so a malformed string cannot redirect the fetch.
+logger = logging.getLogger(__name__)
 
 # Official BFS Canton numeric IDs (1..26)
 BFS_CANTON_MAP: dict[int, str] = {
@@ -282,11 +318,104 @@ class VoteService:
 
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
         self._client = client
-        self._proposals = _all_default_proposals()
+        self._proposals: dict[int, FederalVoteProposal] = _all_default_proposals()
+        # Metadata that travels with every votes response (SPEC-056b FR-03).
+        # Not stored on the FederalVoteProposal itself — the envelope carries
+        # it in src/main.py so the model stays byte-identical to existing tests.
+        self._source: str = "embedded-fixture"
+        self._fetched_at: str | None = None
+        self._trust_state: str = "source_pending"
+        self._live_source_url: str | None = None
+
+    @property
+    def source(self) -> str:
+        return self._source
+
+    @property
+    def fetched_at(self) -> str | None:
+        return self._fetched_at
+
+    @property
+    def trust_state(self) -> str:
+        return self._trust_state
+
+    @property
+    def live_source_url(self) -> str | None:
+        return self._live_source_url
+
+    async def refresh_from_live(self, vote_date: str | None = None) -> bool:
+        """Attempts an async refresh from the VoteInfo OGD live host.
+
+        Passes the fetched payload to :meth:`parse_voteinfo_payload`
+        (existing, unmodified parser at line 311+) and, on success
+        (26 cantons, ``proposal_id > 0``), replaces ``_proposals`` and
+        updates metadata to the honest-live state.
+
+        Honest-state behaviour (SPEC-056b R-1/R-2/FR-04):
+
+        * Transport error / non-200 / parse ``None`` → fixtures stay served
+          but labelled ``trust_state="stale"``; when the store is empty
+          (not the case here) ``source_pending`` would apply. Never 500.
+        * Only one attempt per call; retries are a later slice (R-1).
+        * ``vote_date`` is validated strictly as ``^\\d{8}$`` (R-3/R-6); a
+          malformed value raises ``ValueError`` and never hits the network.
+
+        Args:
+            vote_date: ``YYYYMMDD``; defaults to :data:`LATEST_VOTE_DATE`.
+                TODO(SPEC-056b-R3): replace this constant with catalogue lookup
+                when a catalogue endpoint becomes known.
+
+        Returns:
+            ``True`` when the proposals were replaced from live data,
+            ``False`` otherwise (fixtures keep being served).
+        """
+        from src.services.connectors.bfs_voteinfo_client import (
+            BfsVoteInfoClient,
+            VoteInfoFetchError,
+        )
+
+        use_date = vote_date if vote_date is not None else LATEST_VOTE_DATE
+        if not VOTE_DATE_RE.match(use_date):
+            raise ValueError(
+                f"vote_date must match ^\\d{{8}}$ (YYYYMMDD), got {use_date!r}"
+            )
+
+        try:
+            connector = BfsVoteInfoClient(client=self._client)
+            payload, source_url = await connector.fetch(use_date)
+            parsed: FederalVoteProposal | None = self.parse_voteinfo_payload(payload)
+        except (VoteInfoFetchError, httpx.HTTPError) as exc:
+            logger.warning("VoteInfo OGD fetch failed for %s: %s", use_date, exc)
+            # What is actually served is the fixture set, so the source label
+            # stays "embedded-fixture"; only the trust_state degrades.
+            self._trust_state = "stale" if self._proposals else "source_pending"
+            return False
+        except Exception as exc:  # noqa: BLE001 - defensive guard: parser handles untrusted OGD JSON, any drift must degrade to stale, never 500
+            logger.error("VoteInfo OGD parse crashed for %s: %s", use_date, exc)
+            self._trust_state = "stale" if self._proposals else "source_pending"
+            return False
+
+        if parsed is None or parsed.proposal_id <= 0 or len(parsed.cantons) != 26:
+            logger.warning(
+                "VoteInfo OGD payload for %s parsed to None/partial (%s / %s cantons)",
+                use_date,
+                parsed.proposal_id if parsed is not None else "None",
+                len(parsed.cantons) if parsed is not None else 0,
+            )
+            self._trust_state = "stale" if self._proposals else "source_pending"
+            return False
+
+        self._proposals[parsed.proposal_id] = parsed
+        self._source = "BFS VoteInfo OGD"
+        self._live_source_url = source_url
+        self._fetched_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
+        self._trust_state = "official_publication"
+        logger.info("VoteInfo OGD live refresh succeeded (%s -> %s)", use_date, source_url)
+        return True
 
     def get_latest_vote(self) -> FederalVoteProposal:
         """Returns the latest referendum proposal with results for all 26 cantons."""
-        return self._proposals[6670]
+        return max(self._proposals.values(), key=lambda p: p.date)
 
     def get_proposal_by_id(self, proposal_id: int) -> FederalVoteProposal | None:
         """Returns specific proposal by ID."""

@@ -338,25 +338,59 @@ async def politics_representatives(
     return data.model_dump()
 
 
+def _vote_envelope() -> dict[str, object]:
+    """SPEC-056b: top-level source/fetched_at/trust_state for the votes routes."""
+    return {
+        "source": _vote.source,
+        "fetched_at": _vote.fetched_at,
+        "trust_state": _vote.trust_state,
+    }
+
+
 @app.get("/api/v1/politics/votes/latest")
-def politics_votes_latest() -> dict[str, object]:
-    """Hivatalos szövetségi népszavazási eredmények kantonális bontásban (ADR-012)."""
-    return _vote.get_latest_vote().model_dump()
+async def politics_votes_latest() -> dict[str, object]:
+    """Hivatalos szövetségi népszavazási eredmények kantonális bontásban (ADR-012).
+
+    SPEC-056b: serves the real VoteInfo OGD data after a live refresh.
+    When the host is unreachable the fixtures are served but labelled
+    "stale"; when absolutely nothing is servable the response is HTTP 200
+    with proposal=null and trust_state="source_pending" — never a 500.
+    """
+    await _vote.refresh_from_live()
+    if not _vote.list_proposals():
+        return {"proposal": None, **_vote_envelope()}
+    proposal = _vote.get_latest_vote()
+    envelope = _vote_envelope()
+    if envelope["trust_state"] == "source_pending":
+        return {"proposal": None, **envelope}
+    return {**proposal.model_dump(), **envelope}
 
 
 @app.get("/api/v1/politics/votes/list")
-def politics_votes_list() -> dict[str, object]:
-    """Elérhető szövetségi népszavazási javaslatok listája (ADR-017)."""
-    return {"items": _vote.list_proposals()}
+async def politics_votes_list() -> dict[str, object]:
+    """Elérhető szövetségi népszavazási javaslatok listája (ADR-017).
+
+    SPEC-056b: same honest envelope as latest (see above).
+    """
+    await _vote.refresh_from_live()
+    items: list[dict[str, object]] = (
+        _vote.list_proposals() if _vote.trust_state != "source_pending" else []
+    )
+    return {"items": items, **_vote_envelope()}
 
 
 @app.get("/api/v1/politics/votes/{proposal_id}")
-def politics_vote_by_id(proposal_id: int) -> dict[str, object]:
-    """Egy konkrét szövetségi javaslat 26 kantonos adatai (ADR-017)."""
+async def politics_vote_by_id(proposal_id: int) -> dict[str, object]:
+    """Egy konkrét szövetségi javaslat 26 kantonos adatai (ADR-017).
+
+    SPEC-056b: 404 for unknown proposal_id is UNCHANGED; the honest envelope
+    travels alongside the payload.
+    """
+    await _vote.refresh_from_live()
     item = _vote.get_proposal_by_id(proposal_id)
     if item is None:
         raise HTTPException(status_code=404, detail=f"Proposal {proposal_id} not found")
-    return item.model_dump()
+    return {**item.model_dump(), **_vote_envelope()}
 
 
 @app.get("/api/v1/place/{postcode}")
