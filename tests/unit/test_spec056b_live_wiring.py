@@ -311,3 +311,50 @@ def test_contract_unknown_proposal_404() -> None:
     c = TestClient(app)
     resp = c.get("/api/v1/politics/votes/99999")
     assert resp.status_code == 404, f"unknown proposal must be 404, got {resp.status_code}: {resp.text}"
+
+
+# =============================================================================
+# 4. REGRESSION — the binding gate's blocking defect: refresh_from_live used to
+#    INSERT the live proposal into a store still holding the four 2024
+#    fixtures, so /votes/list served five ids under trust_state
+#    official_publication. Four of them are constants in this repository,
+#    presented as federal results with a fresh timestamp — the exact
+#    dishonesty SPEC-056b FR-02 exists to remove. On success the served set
+#    must contain ONLY live ids. No network — MockTransport + recorded fixture.
+# =============================================================================
+
+
+@pytest.mark.asyncio
+@pytest.mark.test_id("TEST-SPEC056B-012")
+@pytest.mark.requirements("SPEC-056b:FR-02")
+@pytest.mark.scenario(
+    "AC12: regression — on a successful refresh the served set contains only live ids, "
+    "none of the four fixture ids appears under official_publication."
+)
+async def test_regression_success_serves_only_live_ids() -> None:
+    fixture = _load_fixture()
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json=fixture)
+
+    transport = httpx.MockTransport(handler)
+    async with httpx.AsyncClient(transport=transport) as client:
+        svc = VoteService(client=client)
+        ok = await svc.refresh_from_live(vote_date="20260927")
+        assert ok is True, "recorded live-shaped payload must refresh successfully"
+        assert svc.trust_state == "official_publication", (
+            f"success must label official_publication, got {svc.trust_state!r}"
+        )
+        served_ids = [p["proposal_id"] for p in svc.list_proposals()]
+        assert len(served_ids) >= 1, "served set must be non-empty after a live success"
+        assert set(served_ids) <= set(LIVE_IDS), (
+            f"served set must contain ONLY live ids {LIVE_IDS}, got {served_ids}"
+        )
+        for fid in FIXTURE_IDS:
+            assert fid not in served_ids, (
+                f"fixture id {fid} must never be served under official_publication "
+                f"— served ids: {served_ids}"
+            )
+            assert svc.get_proposal_by_id(fid) is None, (
+                f"fixture id {fid} must not resolve while trust_state is official_publication"
+            )
