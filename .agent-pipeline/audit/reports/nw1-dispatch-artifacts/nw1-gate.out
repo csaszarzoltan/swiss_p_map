@@ -1,0 +1,7 @@
+Report written to both destinations (14011 B each):
+- (a) /home/zoltan/.hermes/cache/scratch/dispatch/nw1-gate.md
+- (b) /home/zoltan/swiss_p_map/.agent-pipeline/audit/reports/nw1-gate.md (uncommitted — orchestrator to commit via `claude-verdict`)
+
+Scores: target 3, verification 3, scope 5, honesty 3, survival 3 — average 3.4. Blocking defect: `vote_service.py:408` merges live 6880 into fixture store instead of replacing (FR-02), so `/votes/list` serves `[6880,6690,6680,6700,6670]` all labelled `official_publication`; plus `sync()` 6670/58.2 stub survives against FR-01. Full evidence in the report.
+
+VERDICT: REQUEST-CHANGES 3.4

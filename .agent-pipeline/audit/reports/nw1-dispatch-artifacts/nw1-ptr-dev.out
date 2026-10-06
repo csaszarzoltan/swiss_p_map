@@ -1,0 +1,58 @@
+```
+dispatch:  inline audit brief (read-only self-audit, SPEC-056b developer work)
+agent:     developer
+repo:      /home/zoltan/swiss_p_map @ 6947f8f
+brief:     not attempted — no brief file was supplied; the task arrived inline
+verdict:   REQUEST-CHANGES 3.4 (nw1-gate.md, superseded) → APPROVE 5.0 (nw1-gate2.md)
+status:    PARTIAL — all 15 items answered from evidence, but every answer below
+           is reconstructed from disk (commits, artifacts, loop record), not from
+           a report I wrote, because I never completed a dispatch or wrote a report
+```
+
+All commands I ran were read-only (`git log/show/status`, `grep`, `cat`, `wc`, `sha256sum`, `sed`). Tree was clean at start (`git status --short` → empty); nothing I ran writes.
+
+**Q1 — What was the acceptance criterion, and how did you verify it was met?**
+The dev1 brief's ACCEPTANCE line was: *"every item answered, every claim carrying pasted command output, the allowlist respected, and the four gates green with their real counts in the report."* Dev4's DONE was: *"the served set on success contains only live proposals, fixtures still serve on failure under `stale`, all four gates green, committed."* I did not verify it — no `nw1-dev*.md` report exists anywhere (`.agent-pipeline/audit/reports/` contains only `nw1-explore.md nw1-gate.md nw1-gate2.md nw1-reviewer.md nw1-testauthor2.md`, confirmed by `ls`). It was verified by others: the orchestrator's live check in `analysis/next-moves.md` (real proposal 6880, `official_publication`) and the re-gate `nw1-gate2.md:22-24` (264 passed/1 skipped, mypy 50 files clean, ruff clean).
+
+**Q2 — Which command proved the change works, and what was its actual output?**
+No command of mine — I died before verifying in all four dispatches (artifacts read *"waiting on my refresh to resolve before I commit anything"*, *"running verification now"*, *"Committing — …"*, i.e. intent, never output). The commands that proved it were the orchestrator's, quoted from `analysis/next-moves.md`: `GET /api/v1/politics/votes/latest -> HTTP 200 | 4783 B | proposal_id: 6880 | cantons: 26 | source: BFS VoteInfo OGD | trust_state: official_publication`, and post-fix `pytest -q -> 250 passed, 1 skipped`, `mypy -> Success, 50 files`, `ruff -> All checks passed!`.
+
+**Q3 — What did you NOT do that the brief asked for, and why?**
+Three things, all for the same reason — the dispatch process ended mid-task each time (artifacts 99/123/44/101 bytes; ledger `wall_s=1269/634/53/995`): (a) I never wrote the required report to either OUTPUT path; (b) I never committed — the orchestrator committed my diffs as `33aab13` and `2904f21`; (c) I never pasted the verification outputs. Cause of death: not established — wall times never hit the brief budgets (1269 < 1500, 634 < 1200, 53 < 700, 995 vs 900 budget on dev4 is the only possible overrun, and even there the fix was already on disk), and the 81-byte `unrecognized_model` `.err` banner is present on every dispatch on this host including successful ones, so it explains nothing.
+
+**Q4 — What did you change that was NOT in the Target Files allowlist?**
+Nothing in `33aab13`: `git show --name-status --format='' 33aab13` → exactly `M src/main.py`, `M src/services/connectors/bfs_voteinfo_client.py`, `M src/services/vote_service.py`; `src/models/vote.py` correctly untouched. In `2904f21` the stat is `M docs/specs/SPEC-056b-live-voteinfo-ogd-wiring.md` + the two src files — the spec status-line edit was outside the original §1 allowlist but was explicitly ordered by the dev4 brief ("Update SPEC-056b's status line if the fix changes implementation status", and its diff shows only `Status | SPEC_READY / PENDING_DEV` → `IMPLEMENTED (pending re-gate…)`). So: one out-of-allowlist file, brief-authorized, one line.
+
+**Q5 — What did you assume without measuring?**
+not established — I wrote no report, so brief item 7 ("what did you assume") was never answered by me, and I will not reconstruct intent. Code facts that *suggest* unmeasured assumptions, stated as facts not motives: `vote_service.py:408` (pre-2904f21) merged instead of replacing, violating FR-02; `bfs_voteinfo_client.py:122` retained the hardcoded `6670/58.2` `sync()` stub (still present at HEAD — the gate, not I, documented why).
+
+**Q6 — Did any other dispatch touch a file you wrote?**
+No other *agent's* files overlap mine. `git show --name-status` per commit: `33aab13` (my work, 3 src files), `aebfafe` (test-author's gate: 2 new test paths only), `2904f21` (my dev4 continuation: same src files + spec line), `2579c21` (test-author: `tests/unit/test_spec056b_live_wiring.py`, `tests/unit/test_vote_service.py`, one report — all test/report paths I was forbidden to touch and never wrote). The dev2/dev3/dev4 dispatches edited my src files, but they share my persona (`8db013f7015c`) and were continuations, not collisions. I know this from the ledger rows plus per-commit name-status, not from memory.
+
+**Q7 — Did the work you did commit? Which commit SHA is yours?**
+Plainly: no. I never committed anything. Every commit in this repo is authored `Zoltan Csaszar`; the orchestrator committed my recovered diffs as `33aab13` (dev1–3 work) and `2904f21` (dev4 work). Zero commits are mine, and that is exactly why the orchestrator's recovery commits were needed.
+
+**Q8 — What would you do differently if you ran this again tomorrow?**
+Commit the smallest working slice and write the report skeleton *before* running verification — dev3's artifact proves the fix was on disk while the verification and report died with the process. Grounded in: dev1's +279/−13 sat uncommitted through two further dispatches before `33aab13` landed it.
+
+**Q9 — Which clause of your brief did you have to interpret, and what did you assume?**
+Dev2 brief: *"Choose the cleanest option that satisfies BOTH: e.g. keep the documented payload at the top level … rather than nesting … prefer the additive shape unless you can prove nesting is required."* That sentence delegates a product/design decision ("choose", "unless you can prove") inside a build task. What landed was the additive shape (`{**proposal.model_dump(), **envelope}`, per the loop record) — consistent with the preference, but the "unless you can prove" branch was never argued anywhere because no report was written. Brief defect, not agent work: a build brief should have mandated the shape (as dev3 later did).
+
+**Q10 — Was anything you did NOT do that the brief asked for?**
+Yes — the report, the commit, and the pasted gate outputs (see Q3). Reason: the dispatch ended mid-task (process kill/stall), not budget (only dev4's 995 s wall vs 900 s budget is even candidate-exhaustion, and its fix was already fully on disk), not scope, and not "the brief did not ask" — the brief asked explicitly. This is a fixable pipeline finding (commit-before-verify ordering), not a completion.
+
+**Q11 — Would a reader of your report alone know you completed the WHOLE brief?**
+There is no report, so no — and that absence is itself the signal: `ls .agent-pipeline/audit/reports/` shows no `nw1-dev*.md`, and the four ledger artifacts are 44–123-byte sentence fragments. The next brief must treat "artifact < 400 bytes AND no report at the OUTPUT path" as incomplete-by-construction and re-dispatch from `git diff`, which is what the orchestrator did.
+
+**Q12 — Does the symbol you tested have a production caller?**
+Not zero callers. Measured just now:
+`grep -rn 'parse_voteinfo_payload' src/ tests/` → 4 hits, all in `src/services/vote_service.py` (docstring refs at :8, :364; the call at :403 inside `refresh_from_live`; the `def` at :459) — zero hits under `tests/`. `grep -rn 'refresh_from_live' src/` → `src/main.py:359,375,389` (`await _vote.refresh_from_live()` in all three votes routes) plus the `def` at `vote_service.py:361`. So the parser has a production caller chain: routes → `refresh_from_live` (:403) → `parse_voteinfo_payload`. (Loop-target note, not an excuse: at dispatch time the count was 1, the `def` alone.)
+
+**Q13 — Did you quote the stall banner token in your report?**
+I wrote no report, so no. The four artifacts (99/123/44/101 B) are natural-language mid-task fragments, not banners — real partial work, corroborated by the matching on-disk diffs. Ledger `verdict=OK` on all four tickets (181/186/187/198). The `claude-code:unrecognized_model` token appears only in the 81-byte `.err` sidecars, which carry it on *every* dispatch on this host including completed ones — noise, never a verdict. A later reader must not file these as stalls: `wc -c` + reading the content distinguishes them from an 81-byte banner-only file.
+
+**Q14 — What was happening when each dispatch ended? Was any work lost?**
+Each artifact is a freeze-frame mid-sentence: dev1 *"waiting on my refresh to resolve before I commit anything"* (99 B, wall 1269 s — died before commit with +279/−13 uncommitted on disk per the loop record); dev2 *"Now implementing…"* (123 B — loop record: "No change to the tree"); dev3 *"Fixes applied — running verification now"* (44 B, wall 53 s — died after applying, before verifying; the loop record confirms the fix was in the diff and `ruff`/`test_vote_service.py` went green on the recovered tree); dev4 *"Committing — first the message convention check…"* (101 B — died before staging; orchestrator committed it as `2904f21`). Nothing was lost: `git show --stat 33aab13` shows the full +277/−13 across the 3 allowlisted files, `git show 2904f21` shows the `_live_proposals` honesty fix, HEAD is clean, and gate2 measured 264/1 + mypy + ruff on the final tree. Evidence is `git show`/`git status`, not recollection — I have no memory of the runs beyond what disk and ledger show.
+
+**Q15 — Clearest vs most ambiguous brief?**
+Clearest: `nw1-brief-dev3.md` (2549 B, one item): *"make the envelope ADDITIVE — spread the original payload's own keys at the TOP level, then add source / fetched_at / trust_state alongside them. Do NOT nest under 'proposal'."* — exact transformation, exact file:line for both lints, explicit DO-NOT list; the loop record shows the fix landed under this brief. Most ambiguous: `nw1-brief-dev2.md` (5655 B): *"Choose the cleanest option that satisfies BOTH … prefer the additive shape unless you can prove nesting is required"* plus *"If you conclude instead that the tests encode a stale contract and SHOULD change … write your case in the report and leave them failing"* — two tasks (restructure + ruff) and two delegated judgement calls in one dispatch, with no checkable acceptance for the "prove" branch. Caveat: with no developer reports written, the brief→outcome link is the orchestrator's loop-record correlation, not something I measured from inside the runs.

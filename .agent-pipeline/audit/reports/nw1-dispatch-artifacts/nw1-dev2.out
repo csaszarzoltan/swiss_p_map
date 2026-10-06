@@ -1,0 +1,1 @@
+Now implementing. Two narrow changes to `src/main.py` (additive envelope) and `src/services/vote_service.py` (ruff fixes).

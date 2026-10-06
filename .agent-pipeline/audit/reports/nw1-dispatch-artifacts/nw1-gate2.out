@@ -1,0 +1,10 @@
+1. Scores: target 5 (fix 2904f21 isolates live in `_live_proposals`, reproduced served `[6880]` under `official_publication`); verification 5 (2579c21 adds live-only + TEST-SPEC056B-012, mutation FAILED→PASSED); scope 5 (`git diff 2904f21..2579c21 -- src/` empty, test commit touches only 2 test files + report); honesty 5 (docstring + client citation fixed, served set honest); survival 5 (commits durable, pytest 264/1, mypy 50 clean, ruff src clean). Plain average 5.0.
+2. YES closed — MockTransport + committed fixture: `refresh_ok True, trust_state official_publication, source BFS VoteInfo OGD, served_ids [6880], fixture_present [], get_6680 None`. Separator: `_live_proposals` store + `_served_proposals()` (vote_service.py:321-325,350-359,427,437/441/455).
+3. NO weakening — removed `len>=4` and `6670/6680/6690/6700 in ids` encoded the dishonest contract (correct removal, now inverted to `not in` under official_publication); BVG 32.9/ZH 34.8 content relocated intact to new TEST-VOTE-005 stale-path test; success detail now checks live id + envelope keys; 404 unchanged.
+4. YES — mutated `self._live_proposals={...}` back to `self._proposals[...]=...`: TEST-SPEC056B-012 FAILED exit 1; restored: 1 passed.
+5. CONFIRMED — `git show --numstat 2579c21`: only report + 2 test files; `git diff 2904f21..2579c21 -- src/` empty; vote_service.py sha `4345021d48b1` both sides.
+6. NONE blocking. Non-blocking only: docstring:14 "replaced" imprecise, failure-matrix parametrization possible, `docs/specs/validate_specs.py` ruff 9 pre-existing (src/ clean).
+
+Reports: (a) /home/zoltan/.hermes/cache/scratch/dispatch/nw1-gate2.md (11929B) + (b) /home/zoltan/swiss_p_map/.agent-pipeline/audit/reports/nw1-gate2.md (11929B). `git log --oneline -1`: 2579c21. Tests: `.venv/bin/python -m pytest -q` 264 passed 1 skipped; mypy 50 clean; `ruff check src/` clean.
+
+VERDICT: APPROVE 5.0

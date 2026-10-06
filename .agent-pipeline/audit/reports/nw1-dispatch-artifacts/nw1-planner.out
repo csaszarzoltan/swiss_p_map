@@ -1,0 +1,22 @@
+```
+dispatch:  inline planner prompt (no brief file supplied)
+agent:     planner
+repo:      /home/zoltan/swiss_p_map @ adc0093
+brief:     not attempted - no brief file path was given, inline prompt only
+verdict:   none - first pass
+status:    DONE - SPEC-056b written to both destinations, all 8 items answered, no product code touched
+```
+
+Spec: `docs/specs/SPEC-056b-live-voteinfo-ogd-wiring.md` (16 812 bytes — far above the 400-byte banner gate; scratch copy byte-identical at `/home/zoltan/.hermes/cache/scratch/dispatch/nw1-spec.md`). Proof the model was alive: I read and quote `src/services/vote_service.py:311` (`def parse_voteinfo_payload`), `src/main.py:341-357` (three votes routes), the full 17-line `bfs_voteinfo_client.py` stub (imports only `hashlib/json/pydantic`), `src/models/vote.py` (no source/trust fields), and measured venv `httpx 0.28.1` via `.venv/bin/python`.
+
+Coverage of the 8 items: (1) 4-file allowlist with line numbers; (2) FR-01..FR-07; (3) envelope contract + UNCHANGED list; (4) AC-01..AC-07, each with observed output (AC-06/AC-07 honestly marked "not run"); (5) negative `wc -l` = 1 pre-fix; (6) stop command below; (7) R-1..R-7 with unknowns marked `no-live-validation`/`not determined`; (8) 8 explicit out-of-scope items. No-live-validation is flagged for the fetch path itself (planner made no network calls; host facts are orchestrator-measured, re-cited with link+snippet+date).
+
+Commit: NOT committed per the brief's explicit "Do NOT commit. The orchestrator commits after the gate." Uncommitted paths I did not write and left alone: `.agent-pipeline/`, `analysis/` (both `??` in `git status`). My only new path: `docs/specs/SPEC-056b-live-voteinfo-ogd-wiring.md`.
+
+Handoff: developer implements the 4-file slice next; test-author owns `tests/unit/test_spec056b_live_wiring.py` per §9 sketch.
+
+Stop command (item 6):
+
+```sh
+cd /home/zoltan/swiss_p_map && grep -rn "parse_voteinfo_payload" src/ tests/ | wc -l && grep -c "AsyncClient" src/services/connectors/bfs_voteinfo_client.py && grep -c "trust_state" src/main.py
+```

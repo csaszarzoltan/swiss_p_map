@@ -1,0 +1,19 @@
+```
+dispatch:  test-author nw1-testauthor2 (role+task inline, no brief file)
+agent:     test-author
+repo:      /home/zoltan/swiss_p_map @ 2579c21
+brief:     sha256:n/a - not attempted (no brief file was supplied; task arrived inline)
+verdict:   none - first pass
+status:    DONE — new live-only contract encoded, regression proven able to fail, suite green, src/ untouched
+```
+
+Commit `2579c21` (`test(votes): ...` convention measured from `git log`: dominant `type(scope):` pattern). Staged by explicit path only; `git show --name-status` confirms exactly 3 files, all mine: `M tests/unit/test_vote_service.py`, `M tests/unit/test_spec056b_live_wiring.py`, `A .agent-pipeline/audit/reports/nw1-testauthor2.md`. Tree clean afterwards. Nothing under `src/` touched. Never pushed, never amended.
+
+What proves the model was alive: read the split-store implementation (`_live_proposals` vs `_proposals` in `src/services/vote_service.py:319-359`), re-derived the stale test against it, and demonstrated the new regression assertion failing against a pre-fix merge copy under `/tmp` (served `[6880, 6690, 6680, 6700, 6670]` under `official_publication`).
+
+Test files + what each pins + exact commands:
+- `tests/unit/test_vote_service.py` — rewritten `test_vote_proposals_list_and_detail` (200; `items` non-empty; envelope on list+detail; live-only exclusion under `official_publication`; 404 unchanged) + new `test_vote_list_failure_path_serves_fixtures_as_stale` (MockTransport 500 → stale, all four fixture ids + BVG 32.9/ZH 34.8 pinned on the honest path).
+- `tests/unit/test_spec056b_live_wiring.py` — new `TEST-SPEC056B-012` regression: success serves only live ids, fixture ids unresolvable under `official_publication`, no network.
+- `pytest tests/unit/test_vote_service.py -q` → 5 passed; affected pair → 18 passed; full `pytest -q` → **264 passed, 1 skipped**; `mypy src/` → clean (50 files); `ruff check src/` → clean. Pre-fix proof pasted in the committed report.
+
+Report lives at (b) `.agent-pipeline/audit/reports/nw1-testauthor2.md` (committed in 2579c21) and (a) `/home/zoltan/.hermes/cache/scratch/dispatch/nw1-testauthor2.md` (5874 B both). Full per-item answers (all 7, incl. removed-assertion justifications and the residual HTTP-level network gap) are in the report.

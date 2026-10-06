@@ -1,0 +1,1 @@
+Wire BfsVoteInfoClient/VoteService to actually fetch the live VoteInfo OGD host (ogd-static.voteinfo-app.ch) — the parser already handles its payload but has zero callers, so production serves only 2024 hardcoded fixtures.

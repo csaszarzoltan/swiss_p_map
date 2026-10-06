@@ -1,0 +1,1 @@
+First pre-fix failure confirmed (collection error — the constant doesn't exist yet). Checking whether the gate should import cleanly on the old tree or fail per-test instead.
