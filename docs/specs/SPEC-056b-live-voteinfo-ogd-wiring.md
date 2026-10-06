@@ -5,7 +5,7 @@
 | ID | SPEC-056b |
 | Parent | SPEC-056 (`docs/specs/SPEC-056-elo-bfs-voteinfo-szavazasi-konnektor.md`, `implementationStatus: PENDING_DEV`, names NO host/URL) |
 | Scope | Backend only — wire existing parser to live OGD host |
-| Status | SPEC_READY / PENDING_DEV |
+| Status | IMPLEMENTED (pending re-gate: FR-02 honesty fix — live result isolated in `_live_proposals`, fixtures fallback-only) |
 | Date | 2026-10-05 |
 | Repo | `/home/zoltan/swiss_p_map` @ `adc0093` (clean tree) |
 

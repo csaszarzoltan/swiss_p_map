@@ -116,8 +116,9 @@ class BfsVoteInfoClient:
         ``test_spec_055_req_055_001_ac_055_001_voteinfo_hash``) that assert a
         deterministic, network-free ``count == 1`` response, and is served by
         the out-of-scope ``POST /api/v1/connectors/voteinfo/sync`` route.
-        Leaving it live-fetching is an open conflict — see the SPEC-056b
-        implementation report.
+        Leaving it live-fetching is an open conflict — no SPEC-056b
+        implementation report exists yet; the conflict is tracked by the
+        reviewer gate on this slice.
         """
         rows = [{"id": 6670, "yes": 58.2}]
         raw = json.dumps(rows, sort_keys=True).encode()

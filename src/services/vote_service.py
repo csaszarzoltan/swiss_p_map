@@ -319,6 +319,10 @@ class VoteService:
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
         self._client = client
         self._proposals: dict[int, FederalVoteProposal] = _all_default_proposals()
+        # SPEC-056b FR-02 honesty fix: the live result lives in its own store.
+        # Reads serve ONLY this store while trust_state == "official_publication";
+        # _proposals stays the untouched fixture fallback for the failure path.
+        self._live_proposals: dict[int, FederalVoteProposal] | None = None
         # Metadata that travels with every votes response (SPEC-056b FR-03).
         # Not stored on the FederalVoteProposal itself — the envelope carries
         # it in src/main.py so the model stays byte-identical to existing tests.
@@ -343,13 +347,26 @@ class VoteService:
     def live_source_url(self) -> str | None:
         return self._live_source_url
 
+    def _served_proposals(self) -> dict[int, FederalVoteProposal]:
+        """Returns the store the reads must serve.
+
+        While the last refresh succeeded (``trust_state ==
+        "official_publication"``) only the live result is served; otherwise
+        the untouched fixture fallback is served.
+        """
+        if self._trust_state == "official_publication" and self._live_proposals:
+            return self._live_proposals
+        return self._proposals
+
     async def refresh_from_live(self, vote_date: str | None = None) -> bool:
         """Attempts an async refresh from the VoteInfo OGD live host.
 
         Passes the fetched payload to :meth:`parse_voteinfo_payload`
-        (existing, unmodified parser at line 311+) and, on success
-        (26 cantons, ``proposal_id > 0``), replaces ``_proposals`` and
-        updates metadata to the honest-live state.
+        (existing, unmodified parser) and, on success
+        (26 cantons, ``proposal_id > 0``), stores ONLY the live result in
+        ``_live_proposals`` — the fixture ``_proposals`` dict is left
+        untouched as the failure-path fallback — and updates metadata to
+        the honest-live state.
 
         Honest-state behaviour (SPEC-056b R-1/R-2/FR-04):
 
@@ -405,7 +422,9 @@ class VoteService:
             self._trust_state = "stale" if self._proposals else "source_pending"
             return False
 
-        self._proposals[parsed.proposal_id] = parsed
+        # Success path: the served set is ONLY the live result. The fixture
+        # dict is left untouched so the failure path still has its fallback.
+        self._live_proposals = {parsed.proposal_id: parsed}
         self._source = "BFS VoteInfo OGD"
         self._live_source_url = source_url
         self._fetched_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
@@ -415,11 +434,11 @@ class VoteService:
 
     def get_latest_vote(self) -> FederalVoteProposal:
         """Returns the latest referendum proposal with results for all 26 cantons."""
-        return max(self._proposals.values(), key=lambda p: p.date)
+        return max(self._served_proposals().values(), key=lambda p: p.date)
 
     def get_proposal_by_id(self, proposal_id: int) -> FederalVoteProposal | None:
         """Returns specific proposal by ID."""
-        return self._proposals.get(proposal_id)
+        return self._served_proposals().get(proposal_id)
 
     def list_proposals(self) -> list[dict[str, object]]:
         """Returns lightweight overview list of available federal proposals."""
@@ -433,7 +452,7 @@ class VoteService:
                 "national_turnout_percent": p.national_turnout_percent,
             }
             for p in sorted(
-                self._proposals.values(), key=lambda x: x.date, reverse=True
+                self._served_proposals().values(), key=lambda x: x.date, reverse=True
             )
         ]
 
