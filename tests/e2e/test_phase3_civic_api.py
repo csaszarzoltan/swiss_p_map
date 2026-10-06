@@ -10,7 +10,12 @@ def test_spec_055_req_055_001_ac_055_001_meteo_api() -> None:
 
 
 def test_spec_056_req_056_001_ac_056_001_vote_sync_api() -> None:
-    assert c.post("/api/v1/connectors/voteinfo/sync").json()["count"] == 1
+    r = c.post("/api/v1/connectors/voteinfo/sync")
+    assert r.status_code == 200
+    b = r.json()
+    assert b["count"] == 0
+    assert b["trust_state"] == "source_pending"
+    assert b["fetched_at"] is None
 
 
 def test_spec_057_req_057_001_ac_057_001_transport_api() -> None:

@@ -72,6 +72,14 @@ any test file (developer writes NO tests in this slice — `test-author` owns th
   for a caller-supplied vote date (`YYYYMMDD`), using an injected `httpx.AsyncClient`
   (optional param, default `None` → create-per-call with `timeout=10`), and returns the
   raw JSON bytes/dict. No hardcoded rows remain on any code path.
+
+> **Status note (SPEC-056c, 2026-10-06):** this second sentence was FALSE from `adc0093` through
+> `f5c27a2` — `BfsVoteInfoClient.sync()` kept a hardcoded row `{"id": 6670, "yes": 58.2}`
+> labelled `trust_state="official_publication"` on `POST /api/v1/connectors/voteinfo/sync`
+> (measured: `grep -n 'rows = [{"id"' src/services/connectors/bfs_voteinfo_client.py` →
+> line 123 pre-fix). Closed by SPEC-056c
+> (`docs/specs/SPEC-056c-honest-sync-probe.md`): `sync()` is now a network-free probe with
+> `count=0`, `fetched_at=null`, `trust_state="source_pending"`.
 - **FR-02 [MUST]:** `VoteService` exposes an async refresh path that passes the fetched
   payload to the UNMODIFIED `parse_voteinfo_payload` and, on successful parse (26 cantons,
   `proposal_id > 0`), replaces the served proposals with the live result.
@@ -125,8 +133,11 @@ Exact envelope shape for `/latest` (new top-level keys only; inner proposal sche
 - Inner `FederalVoteProposal` / `CantonVoteResult` JSON field names and types.
 - `404` for unknown `proposal_id`.
 - All non-votes routes.
-- `POST /api/v1/connectors/voteinfo/sync` and `GET /api/v1/votes/proposals` named in
-  SPEC-056 §8 do NOT exist in this tree — NOT introduced here (out of scope, §8).
+- Correction (SPEC-056c, 2026-10-06): the claim that `POST /api/v1/connectors/voteinfo/sync` and
+  `GET /api/v1/votes/proposals` "do NOT exist in this tree" was false — both exist
+  (`src/main.py:766` and `src/main.py:669`; the latter is SPEC-051's surface,
+  `tests/unit/test_spec051_voting_contract.py:1`). Neither was *introduced by SPEC-056b*, which
+  is what this out-of-scope note meant.
 
 ---
 

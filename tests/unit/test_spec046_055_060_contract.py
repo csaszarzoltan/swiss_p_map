@@ -104,21 +104,23 @@ def test_spec_055_req_055_005_ac_055_002_fallback_never_official() -> None:
 
 def test_spec_056_req_056_001_ac_056_001_sync_deterministic_hash() -> None:
     a, b = BfsVoteInfoClient().sync(), BfsVoteInfoClient().sync()
-    assert a.count == 1 and len(a.sha256) == 64
+    assert a.count == 0 and len(a.sha256) == 64
     assert a.sha256 == b.sha256
 
 
 def test_spec_056_req_056_002_ac_056_001_sync_trust_metadata() -> None:
     s = BfsVoteInfoClient().sync()
     assert s.source == "BFS VoteInfo"
-    assert s.trust_state == "official_publication"
+    assert s.trust_state == "source_pending"
+    assert s.fetched_at is None
     assert s.poll_interval_seconds == 60
 
 
 def test_spec_056_req_056_001_ac_056_001_sync_api_contract() -> None:
     body = c.post("/api/v1/connectors/voteinfo/sync").json()
-    assert body["count"] == 1 and len(body["sha256"]) == 64
-    assert body["trust_state"] == "official_publication"
+    assert body["count"] == 0 and len(body["sha256"]) == 64
+    assert body["trust_state"] == "source_pending"
+    assert body["fetched_at"] is None
 
 
 # ---------------------------------------------------------------- SPEC-057

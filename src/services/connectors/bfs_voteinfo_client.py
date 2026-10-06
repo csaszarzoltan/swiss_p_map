@@ -15,7 +15,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from typing import Any
+from typing import Any, Literal
 
 import httpx
 from pydantic import BaseModel
@@ -36,7 +36,10 @@ class VoteSync(BaseModel):
     count: int
     sha256: str
     source: str = "BFS VoteInfo"
-    trust_state: str = "official_publication"
+    trust_state: Literal["official_publication", "stale", "source_pending"] = (
+        "source_pending"
+    )
+    fetched_at: str | None = None
     poll_interval_seconds: int = 60
 
 
@@ -108,18 +111,12 @@ class BfsVoteInfoClient:
         return data
 
     def sync(self) -> VoteSync:
-        """Legacy connectivity probe kept for the existing sync contract.
+        """Network-free probe for POST /api/v1/connectors/voteinfo/sync (SPEC-056c).
 
-        NOT the live data path: SPEC-056b FR-01's fetch is :meth:`fetch`.
-        This method is pinned by three pre-existing tests
-        (``test_spec_056_req_056_001_ac_056_001_sync_*``,
-        ``test_spec_055_req_055_001_ac_055_001_voteinfo_hash``) that assert a
-        deterministic, network-free ``count == 1`` response, and is served by
-        the out-of-scope ``POST /api/v1/connectors/voteinfo/sync`` route.
-        Leaving it live-fetching is an open conflict — no SPEC-056b
-        implementation report exists yet; the conflict is tracked by the
-        reviewer gate on this slice.
+        Carries no vote rows and performs no I/O, so the response is a
+        deterministic ``count=0`` with ``trust_state="source_pending"`` and
+        ``fetched_at=None``. The live data path is
+        ``VoteService.refresh_from_live()`` (SPEC-056b), not this method.
         """
-        rows = [{"id": 6670, "yes": 58.2}]
-        raw = json.dumps(rows, sort_keys=True).encode()
-        return VoteSync(count=len(rows), sha256=hashlib.sha256(raw).hexdigest())
+        raw = json.dumps([], sort_keys=True).encode()
+        return VoteSync(count=0, sha256=hashlib.sha256(raw).hexdigest())
