@@ -5,7 +5,7 @@
 | ID | SPEC-056c |
 | Parent | SPEC-056 (`docs/specs/SPEC-056-elo-bfs-voteinfo-szavazasi-konnektor.md`, `implementationStatus: PENDING_DEV` — still true, see §5.2) and SPEC-056b (`docs/specs/SPEC-056b-live-voteinfo-ogd-wiring.md`, FR-01 status note, see §5.1) |
 | Scope | Backend only — remove the fabricated vote row from `BfsVoteInfoClient.sync()`, retarget the served contract to an honest probe |
-| Status | SPEC_READY (for developer dispatch) |
+| Status | IMPLEMENTED — 2026-10-06 @ b3ee2bd (gate APPROVE 4.9, tester PASS) |
 | Date | 2026-10-06 |
 | Repo | `/home/zoltan/swiss_p_map` @ `f5c27a2` |
 | Brief | `dispatch/nw2-brief-planner.md`, sha256:`ea083bcda27f` (equals `$CLAUDE_BRIEF_SHA`, verified by `sha256sum`) |

@@ -343,8 +343,10 @@ Ezek mért, valós tételek — de **más itemek**, nem ehhez a szelethez tartoz
 2. **Nincs gemeente-geometria a repóban.** A legfinomabb felbontás 26 kanton + 26 placeholder, tehát
    a host által kínált 161 gemeinde **nem rajzolható choroplethként**, amíg a körvonalak be nem
    töltődnek. Ez az 1. item wiring-szelete.
-3. **A `BfsVoteInfoClient.sync()` még mindig a `6670/58.2` literált adja.** Őszintén dokumentált
-   legacy probe-ként, de fabricáció a kódban. A gate nem blokkolónak jelölte.
+3. **A `BfsVoteInfoClient.sync()` fabricációja zárva (SPEC-056c, 2026-10-06, gate 4.9).**
+   Volt: `6670/58.2` mint `official_publication` (src/services/connectors/bfs_voteinfo_client.py:123).
+   Most: `count=0`, `sha256` of `b"[]"`, `trust_state="source_pending"`, `fetched_at=None`,
+   `POST /api/v1/connectors/voteinfo/sync` 200 + honest JSON (b3ee2bd). Nem shipped — lentebb RECORD.
 4. **Két ismerten vacuus teszt** (`test_spec046_055_060_contract.py:106`,
    `test_phase3_civic_services.py:13`) — konstans hash-hosszát állítanak. Még mindig vacuusak.
 5. **`docs/specs/validate_specs.py`: 9 pre-existing ruff hiba** (mérve); a `src/` tiszta.
@@ -359,6 +361,36 @@ Ezek mért, valós tételek — de **más itemek**, nem ehhez a szelethez tartoz
 - **A queue-várakozás megkülönböztethetetlen egy halott dispatchtől.** Az első gate 1561 s-ig ült,
   10 párhuzamos `claude-queue` versenyzett 3 globális slotért, ledger-sor nélkül — és helyesen
   fejeződött be. Stall bejelentése előtt nézd meg a ledger `ticket=` sorát.
+
+## LOOP RESULT nw2 — iteration 2 complete (gate inside this file: 2026-10-06T10:31)
+
+| lépés | dispatch | eredmény |
+|---|---|---|
+| ASK explore | 256 (a4f3) | Map3D `politik` hiányzó wiring (178 `yes` literál, `fetchVoteProposal` 0 caller) |
+| ASK reviewer | 257 (9d6e) | `sync()` hamis sor `official_publication`-ként (SPEC-056b FR-01) |
+| REFUTE | orchestrator | mindkettő saját méréssel elfogadva; **B rangsorolva 1.-nek** |
+| PLAN | planner (266, 1085s) | SPEC-056c: őszinte sync probe (4f53cda18c...) |
+| BUILD dev | 272 (383s) source probe landolt (29 B fán), 3 teszt maradt a végén |
+| BUILD kézi | orchestrator | 3 teszt + SPEC-056b státuszjegyzetek bezárása + 4 kapu mérés |
+| tester | 280 (421s) | PASS — 6-stage STOP zöld, mutáció 4 bukás vissza zöld |
+| gate | 279 (456s) | **APPROVE 4.9/5** — hamisítás eltávolítva, honest sync proven |
+
+**Tárgya:** `BfsVoteInfoClient.sync()` hamis sora (SPEC-056c FR-01).  
+**Landed:** `b3ee2bd` (4 fájl, +38/-23) fix + `953926d` spec + `183e494` gate docs.  
+**Kapu lezárva:** `183e494` (binding gate + tester PASS).  
+**Fa:** 4 ahead / 0 behind (még nincs pusholva — gate után következik a release).  
+**Sor:** `next=276/277/278` előtt, `279/280` (gate/tester) várólistán — nem stall, slot-ra várás.
+
+**Következő queued:** `explore` tétele — Map3D `politik` choropleth live API-ra kötése
+(frontend/src/app/Map3D.tsx:851 → `fetchVoteProposal`, `swissCantons.ts` terület).
+Nem dobva — külön mért queued entry.
+
+**Módszeri korrekciók (ebben az iterációban, befektetve):**
+1. Developer meghalt 74 B-vel a tesztírás előtt — BFS 29 B maradt, 3 teszt befejezve.
+2. Stall v. queue elszeparálása: ticket sor és load szerint (3/3 foglalt, nem elhalás).
+3. STOP `grep -c` buktató: exit 1 count 0-nál — nem kapu-hiba, hanem `|| true`.
+4. Két saját drafting-hiba visszavonása a queue file-ban (dangling citation + hamis git output) — lásd ORIENT nw2.
+5. `tester` újra dispatcholva (nw1-ben hiányzott), gate binding — 2 év utáni pótlás.
 
 ## Carried forward (do not redo)
 
