@@ -73,6 +73,109 @@ failure the post-task-review of `adc0093` already flagged.
   `source`/`fetched_at`/`trust_state`, unreachable host ⇒ labelled `source_pending`, never a
   fabricated result. The map's hardcoded canton colours are explicitly a SEPARATE later slice.
 
+## STEP 5 BUILD — iteration 1, dispatch 1 (ticket 181)
+
+`claude-dispatch: OK on attempt 1 — 99B` — a 99-byte artifact, which is **not** the stall banner
+(`grep -c unrecognized_model` = 0). The artifact said only:
+> "Async vote routes will need `await` — waiting on my refresh to resolve before I commit anything."
+
+Per the loop's own rule ("a short artifact is not a stall — read it, then diff the target files"),
+the diff was checked and **the work is on disk**: +279/−13 across the 3 allowlisted files
+(`src/main.py` +52, `src/services/connectors/bfs_voteinfo_client.py` +105,
+`src/services/vote_service.py` +135), uncommitted.
+
+**Gates measured by the orchestrator on that uncommitted tree:**
+```
+pytest -q                    -> 2 failed, 248 passed, 1 skipped   (baseline: 250 passed, 1 skipped)
+mypy src/                    -> Success, 50 files
+ruff check src/              -> 2 errors (BLE001 vote_service.py:393, UP017 vote_service.py:411)
+```
+
+**What is good and must not be undone:** the live fetch genuinely works — the route returned real
+live proposal `6880` with `trust_state: "official_publication"` and a real ISO `fetched_at`. The
+connector is a clean typed boundary (`VoteInfoFetchError`, strict `^\d{8}$` date validation,
+constant host, 10 s budget, injected client, **no fabricated fallback rows**).
+
+**The real defect:** the new code nests the payload under `{"proposal": ...}` / `{"items": ...}`,
+which breaks two pre-existing contract tests that read `proposal_id` and `national_yes_percent` at
+the top level (`tests/unit/test_vote_service.py:76,100`). Production impact is small —
+`fetchVoteProposal` in `frontend/src/lib/api.ts:180` has **no UI consumer** — but the documented
+contract is broken for a cosmetic gain, so the additive shape is preferred.
+
+**Also left behind:** the legacy stub `BfsVoteInfoClient.sync()` still returns the `6670/58.2`
+literal. The developer documented it honestly as an out-of-scope legacy probe pinned by three
+pre-existing tests; that is acceptable for this slice but must not be mistaken for the live path.
+
+**Decision: the same item returns to BUILD — no new item.** Continuation brief `nw1-brief-dev2.md`
+carries the measured failure output so the next agent does not have to rediscover it. The item is
+NOT complete and must not be recorded as such.
+
+## STEP 5 BUILD — iteration 1, dispatch 2 and 3
+
+**Dispatch 2 (ticket 186)** — 123 B artifact, same mid-work death. No change to the tree.
+
+**Diagnosis before the third attempt.** Measured across the whole host on 2026-10-05:
+```
+agent=developer  ... nw1-dev.out    artifact_bytes=99    brief 4967 B
+agent=developer  ... nw1-dev2.out   artifact_bytes=123   brief 5655 B
+agent=developer  ... loop6-dev.out  artifact_bytes=95    brief 8148 B   (another repo)
+agent=developer  ... loop2-dev.out  artifact_bytes=5112  brief 4565 B   (another repo)
+agent=explore/reviewer/planner      all completed normally
+```
+So `developer` dies mid-task across repos today while the read-only roles complete. All `.err`
+sidecars carry the 81-byte `unrecognized_model` banner. My dispatch-2 brief also carried **two**
+items (envelope restructure + ruff fixes), which this loop's own rule names as grounds for splitting.
+**Escalation applied: `--max 1`, and a genuinely single-item brief.**
+
+**Dispatch 3 (ticket 187)** — brief 2549 B, one item only. `artifact_bytes=44`, wall 53 s, and the
+artifact read *"Fixes applied — running verification now."* → **died after applying, before verifying.**
+The diff decided it: **the fix landed.**
+```
+ruff check src/                          -> All checks passed!
+pytest tests/unit/test_vote_service.py   -> 4 passed   (was 2 failed, 2 passed)
+```
+
+**Orchestrator re-ran every gate on the recovered tree:**
+```
+pytest -q      -> 250 passed, 1 skipped      (no regression; 2 failures cleared)
+mypy src/      -> Success, no issues in 50 source files
+ruff check src/ -> All checks passed!
+wiring: grep -rn "parse_voteinfo_payload" src/ tests/ | wc -l  -> 4   (pre-fix: 1)
+envelope now ADDITIVE: {**proposal.model_dump(), **envelope}   (nesting removed)
+```
+
+**Committed by the orchestrator as `33aab13`** (the developer died before its own commit):
+`M src/main.py`, `M src/services/connectors/bfs_voteinfo_client.py`, `M src/services/vote_service.py`
+— verified with `git show --name-status`, not `git status`. Every identifier named in the commit
+message was greped first (`parse_voteinfo_payload` 4, `refresh_from_live` 5, `VoteInfoFetchError` 8,
+`BfsVoteInfoClient` 6).
+
+**LIVE end-to-end check (reserved: the change speaks a real wire protocol).** Against a real uvicorn
+on 127.0.0.1:8311, not a mock:
+```
+GET /api/v1/politics/votes/latest -> HTTP 200 | 4783 B | 0.35 s
+  proposal_id : 6880
+  titles.de   : Volksinitiative «Wahrung der schweizerischen Neutralität (Neutralitätsinitiative)»
+  cantons     : 26 | national_yes: 29.84
+  source      : BFS VoteInfo OGD
+  fetched_at  : 2026-10-05T23:20:23.695586Z
+  trust_state : official_publication
+  top-level keys: cantons, date, fetched_at, national_no_percent, national_turnout_percent,
+                  national_yes_percent, proposal_id, source, titles, trust_state
+GET /api/v1/politics/votes/list   -> items 5, trust official_publication
+```
+Real 2026 proposal, real timestamp, honest source label, and the original contract keys preserved at
+the top level. **This is the strongest evidence in the loop so far** — it is the live path, not a mock.
+
+## STEP 7 RECORD — correction committed as `3d21fe5`
+
+The false negative in `docs/research/2026-10-04-events-elections-data-sources.md` was **superseded in
+place, not annotated beside** — the refuted text struck through, the corrective measurement quoted
+with its date. Two surfaces carried the claim, both fixed:
+line 191 (§3 bullet a) and line 50 (§1 summary table, which said "app only — no API found").
+Post-fix sweep for `app only|NOT AVAILABLE as an API` returns exactly one hit: the correction itself
+quoting what was refuted, which is the correct outcome.
+
 ## Carried forward (do not redo)
 
 - `v20261004163958-cc7419` is OPEN and names `adc0093`, which **has already shipped and been pushed**.
