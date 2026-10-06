@@ -1,20 +1,140 @@
 # next-work-loop — queue and record
 
-Loop: `next-work-loop /home/zoltan/swiss_p_map`, started 2026-10-05.
-Lock holder: `claude-loop-lock ~/swiss_p_map` (released on every exit path).
+Loop: `next-work-loop /home/zoltan/swiss_p_map`, started 2026-10-06 (nw2).
+Lock holder: `claude-loop-lock ~/swiss_p_map` pid 994590 — ACQUIRED 2026-10-06T09:33 ORIENT nw2 (released on every exit path).
 
-## ORIENT (measured this run, not assumed)
+## ORIENT nw2 (measured 2026-10-06T09:33+09:48, not assumed)
 
-- HEAD `adc0093`, tree clean. Was **1 commit ahead of origin** → pushed this run
-  (`ee0acf0..adc0093`), now in sync with `origin/master`.
-- Suite: **250 passed, 1 skipped** (`.venv/bin/python -m pytest -q`).
-- Version agreement: `pyproject.toml` 0.3.0, `frontend/package.json` 0.3.0, tag `v0.3.0`,
-  `git describe` = `v0.3.0-7-gadc0093`. All agree. CHANGELOG has an `[Unreleased]` section
-  describing the A1/A2/A3 work; its counts were not re-measured this run.
-- Stale status files: none found. `git ls-files | grep -Ei 'BLOCKED|STATUS|TODO|KNOWN-ISSUES'`
-  returns only `frontend/src/components/PwaStatus.tsx` (a component, not a status file).
-- `analysis/` does not exist in this repo; `docs/audits/` is the nearest equivalent.
-- Open verdict at ORIENT: `v20261004163958-cc7419` (REQUEST-CHANGES, commit `adc0093`).
+- HEAD `f5c27a2`, tree clean at ORIENT start; `0 ahead / 0 behind origin/master`, `git describe = v0.3.0-18-gf5c27a2`, `pyproject.toml 0.3.0 / frontend/package.json 0.3.0` — version agreement holds.
+- Suite at ORIENT: **264 passed, 1 skipped, 52 warnings in ~13s** (`pytest -q`, collect 265), `mypy 50 files clean`, `ruff check src/ clean`. At REFUTE time `265 tests collected` (same).
+- `cat /proc/loadavg` at REFUTE: 7.78 5.54 5.91 — load high but suite stable.
+- Stale status files: `git ls-files | grep -Ei 'BLOCKED|STATUS|TODO|KNOWN-ISSUES'` -> only `frontend/src/components/PwaStatus.tsx` (component, not a status file) — none to close as an item.
+- SPEC-056b: now `IMPLEMENTED, RE-GATED — APPROVE 5.0 (cf5c4ed)` — the nw1 false-open (`pending re-gate` at :8) was already closed in `f5c27a2`.
+- Open verdict at nw2 ORIENT: `v20261006034712-9d9c9e | REQUEST-CHANGES | ptr-nw1-review.md @ 6947f8f | 4.0 APPROVED with findings` — findings 1/2/4/5 are process/method, finding 3 (false-open) is closed; not a blocking code defect for nw2.
+- Lock: ACQUIRED `claude-loop-lock /home/zoltan/swiss_p_map --reason "ORIENT nw2"` pid 994590 at ORIENT start; still held through REFUTE.
+
+### nw1 ORIENT (SUPERSEDED — historical, do not act on these numbers)
+
+~~HEAD `adc0093`, tree clean; suite 250 passed / 1 skipped; `git describe v0.3.0-7-gadc0093`;
+`analysis/` does not exist; open verdict `v20261004163958-cc7419`.~~
+
+**All of the above was true at the nw1 ORIENT on 2026-10-05 and is FALSE at nw2.** HEAD is now
+`f5c27a2` (+8 commits), the suite is **264 passed / 1 skipped**, `git describe` is
+`v0.3.0-18-gf5c27a2`, `analysis/` exists (this file), and `v20261004163958-cc7419` is **CLOSED**.
+Superseded in place 2026-10-06 so no later session re-measures the nw1 numbers.
+
+## STEP 2 ASK (nw2) — two agents, both untrusted, both measured
+
+Dispatched concurrently through `claude-queue` (global 3-slot), `CLAUDE_PHASE=orient`:
+
+| ticket | agent | brief | brief_sha | brief_bytes | wall_s | artifact bytes |
+|---|---|---|---|---|---|---|
+| 256 | explore  | `dispatch/nw2-brief-explore.md`  | 3199fda5832d | 4124 | 97  | 128  |
+| 257 | reviewer | `dispatch/nw2-brief-reviewer.md` | 5036363338bd | 3512 | 282 | 7898 |
+
+Artifacts landed: `.agent-pipeline/audit/reports/nw2-explore.md` (7873 B) and
+`nw2-reviewer.md` (7898 B). The reviewer **refused to write** (read-only grant) and handed the
+text to the orchestrator to land — correct behaviour, recorded here; the orchestrator copied it
+into the repo. Both `.err` sidecars carry the 81-byte `unrecognized_model` banner, which on this
+host is present on **every** dispatch including successful ones — noise, not a verdict
+(CLAUDE.md §3). The explore artifact is 128 B: a real one-line answer to item 1, not a banner
+(`grep -c unrecognized_model` on the `.out` = 0).
+
+**They DISAGREED — and that disagreement is the output.**
+
+- **explore (item 1):** *"Wire the Map3D `politik` choropleth to the live per-canton vote API
+  instead of the hardcoded `yes` values in `swissCantons.ts`."*
+- **reviewer (item 1):** *"`BfsVoteInfoClient.sync()` still serves hardcoded 6670/58.2 as
+  `official_publication` on `POST /api/v1/connectors/voteinfo/sync`, violating SPEC-056b FR-01."*
+
+## STEP 3 REFUTE (nw2) — every claim re-measured by the orchestrator
+
+Neither agent was trusted. Both claims were reproduced with my own commands at `f5c27a2`.
+
+**Claim A (explore) — CONFIRMED as real:**
+
+```
+$ grep -c '"yes":' frontend/src/app/swissCantons.ts                    -> 178
+$ grep -rn 'fetchVoteProposal' frontend/  (excl. node_modules)         -> 2 hits, BOTH the
+                                                                          definitions in lib/api.ts
+                                                                          (170, 177); ZERO callers
+$ sed -n '851,855p' frontend/src/app/Map3D.tsx
+      } else if (activeTopic === "politik") {
+        const yes = (mesh.userData.yes as number) ?? 52.0;
+        const hex = yes >= 55 ? "#38bdf8" : yes >= 50 ? "#0284c7" : ...
+$ grep -rn 'SWISS_CANTONS' frontend/  (excl. node_modules)             -> import + Map3D.tsx:455
+   → the choropleth input is the static literal; the live bridge exists and has no caller.
+$ grep -rn 'fetchVoteProposal' frontend/src --include='*.tsx'          -> (empty) ← consumer absent
+```
+
+So it IS a wiring slice: both ends exist (backend live per-canton data; a render path reading
+`userData.yes`) and nothing connects them.
+
+**Claim B (reviewer) — CONFIRMED, and it is stronger than A:**
+
+```
+$ grep -n 'rows = [{"id"' src/services/connectors/bfs_voteinfo_client.py
+123:        rows = [{"id": 6670, "yes": 58.2}]
+$ .venv/bin/python -c "from src.services.connectors.bfs_voteinfo_client import BfsVoteInfoClient;
+                       print(BfsVoteInfoClient().sync().model_dump())"
+{'count': 1, 'sha256': '8c154363199ba8172033b7e119d991ba0231be27d6b2a7ab5a9c094dd0a9d5b5',
+ 'source': 'BFS VoteInfo', 'trust_state': 'official_publication', 'poll_interval_seconds': 60}
+$ sed -n '766,768p' src/main.py
+@app.post("/api/v1/connectors/voteinfo/sync")
+def connector_voteinfo_sync() -> dict[str, object]:
+    return _voteinfo_connector.sync().model_dump()
+$ grep -n 'No hardcoded rows' docs/specs/SPEC-056b-live-voteinfo-ogd-wiring.md
+74:  raw JSON bytes/dict. No hardcoded rows remain on any code path.
+$ grep -n 'Replace stub' docs/specs/SPEC-056b-live-voteinfo-ogd-wiring.md
+57:| 1 | ... | Replace stub `sync()` with real async fetch ... never fabricate rows |
+```
+
+Three tests pin the fabrication **as correct**, so the suite cannot fail on it:
+```
+$ grep -rn 'voteinfo/sync\|BfsVoteInfoClient().sync()' tests/ --include='*.py'
+tests/e2e/test_phase3_civic_api.py:13        assert c.post(...).json()["count"] == 1
+tests/unit/test_phase3_civic_services.py:14  assert len(BfsVoteInfoClient().sync().sha256) == 64
+tests/unit/test_spec046_055_060_contract.py:106,112,119
+    :112  assert s.trust_state == "official_publication"      ← pins the LIE, on a constant
+    :119  assert body["trust_state"] == "official_publication"
+```
+Three pinning tests, three files. (`grep -rln` returned exactly these three paths.)
+
+**The decisive check the two agents did not run — is `sync()` reachable in production?**
+```
+$ grep -rn '\.sync()' src/ --include='*.py'
+src/main.py:768:    return _voteinfo_connector.sync().model_dump()
+```
+One caller: the route itself. `grep -rn 'connectors/voteinfo' frontend/` → **no frontend
+consumer**; the only other mentions are SPEC-056 §8 (named, never built) and SPEC-056b's own
+OUT-of-scope list. So the fabrication is reachable over HTTP but nobody in this repo calls it.
+That does **not** make it harmless — it is an honest-label defect on a public route, and
+SPEC-056b's own [MUST] forbids it — but it does bound the blast radius, and the brief must say so.
+
+**REFUTE verdict: BOTH ACCEPTED, B ranks above A.** Reasoning, written down because it is a
+ranking decision:
+
+1. **B is a violation of a [MUST] in the spec this loop just closed as APPROVE 5.0.** We shipped
+   `Status: IMPLEMENTED, RE-GATED — APPROVE 5.0` while FR-01's own second sentence ("No hardcoded
+   rows remain on any code path") is measurably false. **RETRACTION — my own first draft of this
+   paragraph claimed the `sync()` docstring carried a "dangling citation to a report that does not
+   exist". That was FALSE and I withdraw it.** Measured (`sed -n '110,124p'`): the docstring says
+   the opposite — *"no SPEC-056b implementation report exists yet; the conflict is tracked by the
+   reviewer gate on this slice"* — which is an honest statement of absence, not a citation. The
+   docstring is accurate about its own status; what is false is FR-01's "no hardcoded rows"
+   sentence in the SPEC, not the docstring. A false green on our own slice outranks a new feature.
+2. **It is fabrication labelled `official_publication`** — the exact defect class the nw1 slice
+   was chartered to kill. Shipping it again in a second place is the failure this loop exists to
+   prevent.
+3. **A's user-visible gain is unmeasured and its risk is the wrong-half risk the user already
+   named.** explore itself flags (its item 7.1) that if `source_pending` is the common production
+   state the map still shows hardcoded colours, so the gain may be ~zero; and item 7.3 warns the
+   drill-down Bezirk layer (152 names, `Bezirk 1001` placeholders) stays hardcoded either way.
+   Building A first risks a second iteration that fixes "the wrong half" of the user's original
+   complaint. A is **not rejected** — it is **queued as the next item**, with its own REFUTE.
+
+**A is therefore queued, not dropped** (see “Queued for the next iteration” below) — the two
+agents' disagreement did not get resolved by discarding one side.
 
 ## Load-bearingness (ORIENT requirement)
 
