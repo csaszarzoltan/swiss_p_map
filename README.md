@@ -1,6 +1,6 @@
 # Swiss P Map
 
-**Version:** v0.3.0 · **Backend:** 57 route · **Tesztek:** 250 passed · **mypy:** 50 clean
+**Version:** v0.3.1 · **Backend:** 57 route · **Tesztek:** 264 passed · **mypy:** 50 clean
 
 > **„A svájci környék egyetlen térképén”** — Integrált interaktív döntéstámogató térkép a helyi politika, életminőség és épített környezet metszetében. 4 nyelven: **de / en / fr / it**.
 

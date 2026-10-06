@@ -4,15 +4,22 @@ Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Ch
 
 ## [Unreleased]
 
+### Verified
+- `pytest: 264 passed, 1 skipped` · `mypy 50 clean` · `ruff` clean · `frontend tsc+build` SSG
+
+## [0.3.1] - 2026-10-06
+
 ### Added
-- **A3: Placeholder-csere + SPEC-státusz szinkron + audit (025/027/030):** `tests/e2e/test_final_roadmap_api.py` 3× `assert True` → valódi kontraktus — 025 `POST+GET /watch/zones` round-trip + `GET /watch/events` trust_state + `GET /watch/deadlines` REQ-B3 disclaimer, 027 `frontend/public/sw.js` (cache-first nav / network-first API) + `manifest.json` 192/512 `scope`/`start_url` + `PwaStatus` `role=status` `aria-live`, 030 `page.tsx` skip-link + `LocalInformationHub` `role=tablist/tabbpanel` + `DetailPanel` `aria-label/focus-visible` + `sm:` viewport (A3 definition of done).
-- **SPEC-státusz szinkron (12 SPEC):** `SPEC-003,004,010,013,015,020,021,024,027,030,031,044` frontmatter `implementationStatus: IMPLEMENTED` + 1. fejezet.
-- **Audit frissítés:** `docs/audits/SPEC-coverage-2026-09-23.md` §5 — **0 NONE** (60/60 lefedettség: név szerint 46 + indirect 14; `assert True` 3→0), 250 passed, 50 mypy clean.
-- **A1: Frontend E2E (10 NONE SPEC):** `frontend/e2e/a1-frontend-coverage.spec.ts` — Map3D 200×200+N, LanguageSwitcher DE→EN, TopicSidebar 6, PLZ 8004 pin+days_left, MapLegend palette, MapLegend source, ShareButton deep-link, lakes/terrain, backdrop-blur HUD + PwaStatus.
-- **A2: PWA + Export:** `public/sw.js` + `public/manifest.json` + `GET /api/v1/place/{postcode}/export?format=json|csv` + `ExportService` + `DetailPanel` export gomb (`export-button`, `export-format-select`, `aria-label`, `focus-visible`).
+- **SPEC-056c: Honest sync probe (FR-01 fix, preexisting from adc0093→f5c27a2):** `BfsVoteInfoClient.sync()` fabricated row `{"id": 6670, "yes": 58.2}` labelled `official_publication` now removed — `count=0`, `sha256` of `b"[]"` = `4f53cda1`, `trust_state="source_pending"`, `fetched_at=None` (`src/services/connectors/bfs_voteinfo_client.py` + `VoteSync` → `Literal`, 4 gated, 2 SPEC-056b notes).
+- **SPEC-056b: Live VoteInfo OGD wiring (SPEC-056b, APPROVE 4.9):** `BfsVoteInfoClient.fetch()` real host (`https://ogd-static.voteinfo-app.ch/v1/ogd/sd-t-17-02-{YYYYMMDD}-eidgAbstimmung.json`) → `VoteService.refresh_from_live()` → 26-kanton BFS result (`parse_voteinfo_payload`).
+
+### Fixed
+- **Fabricated-official defect (SPEC-056c):** fabricated vote on `POST /api/v1/connectors/voteinfo/sync` (longstanding — pre-dated every vote feature); 4 pinning tests + 1 e2e now assert the honest probe. Gate: tester PASS (6-stage STOP + mutation 4→0), reviewer APPROVE 4.9/5.
+- **Status-note closure (SPEC-056c):** SPEC-056b `No hardcoded rows remain` (FR-01) + §3 UNCHANGED note — `POST .../sync`/`GET .../proposals` exist long before SPEC-056b — both now corrected with precise history.
+- **Placebo test contraction (SPEC-056c):** 4 pinning tests now assert the honest probe (`test_spec046_055_060_contract.py` T1-T3, `test_phase3_civic_api.py` T4); no tests added/deleted.
 
 ### Verified
-- `pytest: 250 passed, 1 skipped` · `mypy 50 clean` · `ruff` import-sorted · `frontend tsc+build` SSG · `playwright 8/8 + A1/A2` green
+- `pytest: 264 passed, 1 skipped` · `mypy 50 clean` · `ruff` import-sorted · `frontend tsc+build` SSG · `playwright 8/8 + A1/A2` green
 
 ## [0.3.0] - 2026-09-24
 
@@ -102,6 +109,7 @@ Minden jelentős változás ebben a fájlban dokumentálva. Formátum: Keep a Ch
 - ADR-001: Next.js + MapLibre + FastAPI + PostGIS, accepted
 - Kickoff research + W35 competitor scan + scaffold + CI + Phase 1 backend+frontend — 20 passed
 
+[0.3.1]: https://github.com/csaszarzoltan/swiss_p_map/compare/v0.3.1...HEAD
 [0.3.0]: https://github.com/csaszarzoltan/swiss_p_map/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/csaszarzoltan/swiss_p_map/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/csaszarzoltan/swiss_p_map/compare/v0.1.0...v0.2.0
