@@ -176,13 +176,79 @@ line 191 (§3 bullet a) and line 50 (§1 summary table, which said "app only —
 Post-fix sweep for `app only|NOT AVAILABLE as an API` returns exactly one hit: the correction itself
 quoting what was refuted, which is the correct outcome.
 
+## LOOP RESULT — iteration 1 complete
+
+**1 iteráció · 1 item leszállítva · 0 elutasítva · 1 blokkoló-után-javított.**
+Final: `cf5c4ed`, pusholva (`adc0093..cf5c4ed`), fa tiszta, lock elengedve.
+
+| lépés | dispatch | eredmény |
+|---|---|---|
+| PLAN | planner (178) | `SPEC-056b` 16 812 B, 4-fájlos allowlist, stop-command deklarálva |
+| BUILD dev 1 | developer (181) | 99 B, meghalt munka közben → diffből mentve (+279/−13) |
+| BUILD dev 2 | developer (186) | 123 B, meghalt; fa változatlan |
+| BUILD dev 3 | developer (187) | 44 B, a fix UTÁN halt meg → mentve |
+| gate 1 | reviewer (194) | **REQUEST-CHANGES 3.4** — megtalálta az FR-02 merge-hibát |
+| BUILD dev 4 | developer (198) | 101 B, commit előtt halt meg → mentve |
+| BUILD test | test-author (201) | 2299 B, **végigfutott**; kapu commitolva |
+| **gate 2** | reviewer (204) | **APPROVE 5.0** |
+
+**A hiba, amit az első gate talált meg — és az én saját tévedésem.** A `vote_service.py:408`
+**beszúrta** az élő eredményt a fixture-ökkel teli store-ba, így a `/votes/list` öt ID-t adott
+`official_publication` címke alatt, köztük négy repo-konstanst. **Én ezt már a saját mérésemben is
+láttam (`items 5`), és sikernek olvastam — pedig a szám volt a tünet.** Ezért érte meg a gate a
+költségét.
+
+**A lezárás bizonyítéka (saját, független mutációs próba):** a régi merge-viselkedés visszaállítása
+után `test_regression_success_serves_only_live_ids` **ELBUKIK** (1 failed, 12 passed); visszaállítva
+zöld. A kapu tehát tud bukni, nem vacuus.
+
+**Élő end-to-end ellenőrzés valódi uvicornon:** `served ids [6880]`, fixture ID **nincs**;
+`national_yes_percent` top-level; 26 kanton.
+
+**Stop-command (teljesül):** `parse_voteinfo_payload` call site-ok 4 (pre-fix 1) · `AsyncClient` a
+connectorban 4 (pre-fix 0) · `trust_state` a main.py-ban 9 (pre-fix 4).
+
+**Suite:** 250 passed → **264 passed, 1 skipped**. +14 teszt, regresszió nélkül.
+
+**Verdikt:** `v20261004163958-cc7419` **méréssel lezárva**; a store most `(none open)`.
+
+## Ami szándékosan NEM készült el ebben az iterációban (következő itemek)
+
+Ezek mért, valós tételek — de **más itemek**, nem ehhez a szelethez tartoznak:
+
+1. **A frontend még mindig hardcode-olt kanton-színeket rajzol.** A `swissCantons.ts` kézzel beírt
+   `yes` értéket hordoz, amit a `Map3D` tooltip használ, a „Wahlkreis" réteg pedig 26 placeholder
+   (`Bezirk 1001`…) valódi Bezirk-nevek nélkül. **Ez a user eredeti panasza** — most vált
+   megoldhatóvá, mert a valódi per-kanton és per-gemeinde adat elérhető.
+2. **Nincs gemeente-geometria a repóban.** A legfinomabb felbontás 26 kanton + 26 placeholder, tehát
+   a host által kínált 161 gemeinde **nem rajzolható choroplethként**, amíg a körvonalak be nem
+   töltődnek. Ez az 1. item wiring-szelete.
+3. **A `BfsVoteInfoClient.sync()` még mindig a `6670/58.2` literált adja.** Őszintén dokumentált
+   legacy probe-ként, de fabricáció a kódban. A gate nem blokkolónak jelölte.
+4. **Két ismerten vacuus teszt** (`test_spec046_055_060_contract.py:106`,
+   `test_phase3_civic_services.py:13`) — konstans hash-hosszát állítanak. Még mindig vacuusak.
+5. **`docs/specs/validate_specs.py`: 9 pre-existing ruff hiba** (mérve); a `src/` tiszta.
+
+## Módszertani tanulságok a következő loopnak
+
+- **A `developer` ma mindenhol elhal a munka közben.** Öt developer-dispatchből négy 44–123 B
+  artifactot adott, miközben `explore`/`reviewer`/`planner`/`test-author` végigfutott. Az artifactok
+  valódi rész-riportok voltak, **soha nem** az `unrecognized_model` banner. **A tartalom-diff
+  háromszor mentette meg a munkát** — enélkül három dispatch újrafutott volna. Rövid artifact előtt
+  MINDIG `git diff`.
+- **A queue-várakozás megkülönböztethetetlen egy halott dispatchtől.** Az első gate 1561 s-ig ült,
+  10 párhuzamos `claude-queue` versenyzett 3 globális slotért, ledger-sor nélkül — és helyesen
+  fejeződött be. Stall bejelentése előtt nézd meg a ledger `ticket=` sorát.
+
 ## Carried forward (do not redo)
 
-- `v20261004163958-cc7419` is OPEN and names `adc0093`, which **has already shipped and been pushed**.
-  Its two process asks (a `Commands run` section, a `Not covered` section) are documentation gaps in a
-  committed file. Its `verification 3/5` is consistent with the measured history rather than stale.
-  Decision: fold the `Commands run` / `Not covered` requirement into the SPEC-056b spec's doc duty so
-  it lands with the corrective slice, then close the verdict on that measurement. Do **not** re-dispatch
-  the research report on its account.
-- The report's false line 191 must be corrected (superseded, not appended next to) as part of the
-  corrective slice, and the file grepped for the refuted phrasing afterwards.
+- ~~`v20261004163958-cc7419` is OPEN and names `adc0093`~~ — **CLOSED on measurement 2026-10-05.**
+  Its substance landed: `adc0093` shipped and was pushed, the corrective slice (SPEC-056b) is
+  approved at 5.0, and the report's false line was superseded in `3d21fe5`. The store now reports
+  `(none open)`. Do **not** re-ask the research question on its account.
+- ~~The report's false line 191 must be corrected (superseded, not appended next to)~~ — **DONE in
+  `3d21fe5`.** Both surfaces were superseded in place (line 191 §3 bullet (a) and line 50 §1 table),
+  and the post-fix sweep for `app only|NOT AVAILABLE as an API` returns only the correction itself.
+- The verdict's two remaining process asks (a `Commands run` section, a `Not covered` section on
+  research reports) are **still open as a method change**, not as repo work for this loop: they belong
+  in `~/.claude/agents/researcher.md`, which this loop did not dispatch against.
